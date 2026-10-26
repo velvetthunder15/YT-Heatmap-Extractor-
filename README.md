@@ -449,3 +449,7 @@ This project scrapes YouTube pages and media outside the official Data API. That
 conflict with [YouTube's Terms of Service](https://www.youtube.com/t/terms). **Review them
 (and get legal advice) before running this publicly or as a paid service.** Prefer the
 official API where it covers your needs, cache aggressively, and respect rate limits.
+
+## License
+
+[MIT](LICENSE) © 2026 Chirag Rasane. The license covers this code only. It doesn't grant any rights to YouTube content or override YouTube's Terms of Service.
