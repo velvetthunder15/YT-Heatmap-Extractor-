@@ -38,6 +38,12 @@ def main() -> None:
             text = _set(text, k, v)
         ENV.write_text(text, encoding="utf-8")
 
+    # The web dashboard (Netlify) calls this API from the browser, so allow CORS unless the
+    # user already chose specific origins. Auth is a header key (no cookies), so "*" is safe.
+    text = ENV.read_text(encoding="utf-8")
+    if not re.search(r"^CORS_ORIGINS=[ \t]*[^ \t#\n]", text, re.M):
+        ENV.write_text(_set(text, "CORS_ORIGINS", "*"), encoding="utf-8")
+
     if not KEY_FILE.exists():
         from app.auth import generate_key, hash_key
         from app.config import get_settings

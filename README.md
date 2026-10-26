@@ -254,3 +254,14 @@ This project scrapes YouTube pages and media outside the official Data API. That
 conflict with [YouTube's Terms of Service](https://www.youtube.com/t/terms). **Review them
 (and get legal advice) before running this publicly or as a paid service.** Prefer the
 official API where it covers your needs, cache aggressively, and respect rate limits.
+
+## Web dashboard
+
+`dashboard/` is a static page (no build step) that visualises results: an engagement chart, a heat strip,
+an embedded player that jumps to any moment, top and least engaging moments, signals over time, weights,
+drivers, agreement, a score distribution, and JSON/CSV export. Netlify deploys it from this repo through
+`netlify.toml`.
+
+Open it, click **Connection**, paste your API URL (the trycloudflare URL printed by `start-windows.bat`;
+it changes on every restart) and the key from `secrets\api_key.txt`, then paste a YouTube link.
+The API must allow CORS: `start-windows.bat` sets `CORS_ORIGINS=*` automatically.

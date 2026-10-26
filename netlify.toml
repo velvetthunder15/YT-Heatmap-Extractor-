@@ -1,0 +1,11 @@
+# Netlify serves only the static dashboard; the Python API is not built here.
+[build]
+  base = "dashboard"
+  publish = "."
+  command = "echo 'static dashboard, nothing to build'"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
