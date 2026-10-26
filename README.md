@@ -81,31 +81,38 @@ Want to see it first? Tap **View a sample result** on the dashboard.
 
 ### 6. (Recommended) Get a permanent URL
 
-By default you get a free **quick tunnel**: an anonymous `https://<random>.trycloudflare.com` address
-with no account, which **changes every restart** and disappears when you close the window. For a URL
-that never changes, connect **your own Cloudflare account** once. It takes about 10 minutes.
+By default you get a free **quick tunnel**: an anonymous `https://<random>.trycloudflare.com` address,
+with no account, which **changes every restart**. To get a URL that never changes, connect **your own
+free Cloudflare account** once. Close the server window, double-click **`setup-permanent-url.bat`**, and pick:
 
-**You need:** a free Cloudflare account and a domain on it. Any domain works, including a cheap one
-(you can buy one at Cloudflare Registrar, or add one you own by switching its nameservers to Cloudflare).
-Cloudflare doesn't hand out free permanent subdomains, so a domain is the one requirement.
+#### Option 1: free `workers.dev` URL (no domain, about 3 minutes) [recommended]
 
-1. Sign in at **https://dash.cloudflare.com** and make sure your domain shows as **Active**.
-2. Open **Zero Trust** → **Networks** → **Tunnels** → **Create a tunnel**, choose **Cloudflared**, and name it (for example `heatmap`).
-3. On the install screen pick **Windows**. **Copy the install command** (the long text containing `eyJ...`). You don't need to run it.
-4. Click **Next** and add a **public hostname** (called *Published application routes* in newer dashboards):
-   - Subdomain: `api` (or anything), Domain: your domain
-   - Service type: **HTTP**, URL: **`127.0.0.1:8000`**
-   - Save the tunnel.
-5. In the project folder, close the server window if it's open and double-click **`setup-permanent-url.bat`**.
-   Paste the install command (or just the token), then type your hostname, for example `api.yourdomain.com`.
-6. Double-click **`start-windows.bat`**. It now says *Connecting your permanent Cloudflare tunnel* and prints
-   `API URL: https://api.yourdomain.com`.
-7. Paste that URL into the dashboard **once**. It never changes again.
+You get `https://yt-heatmap-api.<your-subdomain>.workers.dev`, free on Cloudflare's free plan.
 
-To go back to the random quick-tunnel URL, run `setup-permanent-url.bat -Remove`.
+1. Sign up or sign in at **https://dash.cloudflare.com** (free).
+2. Go to **https://dash.cloudflare.com/profile/api-tokens** → **Create Token** → template **Edit Cloudflare Workers** → **Continue to summary** → **Create Token**. Copy it.
+3. In `setup-permanent-url.bat` choose **1** and paste the token.
+4. It prints your URL. Double-click **`start-windows.bat`**. It shows `API URL: https://yt-heatmap-api.….workers.dev`.
+5. Paste that URL into the dashboard **once**.
 
-The token is saved only in your `.env`, which git ignores. Anyone with the token can run your tunnel, so
-don't share it. If it leaks, delete the tunnel in Cloudflare and create a new one.
+How it works: setup deploys a tiny Worker (`worker/proxy.js`) and a KV store to your account. Each time
+`start-windows.bat` starts, it opens a quick tunnel as usual and saves its address in KV. The Worker forwards
+every request on your permanent URL to it. After a restart the URL can take **up to a minute** to switch over.
+While your laptop is off it answers `503 server_offline`. Free plan limit: 100,000 requests/day.
+
+#### Option 2: your own domain (named tunnel)
+
+For `https://api.yourdomain.com`, you need a domain added to your Cloudflare account (status **Active**).
+
+1. **Zero Trust** → **Networks** → **Tunnels** → **Create a tunnel** → **Cloudflared**, and name it.
+2. Pick **Windows** and **copy the install command** (contains `eyJ...`). Don't run it.
+3. Add a **public hostname** (*Published application routes* in newer dashboards): subdomain `api`, your domain, service **HTTP** → **`127.0.0.1:8000`**. Save.
+4. In `setup-permanent-url.bat` choose **2**, paste the command, and type the hostname.
+5. Start `start-windows.bat`. It runs your named tunnel directly, with no quick tunnel and no Worker.
+
+**Switching back:** `setup-permanent-url.bat -Remove` returns to random quick-tunnel URLs.
+**Secrets:** the Cloudflare token is stored only in your `.env`, which git ignores. Don't share it. If it
+leaks, delete it in Cloudflare (API Tokens or the tunnel) and run setup again.
 
 ### Updating
 
@@ -301,11 +308,15 @@ in `.env`. Requests leave from your own internet connection, so YouTube rarely b
 
 ### Permanent URL: how it works
 
-`setup-permanent-url.bat` (`scripts/setup-tunnel.ps1`) writes `CLOUDFLARE_TUNNEL_TOKEN` and `PUBLIC_BASE_URL`
-to `.env`. When a token is present, `start-windows.bat` runs `cloudflared tunnel run --token ...` (your named
-tunnel) instead of the quick tunnel, waits for *Registered tunnel connection*, and prints `PUBLIC_BASE_URL`.
-Cloudflare routes your hostname to `127.0.0.1:8000` on your laptop. The Docker path below reads the same two
-values from `.env`.
+`setup-permanent-url.bat` → `scripts/setup-tunnel.ps1`:
+
+- **workers.dev:** `scripts/cf_worker.py setup` uses your API token to read your account, claim your
+  workers.dev subdomain if you don't have one yet, create the KV namespace `yt-heatmap-api`, upload
+  `worker/proxy.js` as the Worker `yt-heatmap-api`, and enable it on workers.dev. It saves `CF_API_TOKEN`, `CF_ACCOUNT_ID`,
+  `CF_KV_NAMESPACE_ID`, `CF_WORKER_URL` and `PUBLIC_BASE_URL` in `.env`. On each start the runner calls
+  `cf_worker set-target <quick-tunnel-url>`.
+- **Own domain:** writes `CLOUDFLARE_TUNNEL_TOKEN` and `PUBLIC_BASE_URL`. The runner then runs
+  `cloudflared tunnel run --token ...` instead of a quick tunnel. The Docker path reads the same two values.
 
 ### Free self-hosting with Docker (your own computer + Cloudflare Tunnel)
 
@@ -419,10 +430,12 @@ scripts/
   local-windows.ps1  Windows runner behind start-windows.bat
   local_setup.py     creates .env, CORS and the permanent API key
   setup-tunnel.ps1   behind setup-permanent-url.bat
+  cf_worker.py       deploys the Worker + KV and updates its target
   manage_keys.py     create / list / revoke keys (Docker mode)
   selfhost.sh/.ps1   Docker + tunnel self-hosting
 start-windows.bat
-setup-permanent-url.bat   saves your Cloudflare tunnel token + hostname for a permanent URL
+setup-permanent-url.bat   permanent URL via your Cloudflare account (workers.dev or own domain)
+worker/proxy.js           the workers.dev forwarding Worker
 netlify.toml      deploys dashboard/ to Netlify
 tests/
 ```

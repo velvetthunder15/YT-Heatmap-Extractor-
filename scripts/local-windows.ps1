@@ -135,6 +135,13 @@ if ($named) {
       if ($m) { $url = $m.Matches[0].Value }
     }
   }
+  # Free permanent URL: point the user's workers.dev Worker at this run's quick tunnel.
+  if ($url -and (Get-EnvValue "CF_KV_NAMESPACE_ID")) {
+    Step "Pointing your permanent workers.dev URL at this run"
+    $w = (& $venvPy -m scripts.cf_worker set-target $url | Select-Object -Last 1)
+    if ($LASTEXITCODE -eq 0 -and $w) { $url = $w.Trim(); $named = $true }
+    else { Write-Host "Couldn't update the workers.dev URL (see the error above). Using the random URL for now." -ForegroundColor Yellow }
+  }
 }
 
 Write-Host ""
