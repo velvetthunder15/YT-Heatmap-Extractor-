@@ -111,8 +111,8 @@
       e.status = res.status;
       if (res.status === 401 || res.status === 403) e.hint = "Check your API key: it's the line in secrets\\api_key.txt.";
       if (res.status === 429) e.hint = "You've hit the rate limit or daily quota. Wait a minute and try again.";
-      if (res.status === 530 || res.status === 502 || res.status === 404 && !body) e.hint = "The tunnel isn't reaching your server. Restart start-windows.bat (and paste the new URL if you aren't using a permanent one).";
-      if (e.code === "server_offline") e.hint = "Your permanent URL works, but the server behind it is off. Start start-windows.bat on the host computer. Right after a start it can take up to a minute to switch over.";
+      if (res.status === 530 || res.status === 502 || res.status === 404 && !body) e.hint = "The tunnel isn't reaching your server. Restart the server (start-windows.bat or start-mac.command), and paste the new URL if you aren't using a permanent one.";
+      if (e.code === "server_offline") e.hint = "Your permanent URL works, but the server behind it is off. Start the server (start-windows.bat or start-mac.command) on the host computer. Right after a start it can take up to a minute to switch over.";
       throw e;
     }
     return { status: res.status, body };
@@ -141,7 +141,7 @@
     if (!videoIdFrom(url)) return showError("That doesn't look like a YouTube link.", "Paste a full video URL like https://www.youtube.com/watch?v=… or a youtu.be link.");
     if (!normBase($("apiBase").value) || !$("apiKey").value.trim()) {
       $("connection").classList.remove("collapsed");
-      return showError("Add your API URL and key first.", "Both are shown in the server window when you run start-windows.bat.");
+      return showError("Add your API URL and key first.", "Both are shown in the server window when you run start-windows.bat (Windows) or start-mac.command (Mac).");
     }
     saveSettings();
     const token = ++pollToken;

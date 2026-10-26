@@ -1,5 +1,5 @@
 // Cloudflare Worker: a permanent https://<name>.<you>.workers.dev front door for the API.
-// start-windows.bat stores the current quick-tunnel URL in Workers KV (key "target") on
+// The start script (start-windows.bat / start-mac.command) stores the current quick-tunnel URL in Workers KV (key "target") on
 // every start, and this Worker forwards each request there. Free plan: 100k requests/day.
 const offline = (msg) =>
   new Response(JSON.stringify({ error: { code: "server_offline", message: msg } }), {
@@ -10,7 +10,7 @@ const offline = (msg) =>
 export default {
   async fetch(request, env) {
     const target = await env.KV.get("target", { cacheTtl: 30 });
-    if (!target) return offline("The API server isn't running. Start start-windows.bat on the host computer.");
+    if (!target) return offline("The API server isn't running. Start the server (start-windows.bat or start-mac.command) on the host computer.");
     const url = new URL(request.url);
     const t = new URL(target);
     url.protocol = t.protocol;
@@ -19,7 +19,7 @@ export default {
     try {
       resp = await fetch(new Request(url, request), { redirect: "manual" });
     } catch (e) {
-      return offline("The API server can't be reached. Is start-windows.bat still open?");
+      return offline("The API server can't be reached. Is the server window still open?");
     }
     // 530 / 1033: the quick tunnel behind the stored URL is gone (window closed or restarting).
     if (resp.status === 530 || resp.status === 502) {

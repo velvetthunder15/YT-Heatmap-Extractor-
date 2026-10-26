@@ -1,6 +1,6 @@
 # YouTube Heatmap Extractor
 
-Paste a YouTube link, get the **most** and **least engaging moments** of the video, with a
+Runs on your own Windows or Mac for free. Paste a YouTube link, get the **most** and **least engaging moments** of the video, with a
 dashboard that shows exactly why.
 
 - Uses YouTube's own **"Most replayed"** data when the video has it.
@@ -8,6 +8,8 @@ dashboard that shows exactly why.
 - Never makes numbers up: if nothing usable exists, you get a clear error.
 
 **Dashboard:** https://yt-heatmap-dashboard.netlify.app
+
+**Quick start:** [Windows](#quick-start-windows-about-5-minutes) · [macOS](#quick-start-macos-about-5-minutes)
 
 | Source | When | Confidence |
 |---|---|---|
@@ -84,7 +86,7 @@ Want to see it first? Tap **View a sample result** on the dashboard.
 
 By default you get a free **quick tunnel**: an anonymous `https://<random>.trycloudflare.com` address,
 with no account, which **changes every restart**. To get a URL that never changes, connect **your own
-free Cloudflare account** once. Close the server window, double-click **`setup-permanent-url.bat`**, and pick:
+free Cloudflare account** once. Close the server window, double-click **`setup-permanent-url.bat`** (on a Mac: `bash setup-permanent-url.command`), and pick:
 
 #### Option 1: free `workers.dev` URL (no domain, about 3 minutes) [recommended]
 
@@ -119,6 +121,65 @@ leaks, delete it in Cloudflare (API Tokens or the tunnel) and run setup again.
 
 Re-download the ZIP and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
 Your `.env` and API key are kept.
+
+---
+
+## Quick start (macOS, about 5 minutes)
+
+Works on Apple Silicon (M1–M4) and Intel Macs running macOS 12 or later. No Docker, no Homebrew, no admin password.
+
+### 1. Get the code
+
+Open **Terminal** (Spotlight → "Terminal") and run:
+
+```bash
+git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git
+cd YT-Heatmap-Extractor-
+```
+
+No git? Click **Code → Download ZIP** on GitHub, double-click the ZIP in Downloads, then in Terminal:
+
+```bash
+cd ~/Downloads/YT-Heatmap-Extractor--main
+```
+
+(If macOS asks to install the *command line developer tools* when you run `git`, click Install, or use the ZIP.)
+
+### 2. Start the server
+
+```bash
+bash start-mac.command
+```
+
+You can also double-click `start-mac.command` in Finder. The first time, macOS may block it because it was downloaded:
+right-click it → **Open** → **Open**, or just use the Terminal command above, which always works.
+
+The first run takes a few minutes and keeps everything inside the project folder:
+
+| Step | What happens |
+|---|---|
+| Python | Uses Python 3.10 to 3.13 if you have it. macOS's built-in `python3` is usually too old, so otherwise it downloads a private Python 3.12 into `.tools/` using `uv` |
+| `.venv/` | A private Python environment with the dependencies |
+| `.tools/` | Portable `ffmpeg`, `ffprobe`, `deno` and `cloudflared` for your Mac's chip |
+| `.env`, `secrets/api_key.txt` | Same as Windows: local mode settings and your **permanent** API key |
+| Tunnel | A free Cloudflare quick tunnel, or your permanent URL if you set one up |
+
+### 3. Everything else is the same as Windows
+
+The window prints the same `API URL` and `API key` lines. Continue with **steps 3–6 above**, using these Mac equivalents:
+
+| Windows | macOS |
+|---|---|
+| `start-windows.bat` | `bash start-mac.command` |
+| `setup-permanent-url.bat` | `bash setup-permanent-url.command` |
+| `setup-permanent-url.bat -Remove` | `bash setup-permanent-url.command --remove` |
+| `secrets\api_key.txt` | `secrets/api_key.txt` (`cat secrets/api_key.txt`) |
+| Close the window | Press **Ctrl+C** in Terminal |
+
+Keep the Terminal window open while you use the API. To keep the Mac from sleeping while it serves,
+run it as `caffeinate -i bash start-mac.command`.
+
+**Updating:** run `git pull` (or re-download the ZIP over the folder), then start it again.
 
 ---
 
@@ -431,6 +492,8 @@ app/
 dashboard/        static web dashboard (index.html, styles.css, app.js, sample.json)
 scripts/
   local-windows.ps1  Windows runner behind start-windows.bat
+  local-mac.sh       macOS runner behind start-mac.command
+  setup-tunnel.sh    macOS twin of setup-tunnel.ps1
   local_setup.py     creates .env, CORS and the permanent API key
   setup-tunnel.ps1   behind setup-permanent-url.bat
   cf_worker.py       deploys the Worker + KV and updates its target
@@ -438,6 +501,8 @@ scripts/
   selfhost.sh/.ps1   Docker + tunnel self-hosting
 start-windows.bat
 setup-permanent-url.bat   permanent URL via your Cloudflare account (workers.dev or own domain)
+start-mac.command         macOS one-command start
+setup-permanent-url.command   macOS permanent-URL setup
 worker/proxy.js           the workers.dev forwarding Worker
 netlify.toml      deploys dashboard/ to Netlify
 tests/
