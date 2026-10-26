@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · Heatmap for YouTube</title>
+<meta name="description" content="How Heatmap scores YouTube videos: official Most replayed data, the four estimate signals, weights, confidence and how your API URL works.">
+<meta name="theme-color" content="#08080c">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23ffb347'/><stop offset='.5' stop-color='%23ff5a1f'/><stop offset='1' stop-color='%23ff2e63'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='%2312121a'/><rect x='6' y='18' width='4' height='8' rx='1.5' fill='url(%23g)' opacity='.6'/><rect x='12' y='8' width='4' height='18' rx='1.5' fill='url(%23g)'/><rect x='18' y='13' width='4' height='13' rx='1.5' fill='url(%23g)' opacity='.85'/><rect x='24' y='20' width='4' height='6' rx='1.5' fill='url(%23g)' opacity='.45'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="./">
+      <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span>Heatmap <span class="sub">for YouTube</span></span>
+    </a>
+    <nav class="navlinks">
+      <a href="./">Analyze</a>
+      <a href="about.html" class="active">How it works</a>
+    </nav>
+    <div class="nav-right">
+      <a class="icon-link" href="https://github.com/velvetthunder15/YT-Heatmap-Extractor-" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="doc-hero">
+    <span class="eyebrow"><span class="spark"></span>How it works</span>
+    <h1>How the numbers <span class="grad-text">are made</span>.</h1>
+    <p class="lede">Every video is cut into short segments, 10 seconds by default. Each segment gets a <b>score</b>, built from <b>signals</b>: separate clues about what viewers care about. Here's exactly how each one is measured and blended.</p>
+  </section>
+
+  <div class="doc">
+    <aside class="toc" id="toc">
+      <div class="lbl">On this page</div>
+      <a href="#basics">Scores &amp; signals</a>
+      <a href="#results">Two kinds of result</a>
+      <a href="#signals">The four signals</a>
+      <a href="#calc">How the score is calculated</a>
+      <a href="#peaks">Peaks &amp; drop-offs</a>
+      <a href="#confidence">Confidence</a>
+      <a href="#charts">Reading the charts</a>
+      <a href="#server">Your server &amp; URL</a>
+      <a href="#limits">Limitations</a>
+    </aside>
+
+    <div class="doc-body">
+      <section class="doc-sec" id="basics">
+        <h2><span class="n">01</span>Scores &amp; signals</h2>
+        <div class="tiles two">
+          <div class="tile">
+            <h4>What a score is</h4>
+            <p>A number from <b>0 to 1</b> for one segment, relative to the rest of the same video. 1.00 is the most engaging moment in this video and 0.00 is the least. It ranks segments within one video and isn't a grade, so 0.8 on one video doesn't mean the same as 0.8 on another.</p>
+          </div>
+          <div class="tile">
+            <h4>What a signal is</h4>
+            <p>One independent measurement taken for every segment, such as how often comments point to that moment or how loud it is. Each signal is also scaled 0 to 1 within the video, so signals can be compared and blended fairly.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc-sec" id="results">
+        <h2><span class="n">02</span>Two kinds of result</h2>
+        <div class="tiles two">
+          <div class="tile hl-official">
+            <h4><span class="badge official">Official data</span></h4>
+            <p>When YouTube shows a "Most replayed" graph for a video, the dashboard uses it directly. That's YouTube's real, relative replay intensity, so it's always <b>high confidence</b> and nothing is estimated.</p>
+          </div>
+          <div class="tile hl-estimated">
+            <h4><span class="badge estimated">Estimated</span></h4>
+            <p>Most videos don't have that graph. Then four signals are measured and blended into an estimate. It's an informed guess from public clues, not real viewer data, and it's <b>always labelled</b> as estimated.</p>
+          </div>
+        </div>
+        <p>If neither is possible, you get a clear <code>no_data_available</code> error. The numbers are never made up.</p>
+      </section>
+
+      <section class="doc-sec" id="signals">
+        <h2><span class="n">03</span>The four signals</h2>
+        <p>Each signal looks at the video in a different way. Together they cover what people say about it, what's being said in it, how it sounds and how it looks.</p>
+        <div class="weightbar" aria-label="Default weights">
+          <span style="flex:35;background:#7aa2ff">Comments 35%</span>
+          <span style="flex:25;background:#5fd3a3">Captions 25%</span>
+          <span style="flex:25;background:#ffb454">Audio 25%</span>
+          <span style="flex:15;background:#b392f0">Visuals 15%</span>
+        </div>
+        <div class="tiles four">
+          <div class="tile">
+            <div class="sig-head"><span class="ic" style="background:rgba(122,162,255,.14);color:#7aa2ff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12Z"/></svg></span><h4>Comments</h4><span class="w">35%</span></div>
+            <p>Finds timestamps people write in comments, like "10:24 got me". Each mention counts for about ±5 seconds around that time, and comments with more likes count a bit more (1 + log of likes). Up to 2,000 comments are read.</p>
+            <small>The strongest clue, because people only timestamp moments they care about.</small>
+          </div>
+          <div class="tile">
+            <div class="sig-head"><span class="ic" style="background:rgba(95,211,163,.14);color:#5fd3a3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 12h3M7 15h6M14 12h3"/></svg></span><h4>Captions</h4><span class="w">25%</span></div>
+            <p>Reads the transcript for each segment and scores what's being said: hook phrases ("watch this", "here's why"), emphasis words ("insane", "biggest"), questions, numbers and claims, topic changes, and how much is being said.</p>
+            <small>Catches big reveals and key points in talking videos.</small>
+          </div>
+          <div class="tile">
+            <div class="sig-head"><span class="ic" style="background:rgba(255,180,84,.14);color:#ffb454"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg></span><h4>Audio</h4><span class="w">25%</span></div>
+            <p>Listens to the soundtrack. Loudness is <b>50%</b> of it. How busy it is, meaning sound onsets per second, is <b>30%</b>. Loud, noise-like bursts are <b>20%</b>, a cheap detector for laughter, applause or cheering.</p>
+            <small>Silence and quiet stretches score low.</small>
+          </div>
+          <div class="tile">
+            <div class="sig-head"><span class="ic" style="background:rgba(179,146,240,.14);color:#b392f0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg></span><h4>Visuals</h4><span class="w">15%</span></div>
+            <p>Looks at a small, low-res copy of the video, 2 frames a second at 64×36 pixels. It measures camera cuts, meaning sudden jumps far above the video's usual change (<b>60%</b>), and overall motion between frames (<b>40%</b>).</p>
+            <small>Fast edits and action score high, static shots low.</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc-sec" id="calc">
+        <h2><span class="n">04</span>How the score is calculated</h2>
+        <ol class="pipeline">
+          <li><b>Split</b><span>The video is cut into equal segments, 10 s by default (5 to 60 s).</span></li>
+          <li><b>Measure</b><span>Each signal is measured for every segment.</span></li>
+          <li><b>Scale</b><span>Each signal is rescaled 0 to 1 within the video.</span></li>
+          <li><b>Blend</b><span>The signals are combined in a weighted sum, using the weights above.</span></li>
+          <li><b>Rescale</b><span>The blend is scaled 0 to 1 again, so the top segment is always 1.00.</span></li>
+        </ol>
+        <div class="formula">score = rescale( <span class="k">0.35</span> × comments + <span class="k">0.25</span> × captions + <span class="k">0.25</span> × audio + <span class="k">0.15</span> × visuals )</div>
+        <div class="note">If a signal can't be measured (comments turned off, no captions, a download fails), it's <b>dropped</b> and the remaining weights are scaled up to add to 100%. The reason shows under <b>Signal weights</b> on the results.</div>
+      </section>
+
+      <section class="doc-sec" id="peaks">
+        <h2><span class="n">05</span>Peaks &amp; drop-offs</h2>
+        <p>The highest-scoring segments become <b>top moments</b> and the lowest become <b>drop-offs</b>. Neighbouring segments within 0.05 of each other are merged into one range, and a peak never overlaps a drop-off. The chips on each moment show which signals drove it and how much of its score each one produced.</p>
+      </section>
+
+      <section class="doc-sec" id="confidence">
+        <h2><span class="n">06</span>Confidence</h2>
+        <table class="conf-table">
+          <thead><tr><th>Level</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge high">High</span></td><td>Official data, or at least 50 timestamped comments plus 2 or more other signals.</td></tr>
+            <tr><td><span class="badge medium">Medium</span></td><td>Comments plus one other signal, or captions plus two others.</td></tr>
+            <tr><td><span class="badge low">Low</span></td><td>Anything thinner. Treat it as a rough first look.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="doc-sec" id="charts">
+        <h2><span class="n">07</span>Reading the charts</h2>
+        <div class="tiles three">
+          <div class="tile"><h4>Heat strip</h4><p>The coloured bar under the timeline, like YouTube's own. Gold is hot and deep violet is cold.</p></div>
+          <div class="tile"><h4>What drove the score</h4><p>Each signal's share of the total weighted score across the whole video.</p></div>
+          <div class="tile"><h4>Agreement</h4><p>How closely a signal rises and falls with the final score. +1 is in step, 0 is unrelated.</p></div>
+        </div>
+        <p><b>Hot segments</b> are those scoring 0.6 or more. <b>By part of the video</b> averages the score in each fifth of the runtime, so you can see whether the intro, the middle or the ending holds attention best.</p>
+      </section>
+
+      <section class="doc-sec" id="server">
+        <h2><span class="n">08</span>Your server &amp; URL</h2>
+        <p>The dashboard is just a page in your browser. The real work, from downloading the video to scoring the audio and frames, happens on <b>your own computer</b>, and Cloudflare makes it reachable from the internet. Cloud servers usually get blocked by YouTube, which is why it runs at home.</p>
+        <div class="url-compare">
+          <div class="tile">
+            <h4>Quick tunnel</h4>
+            <p><code>random-words.trycloudflare.com</code></p>
+            <p>The default. No account needed, but the URL <b>changes on every restart</b>.</p>
+          </div>
+          <div class="tile hl-official">
+            <h4>Free permanent URL</h4>
+            <p><code>yt-heatmap-api.you.workers.dev</code></p>
+            <p>Run <code>setup-permanent-url</code> once with your own free Cloudflare account. No domain needed, and it <b>never changes</b>.</p>
+          </div>
+          <div class="tile">
+            <h4>Your own domain</h4>
+            <p><code>api.yourdomain.com</code></p>
+            <p>Option 2 in the same setup. It uses a named Cloudflare Tunnel on a domain you own.</p>
+          </div>
+        </div>
+        <div class="note"><b>No window to keep open:</b> <code>install-background</code> runs the server hidden, starts it at login, restarts it if it stops and reconnects the tunnel by itself. It still stops while the computer is off or asleep, and then a permanent URL answers <code>server_offline</code>.</div>
+      </section>
+
+      <section class="doc-sec" id="limits">
+        <h2><span class="n">09</span>Limitations</h2>
+        <div class="note warnish">Estimates find moments that <b>look and sound</b> engaging and that commenters point to. They can't see real watch time, so treat them as a strong hint, not proof. Official data is relative replay intensity, not view counts.</div>
+      </section>
+
+      <section class="cta">
+        <h2>Ready to find the good parts?</h2>
+        <p>Paste any YouTube link and see its heatmap in a minute or two.</p>
+        <a class="btn-primary" href="./">Analyze a video →</a>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="foot-in">
+    <span>Estimates are heuristics, not real viewer data. Official data is YouTube's relative "Most replayed" intensity.</span>
+    <nav>
+      <a href="./">Analyze</a>
+      <a href="https://github.com/velvetthunder15/YT-Heatmap-Extractor-" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/velvetthunder15/YT-Heatmap-Extractor-/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+    </nav>
+  </div>
+</footer>
+<script>
+  // highlight the section you're reading in the table of contents
+  (() => {
+    const links = [...document.querySelectorAll("#toc a")];
+    const map = new Map(links.map((a) => [a.getAttribute("href").slice(1), a]));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) { links.forEach((a) => a.classList.remove("on")); const a = map.get(e.target.id); if (a) a.classList.add("on"); }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    document.querySelectorAll(".doc-sec").forEach((s) => io.observe(s));
+  })();
+</script>
+</body>
+</html>

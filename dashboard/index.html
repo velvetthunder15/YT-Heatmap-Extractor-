@@ -3,278 +3,288 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Heatmap Dashboard · YouTube engagement</title>
-<meta name="description" content="See which moments of any YouTube video keep people watching, and where they drop off.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231d1d1f'/><rect x='6' y='18' width='4' height='8' rx='1' fill='%23ffb08a'/><rect x='12' y='10' width='4' height='16' rx='1' fill='%23ff4d00'/><rect x='18' y='14' width='4' height='12' rx='1' fill='%23ff8a4d'/><rect x='24' y='20' width='4' height='6' rx='1' fill='%23ffd2bd'/></svg>">
+<title>Heatmap · Find the moments that keep people watching</title>
+<meta name="description" content="Paste a YouTube link and see its most and least engaging moments: YouTube's own Most replayed data, or a clearly labelled estimate from comments, captions, audio and visuals.">
+<meta name="theme-color" content="#08080c">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23ffb347'/><stop offset='.5' stop-color='%23ff5a1f'/><stop offset='1' stop-color='%23ff2e63'/></linearGradient></defs><rect width='32' height='32' rx='8' fill='%2312121a'/><rect x='6' y='18' width='4' height='8' rx='1.5' fill='url(%23g)' opacity='.6'/><rect x='12' y='8' width='4' height='18' rx='1.5' fill='url(%23g)'/><rect x='18' y='13' width='4' height='13' rx='1.5' fill='url(%23g)' opacity='.85'/><rect x='24' y='20' width='4' height='6' rx='1.5' fill='url(%23g)' opacity='.45'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand">
-    <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-    <span>Heatmap<b>Dashboard</b></span>
+  <div class="topbar-in">
+    <a class="brand" href="./">
+      <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span>Heatmap <span class="sub">for YouTube</span></span>
+    </a>
+    <nav class="navlinks">
+      <a href="./" class="active">Analyze</a>
+      <a href="about.html">How it works</a>
+    </nav>
+    <div class="nav-right">
+      <a href="#connection" id="navConn" class="pill neutral" title="Server connection">Not connected</a>
+      <a class="icon-link" href="https://github.com/velvetthunder15/YT-Heatmap-Extractor-" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+      </a>
+    </div>
   </div>
-  <nav class="nav">
-    <a href="#about" class="ghost small navlink">About</a>
-    <button id="settingsToggle" class="ghost small" type="button">Connection</button>
-  </nav>
 </header>
 
 <main class="wrap">
-  <section class="hero card">
-    <h1>Which moments keep people watching?</h1>
-    <p class="muted">Paste a YouTube link. You get YouTube's own "Most replayed" data when it exists, or a clearly labelled estimate built from comments, captions, audio and visuals.</p>
+  <!-- ------------------------------------------------------------ hero -->
+  <section class="hero">
+    <div class="hero-strip" id="heroStrip" aria-hidden="true"></div>
+    <h1>Find the moments that <span class="grad-text">keep people watching</span>.</h1>
+    <p class="lede">Paste a YouTube link. You get YouTube's own "Most replayed" data when it exists, or a clearly labelled estimate built from comments, captions, audio and visuals.</p>
 
-    <form id="analyzeForm" autocomplete="off">
-      <div class="url-row">
-        <input id="ytUrl" type="text" inputmode="url" placeholder="https://www.youtube.com/watch?v=…" aria-label="YouTube URL" required>
-        <button id="analyzeBtn" type="submit" class="primary">Analyze</button>
+    <form id="analyzeForm" class="analyze" autocomplete="off">
+      <div class="url-bar">
+        <svg class="yt" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+        <input id="ytUrl" type="text" inputmode="url" placeholder="Paste a YouTube link…" aria-label="YouTube URL" required>
+        <button id="analyzeBtn" type="submit" class="btn-primary">
+          <span>Analyze</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
       </div>
+      <div class="analyze-opts">
+        <div class="left">
+          <label class="seg">Segments
+            <select id="windowSel" aria-label="Segment size">
+              <option value="">Auto</option>
+              <option value="5">5 s</option>
+              <option value="10">10 s</option>
+              <option value="15">15 s</option>
+              <option value="30">30 s</option>
+              <option value="60">60 s</option>
+            </select>
+          </label>
+          <label class="toggle" title="Skip YouTube's official data and always build an estimate"><input id="forceEst" type="checkbox"> Force estimate</label>
+        </div>
+        <button id="sampleBtn" type="button" class="btn-link">See a sample result →</button>
+      </div>
+    </form>
+    <div id="recent" class="recent"></div>
+  </section>
 
-      <div id="connection" class="connection">
+  <!-- ------------------------------------------------------ connection -->
+  <section id="connection" class="card conn">
+    <div class="conn-top">
+      <div class="conn-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+      </div>
+      <div class="t">
+        <h3>Your server</h3>
+        <p id="connSummary">Connect the dashboard to your own API. It runs free on your Windows or Mac.</p>
+      </div>
+      <div class="actions">
+        <span id="connStatus" class="pill neutral">Not checked</span>
+        <button id="connToggle" type="button" class="btn-ghost btn-sm">Edit</button>
+      </div>
+    </div>
+
+    <div class="conn-body">
+      <ol class="steps-list">
+        <li>
+          <div>
+            <b>Start the server</b>
+            <span>Download the project from GitHub and run the start script. The first run sets everything up by itself.</span>
+            <div class="os-tabs" role="tablist">
+              <button type="button" class="on" data-os="win">Windows</button>
+              <button type="button" data-os="mac">macOS</button>
+            </div>
+            <div class="cmd"><span id="cmdText">Double-click start-windows.bat</span><button type="button" class="copy" id="cmdCopy">Copy</button></div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <b>Copy the URL and key</b>
+            <span>The window prints an <b>API URL</b> and an <b>API key</b>. Get a URL that never changes with <code>setup-permanent-url</code>, and skip the window with <code>install-background</code>.</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <b>Paste them here</b>
+            <span>They're saved only in this browser and sent only to your own server.</span>
+          </div>
+        </li>
+      </ol>
+
+      <div class="conn-form">
         <div class="field">
           <label for="apiBase">API URL</label>
-          <input id="apiBase" type="text" inputmode="url" placeholder="https://yt-heatmap-api.your-name.workers.dev">
-          <small>The API URL your server window prints. A random trycloudflare.com URL changes on every restart; set up a permanent workers.dev URL once with setup-permanent-url (.bat on Windows, .command on Mac).</small>
+          <input id="apiBase" type="text" inputmode="url" placeholder="https://yt-heatmap-api.your-name.workers.dev" spellcheck="false">
+          <small>A <code>workers.dev</code> URL stays the same. A <code>trycloudflare.com</code> URL changes on every restart.</small>
         </div>
         <div class="field">
           <label for="apiKey">API key</label>
           <div class="with-btn">
-            <input id="apiKey" type="password" placeholder="yhx_…" spellcheck="false">
-            <button id="showKey" type="button" class="ghost small">Show</button>
+            <input id="apiKey" type="password" placeholder="yhx_…" spellcheck="false" autocomplete="off">
+            <button id="showKey" type="button" class="btn-ghost btn-sm">Show</button>
           </div>
-          <small>From <code>secrets\api_key.txt</code>. Sent only to your API.</small>
+          <small>It's in <code>secrets/api_key.txt</code> in the project folder.</small>
         </div>
-        <div class="field options">
-          <label for="windowSel">Segment size</label>
-          <select id="windowSel">
-            <option value="">Auto</option>
-            <option value="5">5 s</option>
-            <option value="10">10 s</option>
-            <option value="15">15 s</option>
-            <option value="30">30 s</option>
-            <option value="60">60 s</option>
-          </select>
-          <label class="check"><input id="forceEst" type="checkbox"> Force estimate</label>
-          <label class="check"><input id="remember" type="checkbox" checked> Remember on this device</label>
-        </div>
-        <div class="conn-status">
-          <button id="testConn" type="button" class="ghost small">Test connection</button>
-          <span id="connStatus" class="pill neutral">Not checked</span>
+        <div class="row">
+          <label class="toggle"><input id="remember" type="checkbox" checked> Remember on this device</label>
+          <button id="testConn" type="button" class="btn-ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            Save &amp; test
+          </button>
         </div>
       </div>
-    </form>
-
-    <div class="hero-foot">
-      <div id="recent" class="recent"></div>
-      <button id="sampleBtn" type="button" class="link">View a sample result</button>
     </div>
   </section>
 
-  <section id="progressCard" class="card progress hidden" aria-live="polite">
+  <!-- -------------------------------------------------------- progress -->
+  <section id="progressCard" class="card hidden" aria-live="polite">
     <div class="progress-head">
       <div>
-        <div id="progressStage" class="stage">Queued</div>
-        <div id="progressNote" class="muted small-text">Estimates take a few minutes: comments, captions, audio and video are all analysed.</div>
+        <div class="eyebrow"><span class="spark"></span>Analyzing</div>
+        <div id="progressStage" class="stage" style="margin-top:8px">Queued</div>
+        <div id="progressNote" class="muted small-text">Estimates take a few minutes, because comments, captions, audio and video are all analyzed.</div>
       </div>
       <div id="progressPct" class="pct">0%</div>
     </div>
     <div class="bar"><span id="progressBar"></span></div>
-    <ol class="steps" id="steps">
-      <li data-k="comments">Comments</li><li data-k="transcript">Captions</li><li data-k="audio">Audio</li><li data-k="visual">Visuals</li><li data-k="scor">Scoring</li>
+    <ol class="stepper" id="steps">
+      <li data-k="comments"><i></i>Comments</li>
+      <li data-k="transcript"><i></i>Captions</li>
+      <li data-k="audio"><i></i>Audio</li>
+      <li data-k="visual"><i></i>Visuals</li>
+      <li data-k="scor"><i></i>Scoring</li>
     </ol>
   </section>
 
   <div id="errorBox" class="card error hidden" role="alert"></div>
 
-  <div id="results" class="hidden">
-    <section class="card overview">
-      <a id="thumbLink" class="thumb" target="_blank" rel="noopener"><img id="thumb" alt=""></a>
+  <!-- --------------------------------------------------------- results -->
+  <div id="results" class="results hidden">
+    <nav class="subnav" aria-label="Result sections">
+      <a href="#r-overview">Overview</a>
+      <a href="#r-timeline">Timeline</a>
+      <a href="#r-moments">Moments</a>
+      <a href="#r-signals" id="navSignals">Signals</a>
+      <a href="#r-data">Data</a>
+    </nav>
+
+    <section id="r-overview" class="card overview">
+      <a id="thumbLink" class="thumb" target="_blank" rel="noopener">
+        <img id="thumb" alt="" onerror="this.style.visibility='hidden'" onload="this.style.visibility='visible'">
+        <span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+      </a>
       <div class="ov-body">
         <div class="badges" id="badges"></div>
         <h2 id="vTitle"></h2>
-        <p id="confReason" class="muted"></p>
+        <p id="confReason"></p>
         <p id="disclaimer" class="disclaimer hidden"></p>
       </div>
     </section>
 
     <section class="kpis" id="kpis"></section>
 
-    <section class="card">
+    <section id="r-timeline" class="card">
       <div class="card-head">
         <div>
           <h3>Engagement over time</h3>
-          <p class="muted small-text">Score from 0 to 1 for each segment. Green bands are peaks, red bands are drop-offs. Click anywhere to play from there.</p>
+          <p>Each segment's score from 0 to 1. Hover to inspect, and click to play from that moment.</p>
         </div>
-        <div class="legend"><span class="lg peak">Peak</span><span class="lg drop">Drop-off</span></div>
+        <div class="legend"><span class="lg peak">Peak</span><span class="lg drop">Drop-off</span><span class="lg avg">Average</span></div>
       </div>
-      <div id="strip" class="strip" title="Heat strip"></div>
       <div id="mainChart" class="chart"></div>
     </section>
 
-    <div class="grid-2">
+    <div id="r-moments" class="grid-player">
       <section class="card player-card">
-        <h3>Player</h3>
+        <div class="card-head" style="margin-bottom:14px"><div><h3>Player</h3><p>Jump straight to any moment.</p></div></div>
         <div class="player"><iframe id="player" title="YouTube player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-        <p id="nowPlaying" class="muted small-text">Pick a moment to jump there.</p>
+        <div id="nowPlaying" class="now"><span class="live"></span><span>Pick a moment to jump there.</span></div>
       </section>
       <section class="card">
-        <h3>Top moments</h3>
+        <div class="card-head" style="margin-bottom:14px">
+          <div><h3 id="momTitle">Top moments</h3><p id="momSub">The highest-scoring stretches, with what drove each one.</p></div>
+          <div class="seg-toggle" role="tablist">
+            <button type="button" class="on" data-list="top">Peaks</button>
+            <button type="button" data-list="low">Drop-offs</button>
+          </div>
+        </div>
         <ol id="topList" class="moments"></ol>
+        <ol id="lowList" class="moments low hidden"></ol>
       </section>
     </div>
 
     <div class="grid-2">
       <section class="card">
-        <h3>Least engaging</h3>
-        <ol id="lowList" class="moments low"></ol>
+        <div class="card-head"><div><h3>By part of the video</h3><p>Average score in each fifth of the runtime.</p></div></div>
+        <div id="partsChart" class="chart"></div>
       </section>
       <section class="card">
-        <h3>Engagement by part of the video</h3>
-        <p class="muted small-text">Average score in each fifth of the runtime.</p>
-        <div id="partsChart" class="chart small"></div>
+        <div class="card-head"><div><h3>Score distribution</h3><p>How many segments fall in each score band.</p></div></div>
+        <div id="histChart" class="chart"></div>
       </section>
     </div>
 
-    <section id="signalsCard" class="card">
+    <section id="r-signals" class="card">
       <div class="card-head">
         <div>
           <h3>Signals over time</h3>
-          <p class="muted small-text">Each signal, normalised from 0 to 1. Tap a chip to show or hide it.</p>
+          <p>Each signal scaled 0 to 1. Tap a chip to show or hide it.</p>
         </div>
-        <div id="sigChips" class="chips"></div>
+        <div class="sig-tools">
+          <div id="sigChips" class="chips"></div>
+          <label class="toggle" title="Rolling average over neighbouring segments"><input id="smoothSig" type="checkbox" checked> Smooth</label>
+        </div>
       </div>
       <div id="sigChart" class="chart"></div>
     </section>
 
     <div class="grid-3" id="sigStats">
       <section class="card">
-        <h3>Signal weights</h3>
-        <p class="muted small-text">How much each signal counts in the final score.</p>
+        <div class="card-head"><div><h3>Signal weights</h3><p>How much each signal counts.</p></div></div>
         <div id="weights" class="hbars"></div>
         <div id="skipped" class="skipped"></div>
       </section>
       <section class="card">
-        <h3>What drove the score</h3>
-        <p class="muted small-text">Each signal's share of the total score, across the whole video.</p>
+        <div class="card-head"><div><h3>What drove the score</h3><p>Each signal's share of the total.</p></div></div>
         <div id="drivers" class="hbars"></div>
       </section>
       <section class="card">
-        <h3>Agreement with final score</h3>
-        <p class="muted small-text">Correlation between each signal and the combined score, from −1 to 1.</p>
+        <div class="card-head"><div><h3>Agreement</h3><p>Correlation with the final score, −1 to 1.</p></div></div>
         <div id="agreement" class="hbars"></div>
       </section>
     </div>
 
-    <div class="grid-2">
-      <section class="card">
-        <h3>Score distribution</h3>
-        <p class="muted small-text">How many segments fall in each score band.</p>
-        <div id="histChart" class="chart small"></div>
-      </section>
-      <section class="card">
-        <h3>Data</h3>
-        <p class="muted small-text">Take the numbers with you.</p>
-        <div class="actions">
-          <button id="dlJson" class="ghost" type="button">Download JSON</button>
-          <button id="dlCsv" class="ghost" type="button">Download CSV</button>
-          <button id="copyJson" class="ghost" type="button">Copy JSON</button>
+    <section id="r-data" class="card">
+      <div class="card-head" style="margin-bottom:0">
+        <div><h3>Export</h3><p>Take the numbers with you: every segment's score and signals.</p></div>
+        <div class="data-actions">
+          <button id="dlJson" class="btn-ghost" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>JSON</button>
+          <button id="dlCsv" class="btn-ghost" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>CSV</button>
+          <button id="copyJson" class="btn-ghost" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Copy JSON</span></button>
         </div>
-        <details class="raw">
-          <summary>Raw response</summary>
-          <pre id="rawJson"></pre>
-        </details>
-      </section>
-    </div>
+      </div>
+      <details class="raw">
+        <summary>Raw response</summary>
+        <pre id="rawJson"></pre>
+      </details>
+    </section>
   </div>
-  <section id="about" class="card about">
-    <div class="about-head">
-      <span class="eyebrow">About</span>
-      <h2>How the numbers are made</h2>
-      <p class="muted">Every video is cut into short segments (10 seconds by default). Each segment gets a <b>score</b>, and the score is built from <b>signals</b>: separate clues about what viewers care about.</p>
-    </div>
-
-    <div class="about-grid two">
-      <div class="explain">
-        <h4>What a score is</h4>
-        <p>A number from <b>0 to 1</b> for one segment, relative to the rest of the same video. 1.00 is the most engaging moment in this video and 0.00 is the least. It's a ranking within one video, not a grade, so 0.8 on one video doesn't mean the same as 0.8 on another.</p>
-      </div>
-      <div class="explain">
-        <h4>What a signal is</h4>
-        <p>One independent measurement taken for every segment, such as how often comments point to that moment or how loud it is. Each signal is also scaled 0 to 1 within the video (the segment where it's strongest is 1, the weakest is 0), so signals can be compared and blended fairly.</p>
-      </div>
-    </div>
-
-    <h3 class="about-sub">Two kinds of result</h3>
-    <div class="about-grid two">
-      <div class="explain tint-good">
-        <h4><span class="badge official">Official data</span></h4>
-        <p>When YouTube shows a "Most replayed" graph for a video, the dashboard uses it directly. That's real, relative replay intensity from YouTube, so it's always high confidence and no estimating is done.</p>
-      </div>
-      <div class="explain tint-heat">
-        <h4><span class="badge estimated">Estimated</span></h4>
-        <p>Most videos don't have that graph. Then four signals are measured and blended into an estimate. It's a smart guess from public clues, not real viewer data, and it's always labelled as estimated.</p>
-      </div>
-    </div>
-
-    <h3 class="about-sub">The four signals</h3>
-    <div class="about-grid four">
-      <div class="sig-card">
-        <div class="sig-top"><span class="dot" style="background:#5b7bb5"></span><b>Comments</b><span class="w">35%</span></div>
-        <p>Finds timestamps people write in comments, like "10:24 got me". Each mention counts for about ±5 seconds around that time, and comments with more likes count a bit more (1 + log of likes). Up to 2,000 comments are read.</p>
-        <small>Strongest clue: people only timestamp moments they care about.</small>
-      </div>
-      <div class="sig-card">
-        <div class="sig-top"><span class="dot" style="background:#4e7a5c"></span><b>Captions</b><span class="w">25%</span></div>
-        <p>Reads the transcript for each segment and scores what's being said: hook phrases ("watch this", "here's why"), emphasis words ("insane", "biggest"), questions, numbers and claims, topic changes, and how much is being said.</p>
-        <small>Catches big reveals and key points in talking videos.</small>
-      </div>
-      <div class="sig-card">
-        <div class="sig-top"><span class="dot" style="background:#c08a52"></span><b>Audio</b><span class="w">25%</span></div>
-        <p>Listens to the soundtrack: loudness (50%), how busy it is, meaning sound onsets per second (30%), and bursts that are loud and noise-like, a cheap detector for laughter, applause or cheering (20%).</p>
-        <small>Silence and quiet stretches score low.</small>
-      </div>
-      <div class="sig-card">
-        <div class="sig-top"><span class="dot" style="background:#8a7fb0"></span><b>Visuals</b><span class="w">15%</span></div>
-        <p>Looks at a small, low-res copy of the video, 2 frames a second at 64×36 pixels. It measures camera cuts, meaning sudden jumps far above the video's usual change (60%), and overall motion between frames (40%).</p>
-        <small>Fast edits and action score high, static shots low.</small>
-      </div>
-    </div>
-
-    <h3 class="about-sub">How the score is calculated</h3>
-    <ol class="flow">
-      <li><b>Split</b><span>The video is cut into equal segments, 10 s by default (5 to 60 s).</span></li>
-      <li><b>Measure</b><span>Each signal is measured for every segment.</span></li>
-      <li><b>Scale</b><span>Each signal is rescaled 0 to 1 within the video.</span></li>
-      <li><b>Blend</b><span>Weighted sum: 0.35 × comments + 0.25 × captions + 0.25 × audio + 0.15 × visuals.</span></li>
-      <li><b>Rescale</b><span>The blend is scaled 0 to 1 again, so the top segment is always 1.00.</span></li>
-    </ol>
-    <p class="muted small-text">If a signal can't be measured (comments turned off, no captions, a download fails), it's dropped and the remaining weights are scaled up to add to 100%. The reason is listed under "Signal weights".</p>
-
-    <div class="about-grid three">
-      <div class="explain">
-        <h4>Peaks and drop-offs</h4>
-        <p>The highest-scoring segments become top moments and the lowest become drop-offs. Neighbouring segments within 0.05 of each other are merged into one range, and a peak never overlaps a drop-off. The chips on a moment show which signals drove it.</p>
-      </div>
-      <div class="explain">
-        <h4>Confidence</h4>
-        <p><b>High</b>: at least 50 timestamped comments plus 2 or more other signals. <b>Medium</b>: comments plus one other signal, or captions plus two others. <b>Low</b>: anything thinner. Official data is always high.</p>
-      </div>
-      <div class="explain">
-        <h4>Reading the charts</h4>
-        <p><b>What drove the score</b> is each signal's share of the total weighted score. <b>Agreement</b> is how closely a signal rises and falls with the final score (+1 means in step, 0 means unrelated). <b>Hot segments</b> are those scoring 0.6 or more.</p>
-      </div>
-    </div>
-
-    <p class="limits"><b>Keep in mind:</b> estimates find moments that look and sound engaging and that commenters point to. They can't see real watch time, so treat them as a strong hint, not proof.</p>
-
-    <h3 class="about-sub">Your API URL</h3>
-    <p>The API runs on the host's own computer, and Cloudflare makes it reachable from the internet. Out of the box, <code>start-windows.bat</code> / <code>start-mac.command</code> opens a free <b>quick tunnel</b>: a random <code>trycloudflare.com</code> address that needs no account and changes on every restart. Run <code>setup-permanent-url.bat</code> (Mac: <code>setup-permanent-url.command</code>) once with <b>your own free Cloudflare account</b> to get a fixed <code>https://yt-heatmap-api.&lt;you&gt;.workers.dev</code> URL, with no domain needed. A small Worker on your account forwards to the current tunnel and is updated automatically on each start. You can also use your own domain. When the host computer is off, a permanent URL answers <b>server_offline</b>. To avoid keeping a window open, <code>install-background</code> runs the server hidden and starts it at login.</p>
-  </section>
 </main>
 
 <div id="tooltip" class="tooltip hidden"></div>
-<footer class="foot muted small-text">Estimates are heuristics, not real viewer data. Official data is YouTube's relative "Most replayed" intensity.</footer>
+<footer class="foot">
+  <div class="foot-in">
+    <span>Estimates are heuristics, not real viewer data. Official data is YouTube's relative "Most replayed" intensity.</span>
+    <nav>
+      <a href="about.html">How it works</a>
+      <a href="https://github.com/velvetthunder15/YT-Heatmap-Extractor-" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/velvetthunder15/YT-Heatmap-Extractor-/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+    </nav>
+  </div>
+</footer>
 <script src="app.js"></script>
 </body>
 </html>

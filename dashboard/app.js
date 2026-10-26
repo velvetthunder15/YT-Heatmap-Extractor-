@@ -1,15 +1,17 @@
 /* Heatmap Dashboard: talks to the YouTube Heatmap Extractor API and draws the result. */
 (() => {
   "use strict";
+  if (location.hash === "#about") { location.replace("about.html"); return; }
 
   const $ = (id) => document.getElementById(id);
   const SIGNAL_COLORS = {
-    comments: "#5b7bb5",
-    transcript: "#4e7a5c",
-    audio: "#c08a52",
-    visual: "#8a7fb0",
-    official_most_replayed: "#ff4d00",
+    comments: "#7aa2ff",
+    transcript: "#5fd3a3",
+    audio: "#ffb454",
+    visual: "#b392f0",
+    official_most_replayed: "#ff5a1f",
   };
+  const C = { grid: "rgba(255,255,255,.06)", axis: "rgba(255,255,255,.14)", line: "#f3f3f6", good: "#3ecf8e", bad: "#ff6b6b", ember: "#ff5a1f", muted: "#85859a" };
   const SIGNAL_LABELS = {
     comments: "Comments",
     transcript: "Captions",
@@ -29,7 +31,8 @@
   // ------------------------------------------------------------ helpers --
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const label = (n) => SIGNAL_LABELS[n] || n.replace(/_/g, " ");
-  const color = (n, i = 0) => SIGNAL_COLORS[n] || ["#7e9c9b", "#c9a3a8", "#d9c489"][i % 3];
+  const color = (n, i = 0) => SIGNAL_COLORS[n] || ["#6fd6d6", "#f28fb1", "#e6d27a"][i % 3];
+  let playhead = null; // seconds, for the playhead line on the main chart
   function hms(sec) {
     sec = Math.max(0, Math.round(sec || 0));
     const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
@@ -81,12 +84,12 @@
       const params = new URLSearchParams(location.search);
       if (params.get("api")) $("apiBase").value = params.get("api");
       if (params.get("v")) $("ytUrl").value = params.get("v");
-      if (s.apiBase && s.apiKey && !params.get("api")) $("connection").classList.add("collapsed");
+      if (s.os) setOS(s.os);
     } catch (_) { /* ignore */ }
   }
   function saveSettings() {
     const remember = $("remember").checked;
-    const s = { remember, window: $("windowSel").value };
+    const s = { remember, window: $("windowSel").value, os: currentOS };
     if (remember) { s.apiBase = normBase($("apiBase").value); s.apiKey = $("apiKey").value.trim(); }
     localStorage.setItem(STORE, JSON.stringify(s));
   }
@@ -118,20 +121,46 @@
     return { status: res.status, body };
   }
 
-  async function testConnection() {
-    const pill = $("connStatus");
-    if (!normBase($("apiBase").value)) { setPill(pill, "warn", "Add the API URL"); return false; }
-    setPill(pill, "neutral", "Checking…");
+  async function testConnection({ quiet = false } = {}) {
+    const base = normBase($("apiBase").value);
+    if (!base || !$("apiKey").value.trim()) {
+      setConn("neutral", "Not connected", "Connect the dashboard to your own API. It runs free on your Windows or Mac.");
+      openConn(true);
+      return false;
+    }
+    setConn("neutral busy", "Checking…", "Checking " + hostOf(base) + "…");
     try {
       const { body } = await api("/health");
-      setPill(pill, body.status === "ok" ? "ok" : "warn", body.status === "ok" ? `Connected · v${body.version}` : "Server degraded");
-      return true;
+      const ok = body.status === "ok";
+      setConn(ok ? "ok" : "warn", ok ? "Connected" : "Degraded", `${hostOf(base)} · API v${esc(body.version || "?")}${ok ? "" : " · " + esc(body.status)}`);
+      if (ok) openConn(false);
+      return ok;
     } catch (e) {
-      setPill(pill, "bad", e.status ? `Error ${e.status}` : "Unreachable");
+      const short = e.code === "server_offline" ? "Server offline" : e.status === 401 || e.status === 403 ? "Wrong key" : e.status ? `Error ${e.status}` : "Unreachable";
+      setConn("bad", short, (e.hint || e.message) );
+      if (!quiet) openConn(true);
       return false;
     }
   }
+  function hostOf(u) { try { return new URL(u).host; } catch (_) { return u; } }
+  function setConn(kind, text, summary) {
+    setPill($("connStatus"), kind, text);
+    setPill($("navConn"), kind, text);
+    if (summary != null) $("connSummary").innerHTML = summary;
+  }
+  function openConn(open) {
+    $("connection").classList.toggle("collapsed", !open);
+    $("connToggle").textContent = open ? "Hide" : "Edit";
+  }
   function setPill(el, kind, text) { el.className = "pill " + kind; el.textContent = text; }
+
+  let currentOS = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? "mac" : "win";
+  const OS_CMD = { win: "Double-click start-windows.bat", mac: "bash start-mac.command" };
+  function setOS(os) {
+    currentOS = os === "mac" ? "mac" : "win";
+    document.querySelectorAll(".os-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.os === currentOS));
+    $("cmdText").textContent = OS_CMD[currentOS];
+  }
 
   // ----------------------------------------------------------- analysis --
   async function analyze(ev) {
@@ -140,7 +169,8 @@
     const url = $("ytUrl").value.trim();
     if (!videoIdFrom(url)) return showError("That doesn't look like a YouTube link.", "Paste a full video URL like https://www.youtube.com/watch?v=… or a youtu.be link.");
     if (!normBase($("apiBase").value) || !$("apiKey").value.trim()) {
-      $("connection").classList.remove("collapsed");
+      openConn(true);
+      $("connection").scrollIntoView({ behavior: "smooth", block: "center" });
       return showError("Add your API URL and key first.", "Both are shown in the server window when you run start-windows.bat (Windows) or start-mac.command (Mac).");
     }
     saveSettings();
@@ -189,11 +219,12 @@
 
   function setBusy(b) {
     $("analyzeBtn").disabled = b;
-    $("analyzeBtn").textContent = b ? "Analyzing…" : "Analyze";
+    $("analyzeBtn").querySelector("span").textContent = b ? "Analyzing…" : "Analyze";
   }
 
   function showProgress(job) {
-    $("progressCard").classList.remove("hidden");
+    const card = $("progressCard");
+    if (card.classList.contains("hidden")) { card.classList.remove("hidden"); card.scrollIntoView({ behavior: "smooth", block: "center" }); }
     const p = Math.max(0.02, Math.min(1, job.progress || 0));
     const stage = job.stage || job.status || "queued";
     $("progressStage").textContent = stage;
@@ -210,7 +241,7 @@
   function hideProgress() { $("progressCard").classList.add("hidden"); }
   function showError(msg, hint) {
     const box = $("errorBox");
-    box.innerHTML = `<b>${esc(msg)}</b>${hint ? `<p>${esc(hint)}</p>` : ""}`;
+    box.innerHTML = `<span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg></span><div><b>${esc(msg)}</b>${hint ? `<p>${esc(hint)}</p>` : ""}</div>`;
     box.classList.remove("hidden");
     box.scrollIntoView({ behavior: "smooth", block: "center" });
   }
@@ -229,13 +260,16 @@
   function drawHistory() {
     const h = getHistory();
     $("recent").innerHTML = h.length
-      ? `<span class="muted small-text">Recent</span>` + h.map((r, i) => `<button type="button" class="chip" data-i="${i}" title="${esc(r.title)}">${esc(r.title || r.video_id)}</button>`).join("")
+      ? `<span class="lbl">Recent</span>` + h.map((r, i) => `<button type="button" class="chip" data-i="${i}" title="${esc(r.title)}">${esc(r.title || r.video_id)}</button>`).join("")
       : "";
   }
 
   // ------------------------------------------------------------- render --
   function render(r) {
     current = r;
+    playhead = null;
+    const peakTab = document.querySelector('.seg-toggle button[data-list="top"]');
+    if (peakTab) peakTab.click();
     hiddenSignals = new Set();
     $("results").classList.remove("hidden");
     const heat = r.full_heatmap || [];
@@ -250,14 +284,14 @@
     $("badges").innerHTML = [
       `<span class="badge ${estimated ? "estimated" : "official"}">${estimated ? "Estimated" : "Official data"}</span>`,
       r.confidence ? `<span class="badge ${esc(r.confidence)}">${esc(r.confidence)} confidence</span>` : "",
-      `<span class="badge">${hms(r.duration)} long</span>`,
+      `<span class="badge">${hms(r.duration)}</span>`,
       r.cached ? `<span class="badge">Cached</span>` : "",
     ].join("");
     const d = $("disclaimer");
     d.textContent = r.disclaimer || "";
     d.classList.toggle("hidden", !r.disclaimer);
     $("player").src = `https://www.youtube-nocookie.com/embed/${vid}?rel=0`;
-    $("nowPlaying").textContent = "Pick a moment to jump there.";
+    setNow(null);
 
     // KPIs
     const scores = heat.map((x) => x.score);
@@ -267,8 +301,8 @@
     const hot = scores.filter((s) => s >= 0.6).length;
     const win = r.window_seconds || (heat[0] ? heat[0].end - heat[0].start : 0);
     $("kpis").innerHTML = [
-      kpi("Peak moment", top ? hms(top.start) : "–", top ? `score ${top.score.toFixed(2)}` : "", top && top.start),
-      kpi("Biggest drop-off", low ? hms(low.start) : "–", low ? `score ${low.score.toFixed(2)}` : "", low && low.start),
+      kpi("Peak moment", top ? hms(top.start) : "–", top ? `score ${top.score.toFixed(2)} · tap to play` : "", top && top.start, "accent"),
+      kpi("Biggest drop-off", low ? hms(low.start) : "–", low ? `score ${low.score.toFixed(2)} · tap to play` : "", low && low.start),
       kpi("Average engagement", avg.toFixed(2), "out of 1.00"),
       kpi("Hot segments", heat.length ? pct(hot / heat.length) : "–", `${hot} of ${heat.length} score ≥ 0.6`),
       kpi(estimated ? "Signals used" : "Data points", estimated ? String((r.signals_used || []).length) : String(heat.length), estimated ? `${win}s segments` : "from YouTube"),
@@ -280,7 +314,8 @@
 
     // signals
     const sigNames = estimated ? Object.keys((heat[0] && heat[0].signals) || {}) : [];
-    $("signalsCard").classList.toggle("hidden", !sigNames.length);
+    $("r-signals").classList.toggle("hidden", !sigNames.length);
+    $("navSignals").classList.toggle("hidden", !sigNames.length);
     $("sigStats").classList.toggle("hidden", !estimated);
     $("sigChips").innerHTML = sigNames.map((n, i) => `<button type="button" class="chip" data-sig="${esc(n)}"><span class="dot" style="background:${color(n, i)}"></span>${esc(label(n))}</button>`).join("");
     if (estimated) drawSignalStats(r, heat, sigNames);
@@ -292,8 +327,8 @@
     $("results").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function kpi(k, v, s, seek) {
-    const attr = Number.isFinite(seek) ? ` class="kpi clickable" data-seek="${seek}" title="Play from here"` : ` class="kpi"`;
+  function kpi(k, v, s, seek, extra = "") {
+    const attr = Number.isFinite(seek) ? ` class="kpi clickable ${extra}" data-seek="${seek}" title="Play from here"` : ` class="kpi ${extra}"`;
     return `<div${attr}><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div><div class="s">${esc(s)}</div></div>`;
   }
 
@@ -301,7 +336,7 @@
     const sigs = Array.isArray(m.signals) ? m.signals : [];
     const chips = sigs
       .filter((s) => typeof s === "object")
-      .slice(0, 4)
+      .slice(0, isPeak ? 3 : 2)
       .map((s, j) => `<span class="chip"><span class="dot" style="background:${color(s.name, j)}"></span>${esc(label(s.name))} ${s.share != null ? pct(s.share) : s.value.toFixed(2)}</span>`)
       .join("");
     const len = Math.round(m.end - m.start);
@@ -312,7 +347,7 @@
         ${chips ? `<div class="chips">${chips}</div>` : ""}
       </div>
       <div class="sc"><b>${m.score.toFixed(2)}</b><div class="mini"><span style="width:${Math.max(3, m.score * 100)}%"></span></div>
-      <a class="open" href="${esc(m.link)}" target="_blank" rel="noopener" data-noseek>YouTube ↗</a></div>
+      <a class="open" href="${esc(m.link)}" target="_blank" rel="noopener" data-noseek>Open ↗</a></div>
     </li>`;
   }
 
@@ -327,7 +362,7 @@
     const skipped = r.signals_skipped || {};
     $("skipped").innerHTML = Object.keys(skipped).length
       ? Object.entries(skipped).map(([n, why]) => `<div class="skip"><b>${esc(label(n))} skipped:</b> ${esc(why)}</div>`).join("")
-      : `<div class="chip" style="align-self:flex-start"><span class="dot" style="background:var(--good)"></span>Every signal ran</div>`;
+      : `<div class="allgood"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Every signal ran</div>`;
 
     // share of total score each signal produced = weight * value, summed
     const contrib = {};
@@ -366,59 +401,75 @@
     drawHist(heat);
   }
 
+  // inferno-like ramp: deep violet -> magenta -> ember -> gold
+  const RAMP = [[27, 16, 51], [91, 26, 110], [184, 37, 95], [242, 84, 45], [255, 179, 71], [255, 232, 163]];
   function heatColor(v) {
-    // pale peach -> brand heat
-    const a = Math.max(0, Math.min(1, v));
-    const c0 = [255, 236, 226], c1 = [255, 77, 0];
-    const mix = c0.map((x, i) => Math.round(x + (c1[i] - x) * Math.pow(a, 1.15)));
-    return `rgb(${mix.join(",")})`;
+    const a = Math.max(0, Math.min(1, v)) * (RAMP.length - 1);
+    const i = Math.min(RAMP.length - 2, Math.floor(a)), f = a - i;
+    const c = RAMP[i].map((x, k) => Math.round(x + (RAMP[i + 1][k] - x) * f));
+    return `rgb(${c.join(",")})`;
   }
-  function drawStrip(heat) {
-    $("strip").innerHTML = heat.map((x) => `<span style="background:${heatColor(x.score)};flex:${Math.max(0.1, x.end - x.start)}" data-seek="${x.start}"></span>`).join("");
-  }
+  function drawStrip() { /* the heat strip is drawn inside the main chart */ }
 
   function drawMain(heat, r) {
     const box = $("mainChart");
-    const W = Math.max(320, box.clientWidth), H = W < 600 ? 220 : 280;
-    const m = { l: 34, r: 12, t: 14, b: 26 };
+    const W = Math.max(320, box.clientWidth), narrow = W < 600, H = narrow ? 260 : 340;
+    const m = { l: 36, r: 14, t: 16, b: 52 };
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
     const dur = r.duration || (heat.length ? heat[heat.length - 1].end : 1);
     const x = (t) => m.l + (t / dur) * iw;
     const y = (v) => m.t + (1 - v) * ih;
-    let g = "";
+    const stripY = m.t + ih + 10, stripH = 14;
+    let g = `<defs>
+      <linearGradient id="fade" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ff5a1f" stop-opacity=".38"/><stop offset=".6" stop-color="#ff2e63" stop-opacity=".08"/><stop offset="1" stop-color="#ff2e63" stop-opacity="0"/></linearGradient>
+      <linearGradient id="stroke" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#ffb347"/><stop offset=".5" stop-color="#ff5a1f"/><stop offset="1" stop-color="#ff2e63"/></linearGradient>
+      <clipPath id="stripClip"><rect x="${m.l}" y="${stripY}" width="${iw}" height="${stripH}" rx="4"/></clipPath>
+      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>`;
     [0, 0.25, 0.5, 0.75, 1].forEach((v) => {
-      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(29,29,31,.07)"/>`;
-      g += `<text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${v.toFixed(2).replace(/0$/, "")}</text>`;
+      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="${C.grid}"/>`;
+      g += `<text x="${m.l - 10}" y="${y(v) + 3.5}" text-anchor="end">${v === 0 ? "0" : v === 1 ? "1" : v.toFixed(2).replace(/0$/, "")}</text>`;
     });
-    const ticks = niceTicks(dur, W < 600 ? 4 : 7);
-    ticks.forEach((t) => (g += `<text x="${x(t)}" y="${H - 6}" text-anchor="middle">${hms(t)}</text>`));
+    niceTicks(dur, narrow ? 4 : 8).forEach((t) => (g += `<text x="${x(t)}" y="${H - 8}" text-anchor="middle">${hms(t)}</text>`));
 
-    const bands = (list, fill, stroke) => (list || []).map((s) => `<rect x="${x(s.start)}" y="${m.t}" width="${Math.max(2, x(s.end) - x(s.start))}" height="${ih}" fill="${fill}"/><line x1="${x(s.start)}" x2="${x(s.end)}" y1="${m.t + ih}" y2="${m.t + ih}" stroke="${stroke}" stroke-width="3"/>`).join("");
-    g += bands(r.least_engaging, "rgba(156,99,94,.10)", "#9c635e");
-    g += bands(r.most_engaging, "rgba(96,120,104,.15)", "#4e7a5c");
+    const bands = (list, fill, stroke) => (list || []).map((s) => `<rect x="${x(s.start)}" y="${m.t}" width="${Math.max(2, x(s.end) - x(s.start))}" height="${ih}" fill="${fill}" rx="2"/><rect x="${x(s.start)}" y="${m.t + ih - 2}" width="${Math.max(2, x(s.end) - x(s.start))}" height="3" fill="${stroke}" rx="1.5"/>`).join("");
+    g += bands(r.least_engaging, "rgba(255,107,107,.08)", C.bad);
+    g += bands(r.most_engaging, "rgba(62,207,142,.10)", C.good);
 
     if (heat.length) {
       const pts = heat.map((p) => [x((p.start + p.end) / 2), y(p.score)]);
-      const line = "M" + pts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join("L");
+      const line = smooth(pts);
       const area = `${line}L${pts[pts.length - 1][0].toFixed(1)},${y(0)}L${pts[0][0].toFixed(1)},${y(0)}Z`;
-      g += `<defs><linearGradient id="fade" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ff4d00" stop-opacity=".22"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></linearGradient></defs>`;
       g += `<path d="${area}" fill="url(#fade)"/>`;
-      g += `<path d="${line}" fill="none" stroke="#1d1d1f" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+      g += `<path d="${line}" fill="none" stroke="url(#stroke)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>`;
       const avg = mean(heat.map((p) => p.score));
-      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(avg)}" y2="${y(avg)}" stroke="rgba(29,29,31,.3)" stroke-dasharray="4 4"/>`;
-      g += `<text x="${W - m.r}" y="${y(avg) - 6}" text-anchor="end">avg ${avg.toFixed(2)}</text>`;
+      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(avg)}" y2="${y(avg)}" stroke="rgba(255,255,255,.28)" stroke-dasharray="3 5"/>`;
+      g += `<text x="${W - m.r}" y="${y(avg) - 7}" text-anchor="end" style="fill:#b9b9c6">avg ${avg.toFixed(2)}</text>`;
+      // heat strip, like YouTube's own "most replayed" bar
+      g += `<g clip-path="url(#stripClip)">` + heat.map((p) => `<rect x="${x(p.start)}" y="${stripY}" width="${Math.max(0.6, x(p.end) - x(p.start)) + 0.5}" height="${stripH}" fill="${heatColor(p.score)}"/>`).join("") + `</g>`;
+      g += `<rect x="${m.l}" y="${stripY}" width="${iw}" height="${stripH}" rx="4" fill="none" stroke="rgba(255,255,255,.08)"/>`;
+      const R = narrow ? 9 : 11, placed = [];
       (r.most_engaging || []).slice(0, 5).forEach((s, i) => {
-        const cx = x((s.start + s.end) / 2), cy = y(s.score);
-        g += `<circle cx="${cx}" cy="${cy}" r="9" fill="#4e7a5c" stroke="#fff" stroke-width="2"/><text x="${cx}" y="${cy + 3.5}" text-anchor="middle" style="fill:#fff;font-weight:700;font-size:10px">${i + 1}</text>`;
+        const cx = x((s.start + s.end) / 2);
+        let cy = y(s.score);
+        // nudge a marker up (or down) so numbered circles never sit on top of each other
+        for (let k = 0; k < 6 && placed.some(([px, py]) => Math.hypot(px - cx, py - cy) < R * 2 + 2); k++) cy = cy - (R * 2 + 3) >= m.t - 4 ? cy - (R * 2 + 3) : cy + (R * 2 + 3);
+        placed.push([cx, cy]);
+        g += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#0b0b10" stroke="${C.good}" stroke-width="1.6"/><text x="${cx}" y="${cy + 3.6}" text-anchor="middle" style="fill:${C.good};font-weight:700;font-size:10.5px">${i + 1}</text>`;
       });
     }
-    g += `<line id="hoverLine" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="rgba(29,29,31,.4)" visibility="hidden"/>`;
-    g += `<rect class="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
+    if (playhead != null) {
+      const px = x(playhead);
+      g += `<line x1="${px}" x2="${px}" y1="${m.t}" y2="${stripY + stripH}" stroke="${C.ember}" stroke-width="1.5"/><circle cx="${px}" cy="${m.t}" r="4" fill="${C.ember}"/>`;
+    }
+    g += `<line id="hoverLine" x1="0" x2="0" y1="${m.t}" y2="${stripY + stripH}" stroke="rgba(255,255,255,.35)" visibility="hidden"/>`;
+    g += `<circle id="hoverDot" r="5" fill="#fff" stroke="#ff5a1f" stroke-width="2" visibility="hidden"/>`;
+    g += `<rect class="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${stripY + stripH - m.t}" fill="transparent"/>`;
     box.innerHTML = svgEl(W, H, g);
 
     const svg = box.querySelector("svg");
     const hit = svg.querySelector(".hit");
-    const hl = svg.querySelector("#hoverLine");
+    const hl = svg.querySelector("#hoverLine"), hd = svg.querySelector("#hoverDot");
     const at = (evt) => {
       const rect = svg.getBoundingClientRect();
       const t = ((evt.clientX - rect.left) * (W / rect.width) - m.l) / iw * dur;
@@ -429,37 +480,63 @@
       if (!p) return;
       const xx = x((p.start + p.end) / 2);
       hl.setAttribute("x1", xx); hl.setAttribute("x2", xx); hl.setAttribute("visibility", "visible");
+      hd.setAttribute("cx", xx); hd.setAttribute("cy", y(p.score)); hd.setAttribute("visibility", "visible");
       const rows = Object.entries(p.signals || {}).map(([n, v], i) => `<div class="r"><span><span class="dot" style="background:${color(n, i)}"></span>${esc(label(n))}</span><b>${v.toFixed(2)}</b></div>`).join("");
-      showTip(evt, `<div class="t">${hms(p.start)} – ${hms(p.end)}</div><div class="r"><span>Score</span><b>${p.score.toFixed(2)}</b></div>${rows}<div class="hint">Click to play</div>`);
+      showTip(evt, `<div class="t">${hms(p.start)} – ${hms(p.end)}</div><div class="r main"><span>Score</span><b>${p.score.toFixed(2)}</b></div>${rows}<div class="hint">Click to play from here</div>`);
     });
-    hit.addEventListener("mouseleave", () => { hl.setAttribute("visibility", "hidden"); hideTip(); });
+    hit.addEventListener("mouseleave", () => { hl.setAttribute("visibility", "hidden"); hd.setAttribute("visibility", "hidden"); hideTip(); });
     hit.addEventListener("click", (evt) => { const p = at(evt); if (p) seek(p.start); });
+  }
+
+  // centred moving average over +-k neighbours (display only; tooltips show raw values)
+  function rolling(a, k) {
+    if (!k) return a;
+    return a.map((_, i) => { let s = 0, c = 0; for (let d = -k; d <= k; d++) { const v = a[i + d]; if (v != null) { s += v; c++; } } return s / c; });
+  }
+
+  // monotone cubic path: smooth, but never overshoots a real peak or dip
+  function smooth(pts) {
+    const n = pts.length;
+    if (n < 3) return "M" + pts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join("L");
+    const dx = [], dy = [], ms = [];
+    for (let i = 0; i < n - 1; i++) { dx[i] = pts[i + 1][0] - pts[i][0]; dy[i] = pts[i + 1][1] - pts[i][1]; ms[i] = dy[i] / (dx[i] || 1); }
+    const t = [ms[0]];
+    for (let i = 1; i < n - 1; i++) t[i] = ms[i - 1] * ms[i] <= 0 ? 0 : (3 * (dx[i - 1] + dx[i])) / ((2 * dx[i] + dx[i - 1]) / ms[i - 1] + (dx[i] + 2 * dx[i - 1]) / ms[i]);
+    t[n - 1] = ms[n - 2];
+    let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+    for (let i = 0; i < n - 1; i++) {
+      const h = dx[i] / 3;
+      d += `C${(pts[i][0] + h).toFixed(1)},${(pts[i][1] + h * t[i]).toFixed(1)} ${(pts[i + 1][0] - h).toFixed(1)},${(pts[i + 1][1] - h * t[i + 1]).toFixed(1)} ${pts[i + 1][0].toFixed(1)},${pts[i + 1][1].toFixed(1)}`;
+    }
+    return d;
   }
 
   function drawSignals(heat) {
     const box = $("sigChart");
-    if (!heat.length || !heat[0].signals || $("signalsCard").classList.contains("hidden")) { box.innerHTML = ""; return; }
+    if (!heat.length || !heat[0].signals || $("r-signals").classList.contains("hidden")) { box.innerHTML = ""; return; }
     const names = Object.keys(heat[0].signals);
-    const W = Math.max(320, box.clientWidth), H = W < 600 ? 200 : 240;
-    const m = { l: 34, r: 12, t: 10, b: 26 };
+    const W = Math.max(320, box.clientWidth), H = W < 600 ? 220 : 260;
+    const m = { l: 36, r: 14, t: 10, b: 28 };
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
     const dur = current.duration || heat[heat.length - 1].end;
     const x = (t) => m.l + (t / dur) * iw;
     const y = (v) => m.t + (1 - v) * ih;
     let g = "";
     [0, 0.5, 1].forEach((v) => {
-      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(29,29,31,.07)"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="${C.grid}"/><text x="${m.l - 10}" y="${y(v) + 3.5}" text-anchor="end">${v}</text>`;
     });
-    niceTicks(dur, W < 600 ? 4 : 7).forEach((t) => (g += `<text x="${x(t)}" y="${H - 6}" text-anchor="middle">${hms(t)}</text>`));
+    niceTicks(dur, W < 600 ? 4 : 8).forEach((t) => (g += `<text x="${x(t)}" y="${H - 8}" text-anchor="middle">${hms(t)}</text>`));
     names.forEach((n, i) => {
       if (hiddenSignals.has(n)) return;
-      const d = "M" + heat.map((p) => `${x((p.start + p.end) / 2).toFixed(1)},${y(p.signals[n] || 0).toFixed(1)}`).join("L");
-      g += `<path d="${d}" fill="none" stroke="${color(n, i)}" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity=".85"/>`;
+      const vals = rolling(heat.map((p) => p.signals[n] || 0), $("smoothSig").checked ? 2 : 0);
+      const d = smooth(heat.map((p, k) => [x((p.start + p.end) / 2), y(vals[k])]));
+      g += `<path d="${d}" fill="none" stroke="${color(n, i)}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>`;
     });
+    g += `<line class="hl" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="rgba(255,255,255,.35)" visibility="hidden"/>`;
     g += `<rect class="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
     box.innerHTML = svgEl(W, H, g);
     const svg = box.querySelector("svg");
-    const hit = svg.querySelector(".hit");
+    const hit = svg.querySelector(".hit"), shl = svg.querySelector(".hl");
     const at = (evt) => {
       const rect = svg.getBoundingClientRect();
       const t = ((evt.clientX - rect.left) * (W / rect.width) - m.l) / iw * dur;
@@ -467,17 +544,19 @@
     };
     hit.addEventListener("mousemove", (evt) => {
       const p = at(evt);
+      const xx = x((p.start + p.end) / 2);
+      shl.setAttribute("x1", xx); shl.setAttribute("x2", xx); shl.setAttribute("visibility", "visible");
       const rows = names.filter((n) => !hiddenSignals.has(n)).map((n, i) => `<div class="r"><span><span class="dot" style="background:${color(n, names.indexOf(n))}"></span>${esc(label(n))}</span><b>${(p.signals[n] || 0).toFixed(2)}</b></div>`).join("");
       showTip(evt, `<div class="t">${hms(p.start)} – ${hms(p.end)}</div>${rows}`);
     });
-    hit.addEventListener("mouseleave", hideTip);
+    hit.addEventListener("mouseleave", () => { shl.setAttribute("visibility", "hidden"); hideTip(); });
     hit.addEventListener("click", (evt) => seek(at(evt).start));
     document.querySelectorAll("#sigChips .chip").forEach((c) => c.classList.toggle("off", hiddenSignals.has(c.dataset.sig)));
   }
 
   function barChart(box, cats, vals, opts = {}) {
-    const W = Math.max(280, box.clientWidth), H = opts.h || 200;
-    const m = { l: 34, r: 8, t: 18, b: 30 };
+    const W = Math.max(280, box.clientWidth), H = opts.h || 220;
+    const m = { l: 36, r: 8, t: 22, b: 30 };
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
     const max = opts.max || Math.max(...vals, 0.0001);
     const bw = iw / cats.length;
@@ -485,18 +564,18 @@
     const ticks = opts.ticks || [0, max / 2, max];
     ticks.forEach((v) => {
       const yy = m.t + (1 - v / max) * ih;
-      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" stroke="rgba(29,29,31,.07)"/><text x="${m.l - 8}" y="${yy + 4}" text-anchor="end">${opts.fmtTick ? opts.fmtTick(v) : v}</text>`;
+      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" stroke="${C.grid}"/><text x="${m.l - 10}" y="${yy + 3.5}" text-anchor="end">${opts.fmtTick ? opts.fmtTick(v) : v}</text>`;
     });
     vals.forEach((v, i) => {
       const h = (v / max) * ih;
       const bx = m.l + i * bw + bw * 0.16;
       const w = bw * 0.68;
-      const fill = opts.colors ? opts.colors[i] : "#1d1d1f";
-      g += `<rect x="${bx}" y="${m.t + ih - h}" width="${w}" height="${Math.max(0, h)}" rx="4" fill="${fill}"><title>${esc(cats[i])}: ${opts.fmt ? opts.fmt(v) : v}</title></rect>`;
-      if (opts.labels !== false) g += `<text x="${bx + w / 2}" y="${m.t + ih - h - 5}" text-anchor="middle" style="fill:#1d1d1f">${opts.fmt ? opts.fmt(v) : v}</text>`;
+      const fill = opts.colors ? opts.colors[i] : "rgba(255,255,255,.2)";
+      g += `<rect x="${bx}" y="${m.t + ih - h}" width="${w}" height="${Math.max(0, h)}" rx="5" fill="${fill}"><title>${esc(cats[i])}: ${opts.fmt ? opts.fmt(v) : v}</title></rect>`;
+      if (opts.labels !== false) g += `<text x="${bx + w / 2}" y="${m.t + ih - h - 7}" text-anchor="middle" style="fill:#d8d8e2">${opts.fmt ? opts.fmt(v) : v}</text>`;
       if (!opts.skipCat || i % opts.skipCat === 0) g += `<text class="cat" x="${bx + w / 2}" y="${H - 9}" text-anchor="middle">${esc(cats[i])}</text>`;
     });
-    box.innerHTML = svgEl(W, H, g);
+    box.innerHTML = svgEl(W, H, `<defs><linearGradient id="barGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".5" stop-color="#ff5a1f"/><stop offset="1" stop-color="#ff2e63"/></linearGradient></defs>` + g);
   }
 
   function drawParts(heat, duration) {
@@ -509,7 +588,7 @@
     const best = vals.indexOf(Math.max(...vals));
     barChart($("partsChart"), names.map((n, i) => `${n}`), vals, {
       max: 1, ticks: [0, 0.5, 1], fmt: (v) => v.toFixed(2), fmtTick: (v) => v,
-      colors: vals.map((_, i) => (i === best ? "#ff4d00" : "rgba(29,29,31,.78)")),
+      colors: vals.map((_, i) => (i === best ? "url(#barGrad)" : "rgba(255,255,255,.16)")),
     });
   }
 
@@ -538,12 +617,20 @@
   function hideTip() { tip.classList.add("hidden"); }
 
   // ------------------------------------------------------------- player --
+  function setNow(sec) {
+    const el = $("nowPlaying");
+    el.classList.toggle("playing", sec != null);
+    el.lastElementChild.textContent = sec == null ? "Pick a moment to jump there." : `Playing from ${hms(sec)}`;
+  }
   function seek(sec) {
     if (!current) return;
     const s = Math.max(0, Math.floor(sec));
     $("player").src = `https://www.youtube-nocookie.com/embed/${current.video_id}?start=${s}&autoplay=1&rel=0`;
-    $("nowPlaying").textContent = `Playing from ${hms(s)}.`;
-    if (innerWidth < 760) $("player").scrollIntoView({ behavior: "smooth", block: "center" });
+    setNow(s);
+    playhead = s;
+    drawMain(current.full_heatmap || [], current);
+    const pr = $("player").getBoundingClientRect();
+    if (pr.top < 64 || pr.bottom > innerHeight) $("player").scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   // ------------------------------------------------------------ exports --
@@ -564,13 +651,19 @@
 
   // ------------------------------------------------------------- events --
   $("analyzeForm").addEventListener("submit", analyze);
-  $("settingsToggle").addEventListener("click", () => $("connection").classList.toggle("collapsed"));
+  $("connToggle").addEventListener("click", () => openConn($("connection").classList.contains("collapsed")));
+  $("navConn").addEventListener("click", () => openConn(true));
+  document.querySelectorAll(".os-tabs button").forEach((b) => b.addEventListener("click", () => { setOS(b.dataset.os); saveSettings(); }));
+  $("cmdCopy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(currentOS === "mac" ? "bash start-mac.command" : "start-windows.bat"); $("cmdCopy").textContent = "Copied"; setTimeout(() => ($("cmdCopy").textContent = "Copy"), 1400); } catch (_) { /* ignore */ }
+  });
   $("showKey").addEventListener("click", () => {
     const k = $("apiKey");
     k.type = k.type === "password" ? "text" : "password";
     $("showKey").textContent = k.type === "password" ? "Show" : "Hide";
   });
   $("testConn").addEventListener("click", () => { saveSettings(); testConnection(); });
+  ["apiBase", "apiKey"].forEach((id) => $(id).addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); saveSettings(); testConnection(); } }));
   ["apiBase", "apiKey", "windowSel", "remember"].forEach((id) => $(id).addEventListener("change", saveSettings));
   $("sampleBtn").addEventListener("click", async () => {
     hideError();
@@ -588,6 +681,15 @@
     const s = e.target.closest("[data-seek]");
     if (s && s.closest("#results")) seek(parseFloat(s.dataset.seek));
   });
+  document.querySelectorAll(".seg-toggle button").forEach((b) => b.addEventListener("click", () => {
+    const low = b.dataset.list === "low";
+    document.querySelectorAll(".seg-toggle button").forEach((x) => x.classList.toggle("on", x === b));
+    $("topList").classList.toggle("hidden", low);
+    $("lowList").classList.toggle("hidden", !low);
+    $("momTitle").textContent = low ? "Drop-offs" : "Top moments";
+    $("momSub").textContent = low ? "Where attention is weakest, and which signals were flat." : "The highest-scoring stretches, with what drove each one.";
+  }));
+  $("smoothSig").addEventListener("change", () => current && drawSignals(current.full_heatmap || []));
   $("sigChips").addEventListener("click", (e) => {
     const c = e.target.closest("[data-sig]");
     if (!c) return;
@@ -599,11 +701,22 @@
   $("dlCsv").addEventListener("click", () => current && download(`heatmap-${current.video_id}.csv`, toCSV(current), "text/csv"));
   $("copyJson").addEventListener("click", async () => {
     if (!current) return;
-    try { await navigator.clipboard.writeText(JSON.stringify(current, null, 2)); $("copyJson").textContent = "Copied"; setTimeout(() => ($("copyJson").textContent = "Copy JSON"), 1500); } catch (_) { /* ignore */ }
+    const lbl = $("copyJson").querySelector("span");
+    try { await navigator.clipboard.writeText(JSON.stringify(current, null, 2)); lbl.textContent = "Copied"; setTimeout(() => (lbl.textContent = "Copy JSON"), 1500); } catch (_) { /* ignore */ }
   });
   let rt;
   addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawCharts, 120); });
 
+  // decorative hero bars
+  $("heroStrip").innerHTML = Array.from({ length: 36 }, (_, i) => {
+    const base = 0.18 + 0.8 * Math.pow(Math.sin((i / 35) * Math.PI * 1.15 + 0.4) * 0.5 + 0.5, 2.2) * (0.6 + 0.4 * Math.sin(i * 1.7));
+    const a = Math.max(0.12, Math.min(1, base)), b = Math.max(0.12, Math.min(1, base * (0.55 + 0.6 * ((i * 37) % 10) / 10)));
+    return `<i style="--a:${a.toFixed(2)};--b:${b.toFixed(2)};animation-delay:${(-i * 0.13).toFixed(2)}s"></i>`;
+  }).join("");
+
+  setOS(currentOS);
   loadSettings();
   drawHistory();
+  testConnection({ quiet: true }).then((ok) => { if (!ok && !normBase($("apiBase").value)) openConn(true); });
+  if (new URLSearchParams(location.search).get("sample") != null) $("sampleBtn").click();
 })();

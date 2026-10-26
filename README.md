@@ -514,7 +514,7 @@ app/
   ytdl.py         yt-dlp options, per-download temp folders, proxy/cookies, retry/backoff
   worker.py       multi-process RQ worker entrypoint (Docker mode)
   sources/        official.py comments.py transcript.py audio.py visual.py
-dashboard/        static web dashboard (index.html, styles.css, app.js, sample.json)
+dashboard/        static web dashboard: index.html (connect + analyze), about.html (how it works), styles.css, app.js, sample.json
 scripts/
   local-windows.ps1  Windows runner behind start-windows.bat
   local-mac.sh       macOS runner behind start-mac.command
