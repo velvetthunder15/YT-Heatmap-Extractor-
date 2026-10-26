@@ -117,6 +117,28 @@ For `https://api.yourdomain.com`, you need a domain added to your Cloudflare acc
 **Secrets:** the Cloudflare token is stored only in your `.env`, which git ignores. Don't share it. If it
 leaks, delete it in Cloudflare (API Tokens or the tunnel) and run setup again.
 
+### 7. (Optional) Run it in the background, with no window
+
+A permanent URL is just a fixed address. The actual work (downloading the video, scoring audio and
+frames) still happens **on your computer**, so something has to keep running there. Background mode
+means you never have to keep a window open for it:
+
+1. Run `start-windows.bat` once so it's set up, then close it.
+2. Double-click **`install-background.bat`**. It prints your API URL and key, and that's it.
+
+From then on the server runs **hidden**, **starts by itself every time you log in**, restarts itself if
+it crashes, reconnects the tunnel if your network drops, and keeps the PC from idle-sleeping while it runs.
+
+| File | What it does |
+|---|---|
+| `background-status.bat` | Is it running? Shows the current API URL and key |
+| `uninstall-background.bat` | Stop it and remove it from login |
+| `logs\server.log` | What it's doing (errors show up here) |
+
+It still stops when the computer is **shut down, asleep (lid closed) or offline**. With a workers.dev URL
+the API then answers `503 server_offline` until it's back. For true 24/7 you'd need a machine that's
+always on (an old laptop, a Raspberry Pi-class mini PC). Cloud servers usually get blocked by YouTube, which is why this runs at home.
+
 ### Updating
 
 Re-download the ZIP and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
@@ -166,7 +188,7 @@ The first run takes a few minutes and keeps everything inside the project folder
 
 ### 3. Everything else is the same as Windows
 
-The window prints the same `API URL` and `API key` lines. Continue with **steps 3–6 above**, using these Mac equivalents:
+The window prints the same `API URL` and `API key` lines. Continue with **steps 3–7 above**, using these Mac equivalents:
 
 | Windows | macOS |
 |---|---|
@@ -175,9 +197,12 @@ The window prints the same `API URL` and `API key` lines. Continue with **steps 
 | `setup-permanent-url.bat -Remove` | `bash setup-permanent-url.command --remove` |
 | `secrets\api_key.txt` | `secrets/api_key.txt` (`cat secrets/api_key.txt`) |
 | Close the window | Press **Ctrl+C** in Terminal |
+| `install-background.bat` | `bash install-background.command` (move the folder out of Desktop/Documents/Downloads first, since macOS blocks background jobs there) |
+| `background-status.bat` | `bash install-background.command --status` |
+| `uninstall-background.bat` | `bash install-background.command --uninstall` |
 
-Keep the Terminal window open while you use the API. To keep the Mac from sleeping while it serves,
-run it as `caffeinate -i bash start-mac.command`.
+Keep the Terminal window open while you use the API, or use background mode (step 7) to run it as a hidden
+login service via launchd that also keeps the Mac awake.
 
 **Updating:** run `git pull` (or re-download the ZIP over the folder), then start it again.
 
@@ -493,6 +518,8 @@ dashboard/        static web dashboard (index.html, styles.css, app.js, sample.j
 scripts/
   local-windows.ps1  Windows runner behind start-windows.bat
   local-mac.sh       macOS runner behind start-mac.command
+  background-windows.ps1 / run-hidden.vbs / background-install.ps1   Windows background mode
+  background-mac.sh  macOS background mode (launchd LaunchAgent)
   setup-tunnel.sh    macOS twin of setup-tunnel.ps1
   local_setup.py     creates .env, CORS and the permanent API key
   setup-tunnel.ps1   behind setup-permanent-url.bat
@@ -502,6 +529,8 @@ scripts/
 start-windows.bat
 setup-permanent-url.bat   permanent URL via your Cloudflare account (workers.dev or own domain)
 start-mac.command         macOS one-command start
+install-background.bat / uninstall-background.bat / background-status.bat   Windows background mode
+install-background.command   macOS background mode
 setup-permanent-url.command   macOS permanent-URL setup
 worker/proxy.js           the workers.dev forwarding Worker
 netlify.toml      deploys dashboard/ to Netlify

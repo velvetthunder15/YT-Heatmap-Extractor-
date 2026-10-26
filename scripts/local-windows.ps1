@@ -3,12 +3,13 @@
 # creates .env + a permanent API key, opens a free Cloudflare tunnel and starts the API.
 # Run via start-windows.bat (double-click) or:
 #   powershell -ExecutionPolicy Bypass -File .\scripts\local-windows.ps1
+param([switch]$Background)   # -Background: used by the hidden background service (logs to files)
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"   # makes Invoke-WebRequest much faster
 Set-Location (Join-Path $PSScriptRoot "..")
 $root = (Get-Location).Path
 $tools = Join-Path $root ".tools"
-New-Item -ItemType Directory -Force $tools, "secrets", "tmp" | Out-Null
+New-Item -ItemType Directory -Force $tools, "secrets", "tmp", "logs" | Out-Null
 
 function Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
 
@@ -83,10 +84,24 @@ Step "Preparing config and API key"
 $key = (& $venvPy -m scripts.local_setup | Select-Object -Last 1).Trim()
 if ($LASTEXITCODE -ne 0 -or -not $key) { throw "Config setup failed." }
 
-# ---------- 5. Tunnel + API ----------
+# ---------- 5. Tunnel + API (with a watchdog that reconnects the tunnel) ----------
 $port = 8000
-# Clean up leftovers from a previous run whose window was closed with X
-# (that skips the cleanup below, so cloudflared / the API can linger in the background).
+$statusFile = Join-Path $root "logs\status.txt"
+
+# If the background service is running, don't start a second copy that would fight it.
+if (-not $Background) {
+  $bg = Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -like "*background-windows.ps1*" }
+  if ($bg) {
+    Write-Host ""
+    Write-Host "The server is already running in the background (installed with install-background.bat)." -ForegroundColor Green
+    if (Test-Path $statusFile) { Get-Content $statusFile | Write-Host }
+    Write-Host "Nothing else to do. To stop it, run uninstall-background.bat." -ForegroundColor Yellow
+    exit 0
+  }
+}
+
+# Clean up leftovers from a previous run whose window was closed with X.
 Get-Process cloudflared -ErrorAction SilentlyContinue |
   Where-Object { $_.Path -eq "$tools\cloudflared.exe" } | Stop-Process -Force -ErrorAction SilentlyContinue
 $listeners = @(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
@@ -97,10 +112,7 @@ foreach ($c in $listeners) {
   else { throw "Port $port is already used by another program ($($p.ProcessName)). Close it and retry." }
 }
 Start-Sleep -Milliseconds 500
-Get-ChildItem $tools -Filter "tunnel-*.log*" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
-$log = Join-Path $tools ("tunnel-{0}.log" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
-# Permanent URL: when setup-permanent-url.bat has put a tunnel token in .env, run that named
-# tunnel (your own Cloudflare account + domain). Otherwise open a free quick tunnel (random URL).
+
 function Get-EnvValue($name) {
   $line = Select-String -Path (Join-Path $root ".env") -Pattern "^$name=(.*)$" -ErrorAction SilentlyContinue | Select-Object -First 1
   if (-not $line) { return "" }
@@ -108,41 +120,56 @@ function Get-EnvValue($name) {
 }
 $tunnelToken = Get-EnvValue "CLOUDFLARE_TUNNEL_TOKEN"
 $publicUrl = (Get-EnvValue "PUBLIC_BASE_URL").TrimEnd("/")
-$named = [bool]$tunnelToken
-$url = ""
-if ($named) {
-  Step "Connecting your permanent Cloudflare tunnel"
-  $tunnel = Start-Process -FilePath "$tools\cloudflared.exe" `
-    -ArgumentList "tunnel", "--no-autoupdate", "run", "--token", $tunnelToken `
-    -RedirectStandardError $log -RedirectStandardOutput "$log.out" -WindowStyle Hidden -PassThru
-  $ok = $false
-  for ($i = 0; $i -lt 30 -and -not $ok; $i++) {
-    Start-Sleep 1
-    if ($tunnel.HasExited) { break }
-    if ((Test-Path $log) -and (Select-String -Path $log -Pattern 'Registered tunnel connection' -Quiet)) { $ok = $true }
+$useWorker = [bool](Get-EnvValue "CF_KV_NAMESPACE_ID")
+
+# Starts cloudflared. Sets $script:tunnel, $script:url, $script:named.
+# Named tunnel = your domain; otherwise a quick tunnel (+ workers.dev pointer if set up).
+function Start-Tunnel {
+  Get-ChildItem $tools -Filter "tunnel-*.log*" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+  $log = Join-Path $tools ("tunnel-{0}.log" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
+  $script:url = ""; $script:named = $false
+  if ($tunnelToken) {
+    Step "Connecting your permanent Cloudflare tunnel"
+    $script:tunnel = Start-Process -FilePath "$tools\cloudflared.exe" `
+      -ArgumentList "tunnel", "--no-autoupdate", "run", "--token", $tunnelToken `
+      -RedirectStandardError $log -RedirectStandardOutput "$log.out" -WindowStyle Hidden -PassThru
+    for ($i = 0; $i -lt 30; $i++) {
+      Start-Sleep 1
+      if ($script:tunnel.HasExited) { Write-Host "The tunnel token was rejected. Run setup-permanent-url.bat again with a fresh token." -ForegroundColor Red; return }
+      if ((Test-Path $log) -and (Select-String -Path $log -Pattern 'Registered tunnel connection' -Quiet)) { $script:url = $publicUrl; $script:named = $true; return }
+    }
+    return
   }
-  if ($ok) { $url = $publicUrl }
-  elseif ($tunnel.HasExited) { Write-Host "The tunnel token was rejected. Run setup-permanent-url.bat again with a fresh token." -ForegroundColor Red }
-} else {
   Step "Opening free Cloudflare quick tunnel"
-  $tunnel = Start-Process -FilePath "$tools\cloudflared.exe" `
+  $script:tunnel = Start-Process -FilePath "$tools\cloudflared.exe" `
     -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:$port" `
     -RedirectStandardError $log -RedirectStandardOutput "$log.out" -WindowStyle Hidden -PassThru
-  for ($i = 0; $i -lt 30 -and -not $url; $i++) {
+  for ($i = 0; $i -lt 30 -and -not $script:url; $i++) {
     Start-Sleep 1
     if (Test-Path $log) {
       $m = Select-String -Path $log -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' | Select-Object -First 1
-      if ($m) { $url = $m.Matches[0].Value }
+      if ($m) { $script:url = $m.Matches[0].Value }
     }
   }
-  # Free permanent URL: point the user's workers.dev Worker at this run's quick tunnel.
-  if ($url -and (Get-EnvValue "CF_KV_NAMESPACE_ID")) {
+  if ($script:url -and $useWorker) {
     Step "Pointing your permanent workers.dev URL at this run"
-    $w = (& $venvPy -m scripts.cf_worker set-target $url | Select-Object -Last 1)
-    if ($LASTEXITCODE -eq 0 -and $w) { $url = $w.Trim(); $named = $true }
+    $w = (& $venvPy -m scripts.cf_worker set-target $script:url | Select-Object -Last 1)
+    if ($LASTEXITCODE -eq 0 -and $w) { $script:url = $w.Trim(); $script:named = $true }
     else { Write-Host "Couldn't update the workers.dev URL (see the error above). Using the random URL for now." -ForegroundColor Yellow }
   }
 }
+
+function Write-Status {
+  $shown = if ($script:url) { $script:url } else { "(not ready - local only: http://127.0.0.1:$port)" }
+  @(
+    "API URL:  $shown",
+    "API key:  $key",
+    "Updated:  $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+  ) | Set-Content -Path $statusFile -Encoding UTF8
+}
+
+Start-Tunnel
+Write-Status
 
 Write-Host ""
 Write-Host "================ YouTube Heatmap Extractor ================" -ForegroundColor Green
@@ -155,13 +182,35 @@ Write-Host ""
 Write-Host "Try it in another terminal:"
 Write-Host "  curl.exe -H `"X-API-Key: $key`" `"$base/v1/heatmap?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ`""
 Write-Host ""
-if ($named) { Write-Host "Keep this window open. Close it or press Ctrl+C to stop. Your URL is permanent." -ForegroundColor Yellow }
-else { Write-Host "Keep this window open. Close it or press Ctrl+C to stop. This URL changes each start: run setup-permanent-url.bat for a fixed one." -ForegroundColor Yellow }
-Write-Host ""
+if (-not $Background) {
+  if ($named) { Write-Host "Keep this window open. Close it or press Ctrl+C to stop. Your URL is permanent." -ForegroundColor Yellow }
+  else { Write-Host "Keep this window open. Close it or press Ctrl+C to stop. This URL changes each start: run setup-permanent-url.bat for a fixed one." -ForegroundColor Yellow }
+  Write-Host "Don't want a window at all? Run install-background.bat once: it runs hidden and starts when you log in." -ForegroundColor Yellow
+  Write-Host ""
+}
 
+$env:PORT = "$port"
+$app = $null
 try {
-  $env:PORT = "$port"
-  & $venvPy -m app.local
+  if ($Background) {
+    $app = Start-Process -FilePath $venvPy -ArgumentList "-m", "app.local" -WindowStyle Hidden -PassThru `
+      -RedirectStandardOutput (Join-Path $root "logs\app.log") -RedirectStandardError (Join-Path $root "logs\app.err.log")
+  } else {
+    $app = Start-Process -FilePath $venvPy -ArgumentList "-m", "app.local" -NoNewWindow -PassThru
+  }
+  # Watchdog: if cloudflared dies (network drop it couldn't recover from), start it again.
+  while (-not $app.HasExited) {
+    Start-Sleep 5
+    if ($tunnel -and $tunnel.HasExited) {
+      Write-Host "$(Get-Date -Format 'HH:mm:ss') Tunnel dropped - reconnecting..." -ForegroundColor Yellow
+      Start-Sleep 5
+      Start-Tunnel
+      Write-Status
+      if ($url) { Write-Host "Reconnected: $url" -ForegroundColor Green }
+    }
+  }
+  Write-Host "The API process stopped (exit code $($app.ExitCode))." -ForegroundColor Yellow
 } finally {
+  if ($app -and -not $app.HasExited) { Stop-Process -Id $app.Id -Force -ErrorAction SilentlyContinue }
   if ($tunnel -and -not $tunnel.HasExited) { Stop-Process -Id $tunnel.Id -Force -ErrorAction SilentlyContinue }
 }

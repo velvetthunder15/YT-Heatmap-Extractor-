@@ -7,7 +7,13 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
 TOOLS="$ROOT/.tools"
-mkdir -p "$TOOLS" secrets tmp
+mkdir -p "$TOOLS" secrets tmp logs
+BACKGROUND=0; [ "${1:-}" = "--background" ] && BACKGROUND=1
+if [ "$BACKGROUND" = 1 ]; then
+  echo "==== $(date '+%Y-%m-%d %H:%M:%S') starting ===="
+  # keep the launchd log from growing forever
+  if [ -f logs/server.log ] && [ "$(wc -c < logs/server.log)" -gt 5000000 ]; then tail -c 1000000 logs/server.log > logs/server.log.tmp && cat logs/server.log.tmp > logs/server.log && rm logs/server.log.tmp; fi
+fi
 step() { printf '\033[36m==> %s\033[0m\n' "$*"; }
 warn() { printf '\033[33m%s\033[0m\n' "$*"; }
 die()  { printf '\033[31m%s\033[0m\n' "$*"; exit 1; }
@@ -78,45 +84,81 @@ KEY="$("$VENV_PY" -m scripts.local_setup | tail -n1 | tr -d '[:space:]')"
 [ -n "$KEY" ] || die "Config setup failed."
 envget() { "$VENV_PY" -c "from scripts.cf_worker import read_env; print(read_env().get('$1', ''))"; }
 
-# ---------- 5. Tunnel + API ----------
+# ---------- 5. Tunnel + API (with a watchdog that reconnects the tunnel) ----------
 PORT=8000
+STATUS="$ROOT/logs/status.txt"
+LABEL="com.ytheatmap.server"
+
+# If the background service is running, don't start a second copy that would fight it.
+if [ "$BACKGROUND" = 0 ] && launchctl print "gui/$(id -u)/$LABEL" >/dev/null 2>&1; then
+  echo
+  printf '\033[32mThe server is already running in the background (install-background.command).\033[0m\n'
+  [ -f "$STATUS" ] && cat "$STATUS"
+  warn "Nothing else to do. To stop it: bash install-background.command --uninstall"
+  exit 0
+fi
+
 pkill -f "$TOOLS/cloudflared" 2>/dev/null || true
 for pid in $(lsof -ti tcp:$PORT -sTCP:LISTEN 2>/dev/null || true); do
   if ps -o command= -p "$pid" | grep -q "$ROOT/.venv"; then kill -9 "$pid" 2>/dev/null || true
   else die "Port $PORT is already used by another program ($(ps -o comm= -p "$pid")). Close it and retry."; fi
 done
 sleep 0.5
-rm -f "$TOOLS"/tunnel-*.log
-LOG="$TOOLS/tunnel-$(date +%Y%m%d-%H%M%S).log"
 
 TUNNEL_TOKEN="$(envget CLOUDFLARE_TUNNEL_TOKEN)"
 PUBLIC_URL="$(envget PUBLIC_BASE_URL)"; PUBLIC_URL="${PUBLIC_URL%/}"
-NAMED=0; URL=""
-if [ -n "$TUNNEL_TOKEN" ]; then
-  step "Connecting your permanent Cloudflare tunnel"
-  "$TOOLS/cloudflared" tunnel --no-autoupdate run --token "$TUNNEL_TOKEN" >"$LOG" 2>&1 &
-  TUNNEL_PID=$!
-  for _ in $(seq 30); do
-    sleep 1
-    kill -0 "$TUNNEL_PID" 2>/dev/null || { warn "The tunnel token was rejected. Run setup-permanent-url.command again with a fresh token."; break; }
-    if grep -q "Registered tunnel connection" "$LOG"; then URL="$PUBLIC_URL"; NAMED=1; break; fi
-  done
-else
+USE_WORKER=0; [ -n "$(envget CF_KV_NAMESPACE_ID)" ] && USE_WORKER=1
+TUNNEL_PID=""; APP_PID=""; URL=""; NAMED=0
+
+# Starts cloudflared; sets TUNNEL_PID, URL, NAMED.
+start_tunnel() {
+  rm -f "$TOOLS"/tunnel-*.log
+  local log="$TOOLS/tunnel-$(date +%Y%m%d-%H%M%S).log"
+  URL=""; NAMED=0
+  if [ -n "$TUNNEL_TOKEN" ]; then
+    step "Connecting your permanent Cloudflare tunnel"
+    "$TOOLS/cloudflared" tunnel --no-autoupdate run --token "$TUNNEL_TOKEN" >"$log" 2>&1 &
+    TUNNEL_PID=$!
+    for _ in $(seq 30); do
+      sleep 1
+      kill -0 "$TUNNEL_PID" 2>/dev/null || { warn "The tunnel token was rejected. Run setup-permanent-url.command again with a fresh token."; return 0; }
+      if grep -q "Registered tunnel connection" "$log"; then URL="$PUBLIC_URL"; NAMED=1; return 0; fi
+    done
+    return 0
+  fi
   step "Opening free Cloudflare quick tunnel"
-  "$TOOLS/cloudflared" tunnel --no-autoupdate --url "http://127.0.0.1:$PORT" >"$LOG" 2>&1 &
+  "$TOOLS/cloudflared" tunnel --no-autoupdate --url "http://127.0.0.1:$PORT" >"$log" 2>&1 &
   TUNNEL_PID=$!
   for _ in $(seq 30); do
     sleep 1
-    URL="$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$LOG" | head -n1 || true)"
+    URL="$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$log" | head -n1 || true)"
     [ -n "$URL" ] && break
   done
-  if [ -n "$URL" ] && [ -n "$(envget CF_KV_NAMESPACE_ID)" ]; then
+  if [ -n "$URL" ] && [ "$USE_WORKER" = 1 ]; then
     step "Pointing your permanent workers.dev URL at this run"
-    if W="$("$VENV_PY" -m scripts.cf_worker set-target "$URL" | tail -n1)" && [ -n "$W" ]; then URL="$W"; NAMED=1
+    local w
+    if w="$("$VENV_PY" -m scripts.cf_worker set-target "$URL" | tail -n1)" && [ -n "$w" ]; then URL="$w"; NAMED=1
     else warn "Couldn't update the workers.dev URL (see the error above). Using the random URL for now."; fi
   fi
-fi
-trap 'kill "$TUNNEL_PID" 2>/dev/null || true' EXIT INT TERM
+}
+
+write_status() {
+  {
+    echo "API URL:  ${URL:-(not ready - local only: http://127.0.0.1:$PORT)}"
+    echo "API key:  $KEY"
+    echo "Updated:  $(date '+%Y-%m-%d %H:%M:%S')"
+  } > "$STATUS"
+}
+
+cleanup() {
+  [ -n "$APP_PID" ] && kill "$APP_PID" 2>/dev/null || true
+  [ -n "$TUNNEL_PID" ] && kill "$TUNNEL_PID" 2>/dev/null || true
+}
+trap cleanup EXIT
+trap 'exit 130' INT TERM
+
+start_tunnel
+write_status
 
 echo
 printf '\033[32m================ YouTube Heatmap Extractor ================\033[0m\n'
@@ -132,8 +174,24 @@ echo
 echo "Try it in another Terminal window:"
 echo "  curl -H \"X-API-Key: $KEY\" \"$BASE/v1/heatmap?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ\""
 echo
-if [ "$NAMED" = 1 ]; then warn "Keep this window open. Close it or press Ctrl+C to stop. Your URL is permanent."
-else warn "Keep this window open. Close it or press Ctrl+C to stop. This URL changes each start: run setup-permanent-url.command for a fixed one."; fi
-echo
+if [ "$BACKGROUND" = 0 ]; then
+  if [ "$NAMED" = 1 ]; then warn "Keep this window open. Close it or press Ctrl+C to stop. Your URL is permanent."
+  else warn "Keep this window open. Close it or press Ctrl+C to stop. This URL changes each start: run setup-permanent-url.command for a fixed one."; fi
+  warn "Don't want a window at all? Run  bash install-background.command  once: it runs hidden and starts when you log in."
+  echo
+fi
 
-PORT=$PORT "$VENV_PY" -m app.local
+PORT=$PORT "$VENV_PY" -m app.local &
+APP_PID=$!
+# Watchdog: if cloudflared dies (network drop it couldn't recover from), start it again.
+while kill -0 "$APP_PID" 2>/dev/null; do
+  sleep 5
+  if [ -n "$TUNNEL_PID" ] && ! kill -0 "$TUNNEL_PID" 2>/dev/null; then
+    warn "$(date +%H:%M:%S) Tunnel dropped - reconnecting..."
+    sleep 5
+    start_tunnel
+    write_status
+    [ -n "$URL" ] && printf '\033[32mReconnected: %s\033[0m\n' "$URL"
+  fi
+done
+wait "$APP_PID" || warn "The API process stopped (exit code $?)."
