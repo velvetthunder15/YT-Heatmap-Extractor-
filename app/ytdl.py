@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import logging
 import os
+import tempfile
 import random
 import time
 from typing import Any, Callable, TypeVar
@@ -95,10 +96,13 @@ def download(video_url: str, out_dir: str, fmt: str, **overrides: Any) -> str:
     import yt_dlp  # lazy
 
     def _run() -> str:
-        opts = base_opts(format=fmt, outtmpl=os.path.join(out_dir, "%(id)s.%(ext)s"), **overrides)
+        # Each download gets its own folder, so the audio .wav can never be mistaken for the video.
+        os.makedirs(out_dir, exist_ok=True)
+        dest = tempfile.mkdtemp(prefix="dl-", dir=out_dir)
+        opts = base_opts(format=fmt, outtmpl=os.path.join(dest, "%(id)s.%(ext)s"), **overrides)
         with yt_dlp.YoutubeDL(opts) as ydl:
             ydl.extract_info(video_url, download=True)
-        files = [os.path.join(out_dir, f) for f in os.listdir(out_dir) if not f.endswith(".part")]
+        files = [os.path.join(dest, f) for f in os.listdir(dest) if not f.endswith(".part")]
         if not files:
             raise UpstreamBlocked("Download produced no file.")
         return max(files, key=os.path.getsize)

@@ -88,3 +88,26 @@ def test_visual_cut_detection_ignores_normal_motion():
     diffs[10] = (5.0, 90.0)
     diffs[30] = (15.0, 70.0)
     assert detect_cuts(diffs) == [5.0, 15.0]
+
+
+def test_downloads_never_share_a_folder(tmp_path, monkeypatch):
+    import sys, types
+    from app import ytdl
+
+    class FakeYDL:
+        def __init__(self, opts):
+            self.opts = opts
+        def __enter__(self):
+            return self
+        def __exit__(self, *a):
+            return False
+        def extract_info(self, url, download):
+            path = self.opts["outtmpl"].replace("%(id)s", "vid").replace("%(ext)s", self.opts["ext"])
+            with open(path, "wb") as f:
+                f.write(b"x" * self.opts["size"])
+
+    monkeypatch.setitem(sys.modules, "yt_dlp", types.SimpleNamespace(YoutubeDL=FakeYDL))
+    monkeypatch.setattr(ytdl, "base_opts", lambda **kw: kw)
+    big_audio = ytdl.download("u", str(tmp_path), "a", ext="wav", size=1000)
+    small_video = ytdl.download("u", str(tmp_path), "v", ext="mp4", size=10)
+    assert big_audio.endswith(".wav") and small_video.endswith(".mp4")
