@@ -60,7 +60,7 @@ Public docs: https://random-words-here.trycloudflare.com/docs
 API key:     yhx_xxxxxxxxxxxxxxxx   (also saved in secrets\api_key.txt)
 ```
 
-- **API URL**: the `https://….trycloudflare.com` part (without `/docs`). It **changes every time you restart**.
+- **API URL**: the `https://….trycloudflare.com` part (without `/docs`). It **changes every time you restart**, unless you set up a permanent URL (step 6).
 - **API key**: stays the same forever (it's in `secrets\api_key.txt`).
 
 **Keep this window open.** Closing it or pressing Ctrl+C stops the server.
@@ -69,7 +69,7 @@ API key:     yhx_xxxxxxxxxxxxxxxx   (also saved in secrets\api_key.txt)
 
 1. Go to **https://yt-heatmap-dashboard.netlify.app**
 2. Tap **Connection**, paste the **API URL** and **API key**, then tap **Test connection**. You should see a green *Connected*.
-3. Leave **Remember on this device** ticked so you only paste the key once. After a restart you only update the URL.
+3. Leave **Remember on this device** ticked so you only paste the key once. With the quick tunnel, update the URL after each restart. With a permanent URL, you never have to.
 
 ### 5. Analyze a video
 
@@ -79,17 +79,38 @@ API key:     yhx_xxxxxxxxxxxxxxxx   (also saved in secrets\api_key.txt)
 
 Want to see it first? Tap **View a sample result** on the dashboard.
 
+### 6. (Recommended) Get a permanent URL
+
+By default you get a free **quick tunnel**: an anonymous `https://<random>.trycloudflare.com` address
+with no account, which **changes every restart** and disappears when you close the window. For a URL
+that never changes, connect **your own Cloudflare account** once. It takes about 10 minutes.
+
+**You need:** a free Cloudflare account and a domain on it. Any domain works, including a cheap one
+(you can buy one at Cloudflare Registrar, or add one you own by switching its nameservers to Cloudflare).
+Cloudflare doesn't hand out free permanent subdomains, so a domain is the one requirement.
+
+1. Sign in at **https://dash.cloudflare.com** and make sure your domain shows as **Active**.
+2. Open **Zero Trust** → **Networks** → **Tunnels** → **Create a tunnel**, choose **Cloudflared**, and name it (for example `heatmap`).
+3. On the install screen pick **Windows**. **Copy the install command** (the long text containing `eyJ...`). You don't need to run it.
+4. Click **Next** and add a **public hostname** (called *Published application routes* in newer dashboards):
+   - Subdomain: `api` (or anything), Domain: your domain
+   - Service type: **HTTP**, URL: **`127.0.0.1:8000`**
+   - Save the tunnel.
+5. In the project folder, close the server window if it's open and double-click **`setup-permanent-url.bat`**.
+   Paste the install command (or just the token), then type your hostname, for example `api.yourdomain.com`.
+6. Double-click **`start-windows.bat`**. It now says *Connecting your permanent Cloudflare tunnel* and prints
+   `API URL: https://api.yourdomain.com`.
+7. Paste that URL into the dashboard **once**. It never changes again.
+
+To go back to the random quick-tunnel URL, run `setup-permanent-url.bat -Remove`.
+
+The token is saved only in your `.env`, which git ignores. Anyone with the token can run your tunnel, so
+don't share it. If it leaks, delete the tunnel in Cloudflare and create a new one.
+
 ### Updating
 
 Re-download the ZIP and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
 Your `.env` and API key are kept.
-
-### Is the public URL on my Cloudflare account?
-
-No. It's a Cloudflare **quick tunnel**: anonymous, free, no account or login. `cloudflared` runs on
-your laptop and Cloudflare hands out a random `trycloudflare.com` address that forwards to it. Nothing
-is created in any Cloudflare account, and the URL stops working as soon as you close the window. For
-a URL that never changes, see *Stable URL* under Advanced.
 
 ---
 
@@ -262,7 +283,7 @@ Common dashboard messages:
 
 | Message | Fix |
 |---|---|
-| *Couldn't reach the API* | The tunnel URL changed (restart) or the server window was closed. Paste the new URL. If you're on an old version, update so CORS is on |
+| *Couldn't reach the API* | The server window was closed, or (quick tunnel) the URL changed on restart, so paste the new one. A permanent URL avoids this. On an old version, update so CORS is on |
 | *Error 401* | Wrong key. Copy it again from `secrets\api_key.txt` |
 | *Error 530 / 502* | The tunnel can't reach your server. Restart `start-windows.bat` |
 | `upstream_blocked` | YouTube is blocking the request. See *Reliability* below |
@@ -278,11 +299,13 @@ Common dashboard messages:
 reset when you close the window; the API key stays because only its HMAC hash is stored in `API_KEY_HASHES`
 in `.env`. Requests leave from your own internet connection, so YouTube rarely blocks them.
 
-### Stable URL (optional, free)
+### Permanent URL: how it works
 
-The quick-tunnel URL changes on every restart. For a fixed one you need your own free Cloudflare account
-and a domain on it: create a tunnel in Zero Trust → Networks → Tunnels, then put
-`CLOUDFLARE_TUNNEL_TOKEN=...` and `PUBLIC_BASE_URL=https://your.host` in `.env` (Docker path below).
+`setup-permanent-url.bat` (`scripts/setup-tunnel.ps1`) writes `CLOUDFLARE_TUNNEL_TOKEN` and `PUBLIC_BASE_URL`
+to `.env`. When a token is present, `start-windows.bat` runs `cloudflared tunnel run --token ...` (your named
+tunnel) instead of the quick tunnel, waits for *Registered tunnel connection*, and prints `PUBLIC_BASE_URL`.
+Cloudflare routes your hostname to `127.0.0.1:8000` on your laptop. The Docker path below reads the same two
+values from `.env`.
 
 ### Free self-hosting with Docker (your own computer + Cloudflare Tunnel)
 
@@ -395,9 +418,11 @@ dashboard/        static web dashboard (index.html, styles.css, app.js, sample.j
 scripts/
   local-windows.ps1  Windows runner behind start-windows.bat
   local_setup.py     creates .env, CORS and the permanent API key
+  setup-tunnel.ps1   behind setup-permanent-url.bat
   manage_keys.py     create / list / revoke keys (Docker mode)
   selfhost.sh/.ps1   Docker + tunnel self-hosting
 start-windows.bat
+setup-permanent-url.bat   saves your Cloudflare tunnel token + hostname for a permanent URL
 netlify.toml      deploys dashboard/ to Netlify
 tests/
 ```

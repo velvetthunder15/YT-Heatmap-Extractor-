@@ -99,23 +99,48 @@ foreach ($c in $listeners) {
 Start-Sleep -Milliseconds 500
 Get-ChildItem $tools -Filter "tunnel-*.log*" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
 $log = Join-Path $tools ("tunnel-{0}.log" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
-Step "Opening free Cloudflare tunnel"
-$tunnel = Start-Process -FilePath "$tools\cloudflared.exe" `
-  -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:$port" `
-  -RedirectStandardError $log -RedirectStandardOutput "$log.out" -WindowStyle Hidden -PassThru
+# Permanent URL: when setup-permanent-url.bat has put a tunnel token in .env, run that named
+# tunnel (your own Cloudflare account + domain). Otherwise open a free quick tunnel (random URL).
+function Get-EnvValue($name) {
+  $line = Select-String -Path (Join-Path $root ".env") -Pattern "^$name=(.*)$" -ErrorAction SilentlyContinue | Select-Object -First 1
+  if (-not $line) { return "" }
+  return (($line.Matches[0].Groups[1].Value -split '\s+#')[0]).Trim().Trim('"')
+}
+$tunnelToken = Get-EnvValue "CLOUDFLARE_TUNNEL_TOKEN"
+$publicUrl = (Get-EnvValue "PUBLIC_BASE_URL").TrimEnd("/")
+$named = [bool]$tunnelToken
 $url = ""
-for ($i = 0; $i -lt 30 -and -not $url; $i++) {
-  Start-Sleep 1
-  if (Test-Path $log) {
-    $m = Select-String -Path $log -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' | Select-Object -First 1
-    if ($m) { $url = $m.Matches[0].Value }
+if ($named) {
+  Step "Connecting your permanent Cloudflare tunnel"
+  $tunnel = Start-Process -FilePath "$tools\cloudflared.exe" `
+    -ArgumentList "tunnel", "--no-autoupdate", "run", "--token", $tunnelToken `
+    -RedirectStandardError $log -RedirectStandardOutput "$log.out" -WindowStyle Hidden -PassThru
+  $ok = $false
+  for ($i = 0; $i -lt 30 -and -not $ok; $i++) {
+    Start-Sleep 1
+    if ($tunnel.HasExited) { break }
+    if ((Test-Path $log) -and (Select-String -Path $log -Pattern 'Registered tunnel connection' -Quiet)) { $ok = $true }
+  }
+  if ($ok) { $url = $publicUrl }
+  elseif ($tunnel.HasExited) { Write-Host "The tunnel token was rejected. Run setup-permanent-url.bat again with a fresh token." -ForegroundColor Red }
+} else {
+  Step "Opening free Cloudflare quick tunnel"
+  $tunnel = Start-Process -FilePath "$tools\cloudflared.exe" `
+    -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:$port" `
+    -RedirectStandardError $log -RedirectStandardOutput "$log.out" -WindowStyle Hidden -PassThru
+  for ($i = 0; $i -lt 30 -and -not $url; $i++) {
+    Start-Sleep 1
+    if (Test-Path $log) {
+      $m = Select-String -Path $log -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' | Select-Object -First 1
+      if ($m) { $url = $m.Matches[0].Value }
+    }
   }
 }
 
 Write-Host ""
 Write-Host "================ YouTube Heatmap Extractor ================" -ForegroundColor Green
 Write-Host "Local docs:  http://127.0.0.1:$port/docs"
-if ($url) { Write-Host "Public docs: $url/docs" -ForegroundColor Green }
+if ($url) { Write-Host "Public docs: $url/docs" -ForegroundColor Green; Write-Host "API URL:     $url   (paste this into the dashboard)" -ForegroundColor Green }
 else { Write-Host "Public URL not ready (check the tunnel-*.log file in .tools). Local still works." -ForegroundColor Yellow }
 Write-Host "API key:     $key   (also saved in secrets\api_key.txt)"
 $base = if ($url) { $url } else { "http://127.0.0.1:$port" }
@@ -123,7 +148,8 @@ Write-Host ""
 Write-Host "Try it in another terminal:"
 Write-Host "  curl.exe -H `"X-API-Key: $key`" `"$base/v1/heatmap?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ`""
 Write-Host ""
-Write-Host "Keep this window open. Close it or press Ctrl+C to stop. The public URL changes each start." -ForegroundColor Yellow
+if ($named) { Write-Host "Keep this window open. Close it or press Ctrl+C to stop. Your URL is permanent." -ForegroundColor Yellow }
+else { Write-Host "Keep this window open. Close it or press Ctrl+C to stop. This URL changes each start: run setup-permanent-url.bat for a fixed one." -ForegroundColor Yellow }
 Write-Host ""
 
 try {
