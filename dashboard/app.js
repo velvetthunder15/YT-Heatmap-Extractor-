@@ -11,7 +11,13 @@
     visual: "#b392f0",
     official_most_replayed: "#ff5a1f",
   };
-  const C = { grid: "rgba(255,255,255,.06)", axis: "rgba(255,255,255,.14)", line: "#f3f3f6", good: "#3ecf8e", bad: "#ff6b6b", ember: "#ff5a1f", muted: "#85859a" };
+  const THEMES = {
+    dark: { grid: "rgba(255,255,255,.06)", ref: "rgba(255,255,255,.28)", hover: "rgba(255,255,255,.35)", edge: "rgba(255,255,255,.08)", bar: "rgba(255,255,255,.16)", label: "#d8d8e2", sub: "#b9b9c6", marker: "#0b0b10", dot: "#ffffff", good: "#3ecf8e", bad: "#ff6b6b", ember: "#ff5a1f", peakBand: "rgba(62,207,142,.10)", dropBand: "rgba(255,107,107,.08)",
+      sig: { comments: "#7aa2ff", transcript: "#5fd3a3", audio: "#ffb454", visual: "#b392f0", official_most_replayed: "#ff5a1f" } },
+    light: { grid: "rgba(20,20,30,.07)", ref: "rgba(20,20,30,.35)", hover: "rgba(20,20,30,.35)", edge: "rgba(20,20,30,.1)", bar: "rgba(20,20,30,.12)", label: "#2a2a35", sub: "#555563", marker: "#ffffff", dot: "#ffffff", good: "#128a57", bad: "#d23f3f", ember: "#ff5a1f", peakBand: "rgba(18,138,87,.09)", dropBand: "rgba(210,63,63,.07)",
+      sig: { comments: "#3f6fe0", transcript: "#14946a", audio: "#e07b10", visual: "#7c4ddb", official_most_replayed: "#ff5a1f" } },
+  };
+  let C = THEMES[document.documentElement.dataset.theme === "light" ? "light" : "dark"];
   const SIGNAL_LABELS = {
     comments: "Comments",
     transcript: "Captions",
@@ -31,7 +37,7 @@
   // ------------------------------------------------------------ helpers --
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const label = (n) => SIGNAL_LABELS[n] || n.replace(/_/g, " ");
-  const color = (n, i = 0) => SIGNAL_COLORS[n] || ["#6fd6d6", "#f28fb1", "#e6d27a"][i % 3];
+  const color = (n, i = 0) => C.sig[n] || SIGNAL_COLORS[n] || ["#6fd6d6", "#f28fb1", "#e6d27a"][i % 3];
   let playhead = null; // seconds, for the playhead line on the main chart
   function hms(sec) {
     sec = Math.max(0, Math.round(sec || 0));
@@ -155,11 +161,10 @@
   function setPill(el, kind, text) { el.className = "pill " + kind; el.textContent = text; }
 
   let currentOS = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? "mac" : "win";
-  const OS_CMD = { win: "Double-click start-windows.bat", mac: "bash start-mac.command" };
   function setOS(os) {
     currentOS = os === "mac" ? "mac" : "win";
     document.querySelectorAll(".os-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.os === currentOS));
-    $("cmdText").textContent = OS_CMD[currentOS];
+    $("connection").dataset.osShow = currentOS;
   }
 
   // ----------------------------------------------------------- analysis --
@@ -433,8 +438,8 @@
     niceTicks(dur, narrow ? 4 : 8).forEach((t) => (g += `<text x="${x(t)}" y="${H - 8}" text-anchor="middle">${hms(t)}</text>`));
 
     const bands = (list, fill, stroke) => (list || []).map((s) => `<rect x="${x(s.start)}" y="${m.t}" width="${Math.max(2, x(s.end) - x(s.start))}" height="${ih}" fill="${fill}" rx="2"/><rect x="${x(s.start)}" y="${m.t + ih - 2}" width="${Math.max(2, x(s.end) - x(s.start))}" height="3" fill="${stroke}" rx="1.5"/>`).join("");
-    g += bands(r.least_engaging, "rgba(255,107,107,.08)", C.bad);
-    g += bands(r.most_engaging, "rgba(62,207,142,.10)", C.good);
+    g += bands(r.least_engaging, C.dropBand, C.bad);
+    g += bands(r.most_engaging, C.peakBand, C.good);
 
     if (heat.length) {
       const pts = heat.map((p) => [x((p.start + p.end) / 2), y(p.score)]);
@@ -443,11 +448,11 @@
       g += `<path d="${area}" fill="url(#fade)"/>`;
       g += `<path d="${line}" fill="none" stroke="url(#stroke)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>`;
       const avg = mean(heat.map((p) => p.score));
-      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(avg)}" y2="${y(avg)}" stroke="rgba(255,255,255,.28)" stroke-dasharray="3 5"/>`;
-      g += `<text x="${W - m.r}" y="${y(avg) - 7}" text-anchor="end" style="fill:#b9b9c6">avg ${avg.toFixed(2)}</text>`;
+      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(avg)}" y2="${y(avg)}" stroke="${C.ref}" stroke-dasharray="3 5"/>`;
+      g += `<text x="${W - m.r}" y="${y(avg) - 7}" text-anchor="end" style="fill:${C.sub}">avg ${avg.toFixed(2)}</text>`;
       // heat strip, like YouTube's own "most replayed" bar
       g += `<g clip-path="url(#stripClip)">` + heat.map((p) => `<rect x="${x(p.start)}" y="${stripY}" width="${Math.max(0.6, x(p.end) - x(p.start)) + 0.5}" height="${stripH}" fill="${heatColor(p.score)}"/>`).join("") + `</g>`;
-      g += `<rect x="${m.l}" y="${stripY}" width="${iw}" height="${stripH}" rx="4" fill="none" stroke="rgba(255,255,255,.08)"/>`;
+      g += `<rect x="${m.l}" y="${stripY}" width="${iw}" height="${stripH}" rx="4" fill="none" stroke="${C.edge}"/>`;
       const R = narrow ? 9 : 11, placed = [];
       (r.most_engaging || []).slice(0, 5).forEach((s, i) => {
         const cx = x((s.start + s.end) / 2);
@@ -455,15 +460,15 @@
         // nudge a marker up (or down) so numbered circles never sit on top of each other
         for (let k = 0; k < 6 && placed.some(([px, py]) => Math.hypot(px - cx, py - cy) < R * 2 + 2); k++) cy = cy - (R * 2 + 3) >= m.t - 4 ? cy - (R * 2 + 3) : cy + (R * 2 + 3);
         placed.push([cx, cy]);
-        g += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#0b0b10" stroke="${C.good}" stroke-width="1.6"/><text x="${cx}" y="${cy + 3.6}" text-anchor="middle" style="fill:${C.good};font-weight:700;font-size:10.5px">${i + 1}</text>`;
+        g += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="${C.marker}" stroke="${C.good}" stroke-width="1.6"/><text x="${cx}" y="${cy + 3.6}" text-anchor="middle" style="fill:${C.good};font-weight:700;font-size:10.5px">${i + 1}</text>`;
       });
     }
     if (playhead != null) {
       const px = x(playhead);
       g += `<line x1="${px}" x2="${px}" y1="${m.t}" y2="${stripY + stripH}" stroke="${C.ember}" stroke-width="1.5"/><circle cx="${px}" cy="${m.t}" r="4" fill="${C.ember}"/>`;
     }
-    g += `<line id="hoverLine" x1="0" x2="0" y1="${m.t}" y2="${stripY + stripH}" stroke="rgba(255,255,255,.35)" visibility="hidden"/>`;
-    g += `<circle id="hoverDot" r="5" fill="#fff" stroke="#ff5a1f" stroke-width="2" visibility="hidden"/>`;
+    g += `<line id="hoverLine" x1="0" x2="0" y1="${m.t}" y2="${stripY + stripH}" stroke="${C.hover}" visibility="hidden"/>`;
+    g += `<circle id="hoverDot" r="5" fill="${C.dot}" stroke="#ff5a1f" stroke-width="2" visibility="hidden"/>`;
     g += `<rect class="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${stripY + stripH - m.t}" fill="transparent"/>`;
     box.innerHTML = svgEl(W, H, g);
 
@@ -532,7 +537,7 @@
       const d = smooth(heat.map((p, k) => [x((p.start + p.end) / 2), y(vals[k])]));
       g += `<path d="${d}" fill="none" stroke="${color(n, i)}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>`;
     });
-    g += `<line class="hl" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="rgba(255,255,255,.35)" visibility="hidden"/>`;
+    g += `<line class="hl" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="${C.hover}" visibility="hidden"/>`;
     g += `<rect class="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
     box.innerHTML = svgEl(W, H, g);
     const svg = box.querySelector("svg");
@@ -570,9 +575,9 @@
       const h = (v / max) * ih;
       const bx = m.l + i * bw + bw * 0.16;
       const w = bw * 0.68;
-      const fill = opts.colors ? opts.colors[i] : "rgba(255,255,255,.2)";
+      const fill = opts.colors ? opts.colors[i] : C.bar;
       g += `<rect x="${bx}" y="${m.t + ih - h}" width="${w}" height="${Math.max(0, h)}" rx="5" fill="${fill}"><title>${esc(cats[i])}: ${opts.fmt ? opts.fmt(v) : v}</title></rect>`;
-      if (opts.labels !== false) g += `<text x="${bx + w / 2}" y="${m.t + ih - h - 7}" text-anchor="middle" style="fill:#d8d8e2">${opts.fmt ? opts.fmt(v) : v}</text>`;
+      if (opts.labels !== false) g += `<text x="${bx + w / 2}" y="${m.t + ih - h - 7}" text-anchor="middle" style="fill:${C.label}">${opts.fmt ? opts.fmt(v) : v}</text>`;
       if (!opts.skipCat || i % opts.skipCat === 0) g += `<text class="cat" x="${bx + w / 2}" y="${H - 9}" text-anchor="middle">${esc(cats[i])}</text>`;
     });
     box.innerHTML = svgEl(W, H, `<defs><linearGradient id="barGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".5" stop-color="#ff5a1f"/><stop offset="1" stop-color="#ff2e63"/></linearGradient></defs>` + g);
@@ -588,7 +593,7 @@
     const best = vals.indexOf(Math.max(...vals));
     barChart($("partsChart"), names.map((n, i) => `${n}`), vals, {
       max: 1, ticks: [0, 0.5, 1], fmt: (v) => v.toFixed(2), fmtTick: (v) => v,
-      colors: vals.map((_, i) => (i === best ? "url(#barGrad)" : "rgba(255,255,255,.16)")),
+      colors: vals.map((_, i) => (i === best ? "url(#barGrad)" : C.bar)),
     });
   }
 
@@ -654,10 +659,9 @@
   $("connToggle").addEventListener("click", () => openConn($("connection").classList.contains("collapsed")));
   $("navConn").addEventListener("click", () => openConn(true));
   document.querySelectorAll(".os-tabs button").forEach((b) => b.addEventListener("click", () => { setOS(b.dataset.os); saveSettings(); }));
-  $("cmdCopy").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(currentOS === "mac" ? "bash start-mac.command" : "start-windows.bat"); $("cmdCopy").textContent = "Copied"; setTimeout(() => ($("cmdCopy").textContent = "Copy"), 1400); } catch (_) { /* ignore */ }
-  });
-  $("showKey").addEventListener("click", () => {
+  document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); } catch (_) { /* ignore */ }
+  }));  $("showKey").addEventListener("click", () => {
     const k = $("apiKey");
     k.type = k.type === "password" ? "text" : "password";
     $("showKey").textContent = k.type === "password" ? "Show" : "Hide";
@@ -703,6 +707,17 @@
     if (!current) return;
     const lbl = $("copyJson").querySelector("span");
     try { await navigator.clipboard.writeText(JSON.stringify(current, null, 2)); lbl.textContent = "Copied"; setTimeout(() => (lbl.textContent = "Copy JSON"), 1500); } catch (_) { /* ignore */ }
+  });
+  document.addEventListener("themechange", (e) => {
+    C = THEMES[e.detail === "light" ? "light" : "dark"];
+    if (!current) return;
+    const heat = current.full_heatmap || [];
+    const names = current.source === "estimated" ? Object.keys((heat[0] && heat[0].signals) || {}) : [];
+    $("sigChips").innerHTML = names.map((n, i) => `<button type="button" class="chip${hiddenSignals.has(n) ? " off" : ""}" data-sig="${esc(n)}"><span class="dot" style="background:${color(n, i)}"></span>${esc(label(n))}</button>`).join("");
+    if (current.source === "estimated") drawSignalStats(current, heat, names);
+    $("topList").innerHTML = (current.most_engaging || []).map((m, i) => momentHTML(m, i, true)).join("") || `<li class="empty">No clear peaks.</li>`;
+    $("lowList").innerHTML = (current.least_engaging || []).map((m, i) => momentHTML(m, i, false)).join("") || `<li class="empty">No clear drop-offs.</li>`;
+    drawCharts();
   });
   let rt;
   addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawCharts, 120); });

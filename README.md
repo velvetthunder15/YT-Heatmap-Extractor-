@@ -32,7 +32,7 @@ git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git
 cd YT-Heatmap-Extractor-
 ```
 
-or click **Code → Download ZIP** on GitHub and extract it anywhere (for example `Documents\YT-Heatmap-Extractor`).
+or [**download the latest release (.zip)**](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/YT-Heatmap-Extractor.zip) and extract it anywhere (for example `Documents\YT-Heatmap-Extractor`).
 
 ### 2. Start the server
 
@@ -141,7 +141,7 @@ always on (an old laptop, a Raspberry Pi-class mini PC). Cloud servers usually g
 
 ### Updating
 
-Re-download the ZIP and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
+[Re-download the latest release](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/YT-Heatmap-Extractor.zip) and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
 Your `.env` and API key are kept.
 
 ---
@@ -159,10 +159,10 @@ git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git
 cd YT-Heatmap-Extractor-
 ```
 
-No git? Click **Code → Download ZIP** on GitHub, double-click the ZIP in Downloads, then in Terminal:
+No git? [Download the latest release (.zip)](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/YT-Heatmap-Extractor.zip), double-click it in Downloads, then in Terminal:
 
 ```bash
-cd ~/Downloads/YT-Heatmap-Extractor--main
+cd ~/Downloads/YT-Heatmap-Extractor
 ```
 
 (If macOS asks to install the *command line developer tools* when you run `git`, click Install, or use the ZIP.)
