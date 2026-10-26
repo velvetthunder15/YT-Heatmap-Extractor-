@@ -67,4 +67,4 @@ def audio_signal(video_id: str, windows: list[tuple[float, float]], work_dir: st
         log_event(log, "audio_failed", video_id=video_id, error=str(exc)[:200])
         if get_settings().log_level.upper() == "DEBUG":
             log.exception("audio")
-        return None
+        raise  # the pipeline records the reason in signals_skipped

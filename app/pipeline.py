@@ -7,6 +7,7 @@ cheap, so one cached analysis serves every top/bottom combination.
 from __future__ import annotations
 
 import logging
+import re
 import os
 import shutil
 import tempfile
@@ -131,6 +132,7 @@ def estimated_data(
     enabled = s.enabled_signals
     curves: dict[str, list[float]] = {}
     stats: dict[str, Any] = {"timestamped_comments": 0}
+    skipped: dict[str, str] = {}
 
     os.makedirs(s.tmp_dir, exist_ok=True)
     work_dir = tempfile.mkdtemp(prefix=f"{video_id}-", dir=s.tmp_dir)
@@ -138,6 +140,7 @@ def estimated_data(
         order = ["comments", "transcript", "audio", "visual"]
         for i, name in enumerate(order):
             if not enabled.get(name, True) or name not in sources:
+                skipped[name] = "disabled"
                 continue
             progress(0.1 + 0.8 * i / len(order), f"analysing {name}")
             try:
@@ -157,9 +160,14 @@ def estimated_data(
                         curves[name] = normalize(res)
             except Exception as exc:  # one broken signal never sinks the job
                 log_event(log, "signal_failed", video_id=video_id, signal=name, error=str(exc)[:200])
+                skipped[name] = f"error: {_clean_error(exc)}"
+                continue
+            if name not in curves:
+                skipped[name] = "unavailable for this video"
             # A signal that came back flat carries no information.
-            if name in curves and max(curves[name], default=0) <= 0:
+            elif max(curves[name], default=0) <= 0:
                 curves.pop(name)
+                skipped[name] = "no variation (flat signal)"
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)  # always clean temp audio/video
 
@@ -171,6 +179,7 @@ def estimated_data(
     weights = renormalize_weights(s.weights, list(curves.keys()))
     segs = combine_signals(windows, curves, s.weights)
     signals = [n for n in ["comments", "transcript", "audio", "visual"] if n in curves]
+    stats["signals_skipped"] = skipped
     conf, reason = estimate_confidence(signals, stats["timestamped_comments"])
     progress(0.95, "scoring")
     return HeatmapData(
@@ -186,6 +195,12 @@ def estimated_data(
         window=window,
         stats=stats,
     )
+
+
+def _clean_error(exc: Exception) -> str:
+    msg = " ".join(str(exc).split()) or type(exc).__name__
+    msg = re.sub(r"https?://\S+", "<url>", msg)  # never leak proxy credentials or signed URLs
+    return msg[:200]
 
 
 def _default_sources() -> dict[str, Callable[..., Any]]:
@@ -261,6 +276,7 @@ def render_result(data: HeatmapData, top: int, bottom: int) -> dict[str, Any]:
         "confidence": data.confidence,
         "confidence_reason": data.confidence_reason,
         "signals_used": data.signals_used,
+        **({"signals_skipped": data.stats.get("signals_skipped", {})} if estimated else {}),
         "most_engaging": [fmt(r) for r in peaks],
         "least_engaging": [fmt(r) for r in drops],
         "full_heatmap": [

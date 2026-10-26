@@ -81,4 +81,4 @@ def visual_signal(video_id: str, windows: list[tuple[float, float]], work_dir: s
         return analyse_video(path, windows)
     except Exception as exc:
         log_event(log, "visual_failed", video_id=video_id, error=str(exc)[:200])
-        return None
+        raise  # the pipeline records the reason in signals_skipped

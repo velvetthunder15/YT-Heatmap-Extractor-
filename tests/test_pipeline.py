@@ -54,6 +54,8 @@ def test_falls_back_to_estimated_and_drops_broken_signal():
     assert data.confidence == "high"
     res = render_result(data, 2, 2)
     assert res["is_estimate"] is True and "heuristic" in res["disclaimer"]
+    assert res["signals_skipped"]["visual"].startswith("error:")
+    assert "visuals" not in res["disclaimer"]
     assert res["most_engaging"][0]["start"] == 30  # window 3 has comments + audio peak
     assert res["most_engaging"][0]["signals"][0]["name"] == "comments"
     assert res["most_engaging"][0]["link"].endswith("?t=30")
