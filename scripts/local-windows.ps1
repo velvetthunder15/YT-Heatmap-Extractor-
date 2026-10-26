@@ -85,8 +85,20 @@ if ($LASTEXITCODE -ne 0 -or -not $key) { throw "Config setup failed." }
 
 # ---------- 5. Tunnel + API ----------
 $port = 8000
-$log = Join-Path $tools "tunnel.log"
-if (Test-Path $log) { Remove-Item $log }
+# Clean up leftovers from a previous run whose window was closed with X
+# (that skips the cleanup below, so cloudflared / the API can linger in the background).
+Get-Process cloudflared -ErrorAction SilentlyContinue |
+  Where-Object { $_.Path -eq "$tools\cloudflared.exe" } | Stop-Process -Force -ErrorAction SilentlyContinue
+$listeners = @(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
+foreach ($c in $listeners) {
+  $p = Get-Process -Id $c.OwningProcess -ErrorAction SilentlyContinue
+  if (-not $p) { continue }
+  if ($p.Path -like "$root\.venv\*") { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
+  else { throw "Port $port is already used by another program ($($p.ProcessName)). Close it and retry." }
+}
+Start-Sleep -Milliseconds 500
+Get-ChildItem $tools -Filter "tunnel-*.log*" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+$log = Join-Path $tools ("tunnel-{0}.log" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
 Step "Opening free Cloudflare tunnel"
 $tunnel = Start-Process -FilePath "$tools\cloudflared.exe" `
   -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:$port" `
@@ -104,7 +116,7 @@ Write-Host ""
 Write-Host "================ YouTube Heatmap Extractor ================" -ForegroundColor Green
 Write-Host "Local docs:  http://127.0.0.1:$port/docs"
 if ($url) { Write-Host "Public docs: $url/docs" -ForegroundColor Green }
-else { Write-Host "Public URL not ready (check .tools\tunnel.log). Local still works." -ForegroundColor Yellow }
+else { Write-Host "Public URL not ready (check the tunnel-*.log file in .tools). Local still works." -ForegroundColor Yellow }
 Write-Host "API key:     $key   (also saved in secrets\api_key.txt)"
 $base = if ($url) { $url } else { "http://127.0.0.1:$port" }
 Write-Host ""
