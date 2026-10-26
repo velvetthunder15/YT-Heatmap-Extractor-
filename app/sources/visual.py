@@ -21,7 +21,7 @@ def download_video(video_id: str, out_dir: str) -> str:
     return ytdl.download(
         canonical_url(video_id),
         out_dir,
-        fmt=f"bv*[height<={h}][vcodec!=none]/wv*/worst",
+        fmt=f"bv*[height<={h}][vcodec^=avc1]/bv*[height<={h}][vcodec!=none]/wv*/worst",  # prefer H.264: OpenCV decodes it everywhere
     )
 
 

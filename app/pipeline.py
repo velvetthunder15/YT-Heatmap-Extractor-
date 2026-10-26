@@ -34,6 +34,15 @@ ProgressFn = Callable[[float, str], None]
 ESTIMATE_DISCLAIMER = (
     "Estimated from comments, captions, audio and visuals. This is a heuristic, not real viewer data."
 )
+_SIGNAL_LABELS = {"comments": "timestamped comments", "transcript": "captions", "audio": "audio", "visual": "visuals"}
+
+
+def estimate_disclaimer(signals: list[str]) -> str:
+    names = [_SIGNAL_LABELS.get(s, s) for s in signals]
+    if not names:
+        return ESTIMATE_DISCLAIMER
+    joined = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+    return f"Estimated from {joined}. This is a heuristic, not real viewer data."
 
 
 @dataclass
@@ -266,7 +275,7 @@ def render_result(data: HeatmapData, top: int, bottom: int) -> dict[str, Any]:
     }
     if estimated:
         result["is_estimate"] = True
-        result["disclaimer"] = ESTIMATE_DISCLAIMER
+        result["disclaimer"] = estimate_disclaimer(list(data.signals_used))
         result["weights"] = data.weights
         result["window_seconds"] = data.window
     else:
