@@ -79,3 +79,12 @@ def test_density_curve_spreads_mentions():
     assert curve == [0.0, 1.0, 0.0]
     curve = density_curve([(10, 1.0)], windows, spread=5)
     assert curve == [0.5, 0.5, 0.0]
+
+
+def test_visual_cut_detection_ignores_normal_motion():
+    from app.sources.visual import detect_cuts
+
+    diffs = [(i / 2, 3.0 + (i % 3)) for i in range(40)]
+    diffs[10] = (5.0, 90.0)
+    diffs[30] = (15.0, 70.0)
+    assert detect_cuts(diffs) == [5.0, 15.0]

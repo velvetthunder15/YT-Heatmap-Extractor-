@@ -127,7 +127,7 @@ Always `{"error": {"code": "...", "message": "..."}}`:
      claims, speech density. Optional LLM pass (`LLM_API_KEY`) blended in.
    - **Audio (0.25)**: RMS loudness, onset rate (speech pace), loud + noisy bursts
      (laughter/applause).
-   - **Visual (0.15)**: PySceneDetect cut density + frame-difference motion on a <=360p stream.
+   - **Visual (0.15)**: cut density + frame-difference motion from ffmpeg-decoded frames of a <=360p stream.
    - Unavailable or failing signals are dropped and weights renormalised.
 3. Top/bottom N seeds are grown over neighbours within `MERGE_TOLERANCE` (0.05) into ranges;
    peaks and drop-offs never overlap.
@@ -225,7 +225,7 @@ Cloud Functions). Use a container host:
 - **Fly.io**: `fly launch`, then define `[processes] app = "gunicorn ..."`,
   `worker = "python -m app.worker"`, and attach Upstash Redis (`fly redis create`).
 - **VPS**: `docker compose up -d` behind Caddy or nginx with TLS. Give the worker 2+ GB RAM
-  (librosa + OpenCV).
+  (librosa).
 
 Then create keys with `scripts.manage_keys` inside the API container.
 

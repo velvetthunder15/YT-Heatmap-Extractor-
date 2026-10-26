@@ -49,12 +49,14 @@ def analyse_audio(path: str, windows: list[tuple[float, float]]) -> list[float]:
     loud, rate, burst = [], [], []
     for a, b in windows:
         m = (frame_t >= a) & (frame_t < b)
-        if not m.any():
-            loud.append(0.0); rate.append(0.0); burst.append(0.0)
+        if not m.any():  # past the end of the audio: treat as silence
+            loud.append(float("nan")); rate.append(0.0); burst.append(0.0)
             continue
         loud.append(float(db[m].mean()))
         rate.append(float(((onsets >= a) & (onsets < b)).sum()) / max(b - a, 1e-6))
         burst.append(float(((db[m] > loud_thr) & (flat[m] > flat_thr)).mean()))
+    floor = min((v for v in loud if v == v), default=0.0)  # dB: lowest real value = quietest
+    loud = [floor if v != v else v for v in loud]
     L, R, B = normalize(loud), normalize(rate), normalize(burst)
     return [0.5 * l + 0.3 * r + 0.2 * bb for l, r, bb in zip(L, R, B)]
 

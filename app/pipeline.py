@@ -198,7 +198,8 @@ def estimated_data(
 
 
 def _clean_error(exc: Exception) -> str:
-    msg = " ".join(str(exc).split()) or type(exc).__name__
+    detail = " ".join(str(exc).split())
+    msg = f"{type(exc).__name__}: {detail}" if detail else type(exc).__name__
     msg = re.sub(r"https?://\S+", "<url>", msg)  # never leak proxy credentials or signed URLs
     return msg[:200]
 
