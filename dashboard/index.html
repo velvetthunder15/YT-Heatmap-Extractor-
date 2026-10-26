@@ -34,8 +34,8 @@
       <div id="connection" class="connection">
         <div class="field">
           <label for="apiBase">API URL</label>
-          <input id="apiBase" type="text" inputmode="url" placeholder="https://something.trycloudflare.com">
-          <small>The API URL shown in your server window. Quick-tunnel URLs change every restart; a permanent URL never does.</small>
+          <input id="apiBase" type="text" inputmode="url" placeholder="https://yt-heatmap-api.your-name.workers.dev">
+          <small>The API URL your server window prints. A random trycloudflare.com URL changes on every restart; set up a permanent workers.dev URL once with setup-permanent-url.bat.</small>
         </div>
         <div class="field">
           <label for="apiKey">API key</label>
@@ -267,6 +267,9 @@
     </div>
 
     <p class="limits"><b>Keep in mind:</b> estimates find moments that look and sound engaging and that commenters point to. They can't see real watch time, so treat them as a strong hint, not proof.</p>
+
+    <h3 class="about-sub">Your API URL</h3>
+    <p>The API runs on the host's own computer, and Cloudflare makes it reachable from the internet. Out of the box, <code>start-windows.bat</code> opens a free <b>quick tunnel</b>: a random <code>trycloudflare.com</code> address that needs no account and changes on every restart. Run <code>setup-permanent-url.bat</code> once with <b>your own free Cloudflare account</b> to get a fixed <code>https://yt-heatmap-api.&lt;you&gt;.workers.dev</code> URL, with no domain needed. A small Worker on your account forwards to the current tunnel and is updated automatically on each start. You can also use your own domain. When the host computer is off, a permanent URL answers <b>server_offline</b>.</p>
   </section>
 </main>
 

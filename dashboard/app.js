@@ -100,7 +100,7 @@
       res = await fetch(base + path, { ...opts, headers: { "X-API-Key": key, ...(opts.headers || {}) } });
     } catch (e) {
       const err = new Error("Couldn't reach the API.");
-      err.hint = "Check the API URL (the tunnel URL changes every time the server restarts), that the server window is still open, and that your server is up to date so it allows requests from this dashboard.";
+      err.hint = "Check the API URL (a random trycloudflare.com URL changes on every restart; a workers.dev URL stays the same), that the server window is still open, and that your server is up to date so it allows requests from this dashboard.";
       throw err;
     }
     let body = null;
@@ -111,7 +111,8 @@
       e.status = res.status;
       if (res.status === 401 || res.status === 403) e.hint = "Check your API key: it's the line in secrets\\api_key.txt.";
       if (res.status === 429) e.hint = "You've hit the rate limit or daily quota. Wait a minute and try again.";
-      if (res.status === 530 || res.status === 502 || res.status === 404 && !body) e.hint = "The tunnel isn't reaching your server. Restart start-windows.bat and paste the new URL.";
+      if (res.status === 530 || res.status === 502 || res.status === 404 && !body) e.hint = "The tunnel isn't reaching your server. Restart start-windows.bat (and paste the new URL if you aren't using a permanent one).";
+      if (e.code === "server_offline") e.hint = "Your permanent URL works, but the server behind it is off. Start start-windows.bat on the host computer. Right after a start it can take up to a minute to switch over.";
       throw e;
     }
     return { status: res.status, body };

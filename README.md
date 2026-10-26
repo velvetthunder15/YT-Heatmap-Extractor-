@@ -57,10 +57,11 @@ When it's ready, the window prints something like:
 ================ YouTube Heatmap Extractor ================
 Local docs:  http://127.0.0.1:8000/docs
 Public docs: https://random-words-here.trycloudflare.com/docs
+API URL:     https://random-words-here.trycloudflare.com   (paste this into the dashboard)
 API key:     yhx_xxxxxxxxxxxxxxxx   (also saved in secrets\api_key.txt)
 ```
 
-- **API URL**: the `https://….trycloudflare.com` part (without `/docs`). It **changes every time you restart**, unless you set up a permanent URL (step 6).
+- **API URL**: the `API URL` line. A `trycloudflare.com` URL **changes every time you restart**. Set up a permanent one in step 6 and it shows your fixed `workers.dev` URL instead.
 - **API key**: stays the same forever (it's in `secrets\api_key.txt`).
 
 **Keep this window open.** Closing it or pressing Ctrl+C stops the server.
@@ -293,6 +294,7 @@ Common dashboard messages:
 | *Couldn't reach the API* | The server window was closed, or (quick tunnel) the URL changed on restart, so paste the new one. A permanent URL avoids this. On an old version, update so CORS is on |
 | *Error 401* | Wrong key. Copy it again from `secrets\api_key.txt` |
 | *Error 530 / 502* | The tunnel can't reach your server. Restart `start-windows.bat` |
+| `server_offline` (503) | Your permanent URL works but the server is off. Start `start-windows.bat`, then wait up to a minute after it starts |
 | `upstream_blocked` | YouTube is blocking the request. See *Reliability* below |
 
 ---
@@ -337,8 +339,9 @@ Redis + a Cloudflare quick tunnel, waits for `/health`, and prints your public
 Other commands: `selfhost.sh url` (current URL), `selfhost.sh key NAME` (new key),
 `selfhost.sh stop`.
 
-**Stable URL with Docker:** the quick-tunnel URL changes on every restart. For a fixed
-one, add a domain to a free Cloudflare account, create a tunnel in Zero Trust → Networks → Tunnels
+**Stable URL with Docker:** the quick-tunnel URL changes on every restart. The free workers.dev option is built into
+the Windows runner. With Docker, after each start you can run `python -m scripts.cf_worker set-target <url>` yourself, or for a fixed
+URL on your own domain, add a domain to a free Cloudflare account, create a tunnel in Zero Trust → Networks → Tunnels
 pointing to `http://api:8000`, then put `CLOUDFLARE_TUNNEL_TOKEN=...` and
 `PUBLIC_BASE_URL=https://your.host` in `.env`. The script switches to the named tunnel automatically.
 
