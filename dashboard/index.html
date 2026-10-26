@@ -14,7 +14,10 @@
     <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
     <span>Heatmap<b>Dashboard</b></span>
   </div>
-  <button id="settingsToggle" class="ghost small" type="button">Connection</button>
+  <nav class="nav">
+    <a href="#about" class="ghost small navlink">About</a>
+    <button id="settingsToggle" class="ghost small" type="button">Connection</button>
+  </nav>
 </header>
 
 <main class="wrap">
@@ -184,6 +187,87 @@
       </section>
     </div>
   </div>
+  <section id="about" class="card about">
+    <div class="about-head">
+      <span class="eyebrow">About</span>
+      <h2>How the numbers are made</h2>
+      <p class="muted">Every video is cut into short segments (10 seconds by default). Each segment gets a <b>score</b>, and the score is built from <b>signals</b>: separate clues about what viewers care about.</p>
+    </div>
+
+    <div class="about-grid two">
+      <div class="explain">
+        <h4>What a score is</h4>
+        <p>A number from <b>0 to 1</b> for one segment, relative to the rest of the same video. 1.00 is the most engaging moment in this video and 0.00 is the least. It's a ranking within one video, not a grade, so 0.8 on one video doesn't mean the same as 0.8 on another.</p>
+      </div>
+      <div class="explain">
+        <h4>What a signal is</h4>
+        <p>One independent measurement taken for every segment, such as how often comments point to that moment or how loud it is. Each signal is also scaled 0 to 1 within the video (the segment where it's strongest is 1, the weakest is 0), so signals can be compared and blended fairly.</p>
+      </div>
+    </div>
+
+    <h3 class="about-sub">Two kinds of result</h3>
+    <div class="about-grid two">
+      <div class="explain tint-good">
+        <h4><span class="badge official">Official data</span></h4>
+        <p>When YouTube shows a "Most replayed" graph for a video, the dashboard uses it directly. That's real, relative replay intensity from YouTube, so it's always high confidence and no estimating is done.</p>
+      </div>
+      <div class="explain tint-heat">
+        <h4><span class="badge estimated">Estimated</span></h4>
+        <p>Most videos don't have that graph. Then four signals are measured and blended into an estimate. It's a smart guess from public clues, not real viewer data, and it's always labelled as estimated.</p>
+      </div>
+    </div>
+
+    <h3 class="about-sub">The four signals</h3>
+    <div class="about-grid four">
+      <div class="sig-card">
+        <div class="sig-top"><span class="dot" style="background:#5b7bb5"></span><b>Comments</b><span class="w">35%</span></div>
+        <p>Finds timestamps people write in comments, like "10:24 got me". Each mention counts for about ±5 seconds around that time, and comments with more likes count a bit more (1 + log of likes). Up to 2,000 comments are read.</p>
+        <small>Strongest clue: people only timestamp moments they care about.</small>
+      </div>
+      <div class="sig-card">
+        <div class="sig-top"><span class="dot" style="background:#4e7a5c"></span><b>Captions</b><span class="w">25%</span></div>
+        <p>Reads the transcript for each segment and scores what's being said: hook phrases ("watch this", "here's why"), emphasis words ("insane", "biggest"), questions, numbers and claims, topic changes, and how much is being said.</p>
+        <small>Catches big reveals and key points in talking videos.</small>
+      </div>
+      <div class="sig-card">
+        <div class="sig-top"><span class="dot" style="background:#c08a52"></span><b>Audio</b><span class="w">25%</span></div>
+        <p>Listens to the soundtrack: loudness (50%), how busy it is, meaning sound onsets per second (30%), and bursts that are loud and noise-like, a cheap detector for laughter, applause or cheering (20%).</p>
+        <small>Silence and quiet stretches score low.</small>
+      </div>
+      <div class="sig-card">
+        <div class="sig-top"><span class="dot" style="background:#8a7fb0"></span><b>Visuals</b><span class="w">15%</span></div>
+        <p>Looks at a small, low-res copy of the video, 2 frames a second at 64×36 pixels. It measures camera cuts, meaning sudden jumps far above the video's usual change (60%), and overall motion between frames (40%).</p>
+        <small>Fast edits and action score high, static shots low.</small>
+      </div>
+    </div>
+
+    <h3 class="about-sub">How the score is calculated</h3>
+    <ol class="flow">
+      <li><b>Split</b><span>The video is cut into equal segments, 10 s by default (5 to 60 s).</span></li>
+      <li><b>Measure</b><span>Each signal is measured for every segment.</span></li>
+      <li><b>Scale</b><span>Each signal is rescaled 0 to 1 within the video.</span></li>
+      <li><b>Blend</b><span>Weighted sum: 0.35 × comments + 0.25 × captions + 0.25 × audio + 0.15 × visuals.</span></li>
+      <li><b>Rescale</b><span>The blend is scaled 0 to 1 again, so the top segment is always 1.00.</span></li>
+    </ol>
+    <p class="muted small-text">If a signal can't be measured (comments turned off, no captions, a download fails), it's dropped and the remaining weights are scaled up to add to 100%. The reason is listed under "Signal weights".</p>
+
+    <div class="about-grid three">
+      <div class="explain">
+        <h4>Peaks and drop-offs</h4>
+        <p>The highest-scoring segments become top moments and the lowest become drop-offs. Neighbouring segments within 0.05 of each other are merged into one range, and a peak never overlaps a drop-off. The chips on a moment show which signals drove it.</p>
+      </div>
+      <div class="explain">
+        <h4>Confidence</h4>
+        <p><b>High</b>: at least 50 timestamped comments plus 2 or more other signals. <b>Medium</b>: comments plus one other signal, or captions plus two others. <b>Low</b>: anything thinner. Official data is always high.</p>
+      </div>
+      <div class="explain">
+        <h4>Reading the charts</h4>
+        <p><b>What drove the score</b> is each signal's share of the total weighted score. <b>Agreement</b> is how closely a signal rises and falls with the final score (+1 means in step, 0 means unrelated). <b>Hot segments</b> are those scoring 0.6 or more.</p>
+      </div>
+    </div>
+
+    <p class="limits"><b>Keep in mind:</b> estimates find moments that look and sound engaging and that commenters point to. They can't see real watch time, so treat them as a strong hint, not proof.</p>
+  </section>
 </main>
 
 <div id="tooltip" class="tooltip hidden"></div>
