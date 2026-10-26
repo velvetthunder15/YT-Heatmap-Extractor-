@@ -15,9 +15,21 @@ from .config import get_settings
 from .pipeline import HeatmapData
 
 
+_MEMORY_SERVER = None
+
+
 @lru_cache
 def get_redis() -> redis.Redis:
-    return redis.Redis.from_url(get_settings().redis_url)
+    """Real Redis, or an in-process store when REDIS_URL=memory:// (single-process local mode)."""
+    url = get_settings().redis_url
+    if url.startswith("memory://"):
+        global _MEMORY_SERVER
+        import fakeredis
+
+        if _MEMORY_SERVER is None:
+            _MEMORY_SERVER = fakeredis.FakeServer()
+        return fakeredis.FakeRedis(server=_MEMORY_SERVER)
+    return redis.Redis.from_url(url)
 
 
 def _key_official(video_id: str) -> str:

@@ -176,7 +176,19 @@ make bump-ytdlp V=2026.11.01
 # or without editing requirements: docker compose build --build-arg YTDLP_VERSION=2026.11.01
 ```
 
-## Free self-hosting (your own computer + Cloudflare Tunnel)
+## Windows, no Docker (simplest)
+
+Needs nothing but Windows 10/11. Download or clone the repo, then **double-click
+`start-windows.bat`**. The first run installs Python 3.11 via winget if you don't have it, creates
+a `.venv`, downloads portable ffmpeg, Deno and cloudflared into `.tools\` (nothing system-wide),
+creates `.env` plus a permanent API key (`secrets\api_key.txt`), opens a free Cloudflare quick
+tunnel and prints your public `https://<random>.trycloudflare.com` URL.
+
+It runs in **single-process local mode** (`REDIS_URL=memory://`, `python -m app.local`): API and
+worker share one process with an in-memory store, so there's no Redis to install. Cache and job
+history reset when you close the window; the API key stays. Keep the window open while you want it live.
+
+## Free self-hosting with Docker (your own computer + Cloudflare Tunnel)
 
 Costs nothing, and because requests leave from your home/college internet (not a datacenter IP),
 YouTube is far less likely to block extraction, so no proxy is needed. The API is online only
