@@ -1,0 +1,27 @@
+# Builds YT-Heatmap-Extractor.zip and attaches it to the release, so this link always works:
+# https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/YT-Heatmap-Extractor.zip
+name: Release zip
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to attach the zip to
+        required: true
+        default: v1.0.0
+permissions:
+  contents: write
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - name: Build zip
+        run: git archive --format=zip --prefix=YT-Heatmap-Extractor/ -o YT-Heatmap-Extractor.zip HEAD
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name || inputs.tag }}" YT-Heatmap-Extractor.zip --clobber
