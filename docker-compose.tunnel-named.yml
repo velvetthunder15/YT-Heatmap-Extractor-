@@ -1,0 +1,15 @@
+# Stable URL via a named Cloudflare Tunnel (free Cloudflare account, needs a domain on Cloudflare).
+# Put CLOUDFLARE_TUNNEL_TOKEN=... and PUBLIC_BASE_URL=https://your.host in .env, then:
+#   docker compose -f docker-compose.yml -f docker-compose.tunnel-named.yml up -d --build
+services:
+  api:
+    environment:
+      FORWARDED_ALLOW_IPS: "*"
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env}
+    depends_on:
+      - api
+    restart: unless-stopped

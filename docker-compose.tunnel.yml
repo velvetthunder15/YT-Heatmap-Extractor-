@@ -1,0 +1,13 @@
+# Free public HTTPS URL via a Cloudflare *quick* tunnel (no account, no card).
+# The URL (https://<random>.trycloudflare.com) changes every time the tunnel restarts.
+#   docker compose -f docker-compose.yml -f docker-compose.tunnel.yml up -d --build
+services:
+  api:
+    environment:
+      FORWARDED_ALLOW_IPS: "*"   # trust X-Forwarded-Proto from cloudflared so links are https
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: ["tunnel", "--no-autoupdate", "--url", "http://api:8000"]
+    depends_on:
+      - api
+    restart: unless-stopped

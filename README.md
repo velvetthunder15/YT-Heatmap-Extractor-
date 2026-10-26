@@ -176,6 +176,30 @@ make bump-ytdlp V=2026.11.01
 # or without editing requirements: docker compose build --build-arg YTDLP_VERSION=2026.11.01
 ```
 
+## Free self-hosting (your own computer + Cloudflare Tunnel)
+
+Costs nothing, and because requests leave from your home/college internet (not a datacenter IP),
+YouTube is far less likely to block extraction, so no proxy is needed. The API is online only
+while your computer is on and Docker is running.
+
+1. Install [Docker Desktop](https://docs.docker.com/get-docker/) and start it.
+2. `git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git && cd YT-Heatmap-Extractor-`
+3. Run one command:
+   - macOS / Linux / WSL: `./scripts/selfhost.sh`
+   - Windows PowerShell: `powershell -ExecutionPolicy Bypass -File .\scripts\selfhost.ps1`
+
+It creates `.env` (random pepper, laptop-sized concurrency), builds and starts API + worker +
+Redis + a Cloudflare quick tunnel, waits for `/health`, and prints your public
+`https://<random>.trycloudflare.com` URL plus your first API key (shown once).
+
+Other commands: `selfhost.sh url` (current URL), `selfhost.sh key NAME` (new key),
+`selfhost.sh stop`.
+
+**Stable URL (optional, still free):** the quick-tunnel URL changes on every restart. For a fixed
+one, add a domain to a free Cloudflare account, create a tunnel in Zero Trust → Networks → Tunnels
+pointing to `http://api:8000`, then put `CLOUDFLARE_TUNNEL_TOKEN=...` and
+`PUBLIC_BASE_URL=https://your.host` in `.env`. The script switches to the named tunnel automatically.
+
 ## Deployment
 
 Needs long-running workers and ffmpeg, so it is **not suited to serverless** (Lambda, Vercel,
