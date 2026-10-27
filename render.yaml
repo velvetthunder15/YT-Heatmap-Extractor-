@@ -1,0 +1,9 @@
+# Render Blueprint: hosts the static dashboard (dashboard/) for free.
+# One-click: https://render.com/deploy?repo=https://github.com/velvetthunder15/YT-Heatmap-Extractor-
+services:
+  - type: web
+    name: yt-heatmap-dashboard
+    runtime: static
+    buildCommand: echo "static site, no build"
+    staticPublishPath: ./dashboard
+    pullRequestPreviewsEnabled: false

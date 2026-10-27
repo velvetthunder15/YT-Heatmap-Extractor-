@@ -7,7 +7,7 @@ dashboard that shows exactly why.
 - Otherwise builds a clearly labelled **estimate** from four signals: comments, captions, audio and visuals.
 - Never makes numbers up: if nothing usable exists, you get a clear error.
 
-**Dashboard:** https://yt-heatmap-dashboard.netlify.app
+**Dashboard:** https://yt-heatmap-dashboard.netlify.app · Host your own copy: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/velvetthunder15/YT-Heatmap-Extractor-)
 
 **Quick start:** [Windows](#quick-start-windows-about-5-minutes) · [macOS](#quick-start-macos-about-5-minutes)
 
@@ -534,6 +534,7 @@ install-background.command   macOS background mode
 setup-permanent-url.command   macOS permanent-URL setup
 worker/proxy.js           the workers.dev forwarding Worker
 netlify.toml      deploys dashboard/ to Netlify
+render.yaml       deploys dashboard/ to Render as a free static site
 tests/
 ```
 
