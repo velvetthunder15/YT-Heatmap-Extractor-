@@ -7,7 +7,7 @@ dashboard that shows exactly why.
 - Otherwise builds a clearly labelled **estimate** from four signals: comments, captions, audio and visuals.
 - Never makes numbers up: if nothing usable exists, you get a clear error.
 
-**Dashboard:** https://yt-heatmap-dashboard.netlify.app · Host your own copy: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/velvetthunder15/YT-Heatmap-Extractor-)
+**Dashboard:** https://yt-heatmap-dashboard.onrender.com (backup: https://yt-heatmap-dashboard.netlify.app) · Host your own copy: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/velvetthunder15/YT-Heatmap-Extractor-)
 
 **Quick start:** [Windows](#quick-start-windows-about-5-minutes) · [macOS](#quick-start-macos-about-5-minutes)
 
@@ -70,7 +70,7 @@ API key:     yhx_xxxxxxxxxxxxxxxx   (also saved in secrets\api_key.txt)
 
 ### 4. Open the dashboard
 
-1. Go to **https://yt-heatmap-dashboard.netlify.app**
+1. Go to **https://yt-heatmap-dashboard.onrender.com** (backup: https://yt-heatmap-dashboard.netlify.app)
 2. Tap **Connection**, paste the **API URL** and **API key**, then tap **Test connection**. You should see a green *Connected*.
 3. Leave **Remember on this device** ticked so you only paste the key once. With the quick tunnel, update the URL after each restart. With a permanent URL, you never have to.
 
@@ -533,8 +533,8 @@ install-background.bat / uninstall-background.bat / background-status.bat   Wind
 install-background.command   macOS background mode
 setup-permanent-url.command   macOS permanent-URL setup
 worker/proxy.js           the workers.dev forwarding Worker
-netlify.toml      deploys dashboard/ to Netlify
-render.yaml       deploys dashboard/ to Render as a free static site
+render.yaml       deploys dashboard/ to Render (main dashboard, auto-deploys on push)
+netlify.toml      deploys dashboard/ to Netlify (backup mirror)
 tests/
 ```
 
