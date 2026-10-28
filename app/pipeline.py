@@ -19,6 +19,7 @@ from .errors import NoDataAvailable, VideoTooLong
 from .logging_setup import log_event
 from .scoring import (
     Segment,
+    calibrate_shape,
     combine_signals,
     contributing_signals,
     make_windows,
@@ -178,6 +179,8 @@ def estimated_data(
 
     weights = renormalize_weights(s.weights, list(curves.keys()))
     segs = combine_signals(windows, curves, s.weights)
+    for seg, v in zip(segs, calibrate_shape([x.score for x in segs], s.estimate_median_target)):
+        seg.score = v
     signals = [n for n in ["comments", "transcript", "audio", "visual"] if n in curves]
     stats["signals_skipped"] = skipped
     conf, reason = estimate_confidence(signals, stats["timestamped_comments"])

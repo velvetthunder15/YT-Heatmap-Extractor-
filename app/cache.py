@@ -37,7 +37,7 @@ def _key_official(video_id: str) -> str:
 
 
 def _key_estimated(video_id: str, window: float) -> str:
-    return f"hm:estimated:{video_id}:{int(window)}"
+    return f"hm:estimated:v2:{video_id}:{int(window)}"  # v2: calibrated score shape
 
 
 def get_cached(r: redis.Redis, video_id: str, window: float, force_estimate: bool = False) -> HeatmapData | None:

@@ -269,6 +269,22 @@ A **signal** is one independent measurement taken for every segment. Each one is
 3. **Scale** each signal to 0–1 within the video.
 4. **Blend**: `0.35 × comments + 0.25 × captions + 0.25 × audio + 0.15 × visuals`.
 5. **Rescale** the blend to 0–1 again, so the top segment is always 1.00.
+6. **Shape**: a power curve `score^k` pulls ordinary segments down so the median lands at
+   `ESTIMATE_MEDIAN_TARGET` (default 0.12). YouTube's real replay data is mostly near zero with a few
+   spikes, while an average of four signals hovers around 0.5. Order is unchanged, so peaks and
+   drop-offs stay the same; only the scale now looks like official data. Set it to `0` to turn it off.
+
+A trailing piece of half a segment or less is merged into the previous segment, so the last few seconds
+aren't flagged as a drop-off just because they're short.
+
+#### Calibrating against official data
+
+The weights are reasonable defaults, not truths. To fit them to the videos you analyse, list 10+
+videos that **do** have YouTube's "Most replayed" graph in `calibration/videos.txt` (one per line) and
+double-click `calibrate.bat` (Windows) or `calibrate.command` (Mac). Or run
+`python -m scripts.calibrate --file calibration/videos.txt`. It runs both modes on each video, reports
+how well the estimate's ranking matches (Spearman) and how many of the real top-5 moments it found, then
+searches for the best weights and shape. Add `--apply` to save them to `.env`, then restart the server.
 
 If a signal can't be measured (comments off, no captions, a download fails), it's dropped and the
 remaining weights are scaled up to add to 1. It's listed in `signals_skipped` with the reason, for example
@@ -539,6 +555,7 @@ start-mac.command         macOS one-command start
 install-background.bat / uninstall-background.bat / background-status.bat   Windows background mode
 install-background.command   macOS background mode
 rotate-key.bat / rotate-key.command   replace the API key
+calibrate.bat / calibrate.command     tune estimate weights against official data
 setup-permanent-url.command   macOS permanent-URL setup
 worker/proxy.js           the workers.dev forwarding Worker
 render.yaml       deploys dashboard/ to Render (main dashboard, auto-deploys on push)

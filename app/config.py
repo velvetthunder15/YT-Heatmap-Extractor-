@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     weight_transcript: float = 0.25
     weight_audio: float = 0.25
     weight_visual: float = 0.15
+    # Estimates are reshaped so the median segment scores this (YouTube's own data is mostly
+    # near zero with sharp spikes). 0 = keep the plain weighted average.
+    estimate_median_target: float = 0.12
 
     enable_comments: bool = True
     enable_transcript: bool = True

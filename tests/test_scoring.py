@@ -9,7 +9,10 @@ def segs_from(scores, size=10):
 
 
 def test_make_windows_last_partial():
-    assert make_windows(25, 10) == [(0, 10), (10, 20), (20, 25)]
+    assert make_windows(26, 10) == [(0, 10), (10, 20), (20, 26)]
+    assert make_windows(25, 10) == [(0, 10), (10, 25)]
+    assert make_windows(935, 10)[-1] == (920, 935)  # a 5 s stub joins the previous window
+    assert make_windows(4, 10) == [(0, 4)]
     assert make_windows(0, 10) == []
 
 
@@ -111,3 +114,13 @@ def test_downloads_never_share_a_folder(tmp_path, monkeypatch):
     big_audio = ytdl.download("u", str(tmp_path), "a", ext="wav", size=1000)
     small_video = ytdl.download("u", str(tmp_path), "v", ext="mp4", size=10)
     assert big_audio.endswith(".wav") and small_video.endswith(".mp4")
+
+
+def test_calibrate_shape_keeps_order_and_sets_median():
+    from app.scoring import calibrate_shape
+    vals = [0.0, 0.3, 0.45, 0.5, 0.55, 0.6, 1.0]
+    out = calibrate_shape(vals, 0.12)
+    assert sorted(range(len(out)), key=out.__getitem__) == sorted(range(len(vals)), key=vals.__getitem__)
+    assert out[0] == 0 and out[-1] == 1 and abs(sorted(out)[3] - 0.12) < 1e-9
+    assert calibrate_shape(vals, 0) == vals
+    assert calibrate_shape([0, 0.05, 0.1, 1], 0.12) == [0, 0.05, 0.1, 1]  # already peaky

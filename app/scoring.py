@@ -17,11 +17,17 @@ class Segment:
 
 # ---------------------------------------------------------------- windows ---
 def make_windows(duration: float, window: float) -> list[tuple[float, float]]:
-    """Split [0, duration) into consecutive windows; the last one may be shorter."""
+    """Split [0, duration) into consecutive windows. A leftover of half a window or less is
+    folded into the previous one: a 5 s stub has fewer comments, words and frames than a full
+    window, so on its own it would always look like a drop-off."""
     if duration <= 0 or window <= 0:
         return []
     n = int(math.ceil(duration / window))
-    return [(i * window, min((i + 1) * window, duration)) for i in range(n)]
+    out = [(i * window, min((i + 1) * window, duration)) for i in range(n)]
+    if len(out) > 1 and out[-1][1] - out[-1][0] <= window / 2:
+        out[-2] = (out[-2][0], duration)
+        out.pop()
+    return out
 
 
 def normalize(values: Sequence[float]) -> list[float]:
@@ -61,6 +67,24 @@ def combine_signals(
     for s, v in zip(segs, scaled):
         s.score = v
     return segs
+
+
+def calibrate_shape(scores: Sequence[float], median_target: float) -> list[float]:
+    """Reshape 0..1 estimate scores so they're distributed like YouTube's "Most replayed" data.
+
+    Averaging four independent signals makes most segments land around 0.4-0.5, while real replay
+    data is mostly near zero with a few sharp spikes. A power curve x**k keeps the order of every
+    segment (so peaks and drop-offs stay where they are) and 0 and 1 fixed, and k is picked so
+    the median segment lands at `median_target`. median_target <= 0 turns this off.
+    """
+    vals = [min(1.0, max(0.0, float(v))) for v in scores]
+    if not vals or median_target <= 0 or median_target >= 1:
+        return vals
+    mid = sorted(vals)[len(vals) // 2]
+    if mid <= median_target or mid >= 1:
+        return vals  # already peaky enough
+    k = min(6.0, max(1.0, math.log(median_target) / math.log(mid)))
+    return [v ** k for v in vals]
 
 
 # ------------------------------------------------------------ formatting ---

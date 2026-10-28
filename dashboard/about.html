@@ -143,9 +143,11 @@
           <li><b>Scale</b><span>Each signal is rescaled 0 to 1 within the video.</span></li>
           <li><b>Blend</b><span>The signals are combined in a weighted sum, using the weights above.</span></li>
           <li><b>Rescale</b><span>The blend is scaled 0 to 1 again, so the top segment is always 1.00.</span></li>
+          <li><b>Shape</b><span>A curve pulls ordinary segments down toward 0.12, like YouTube's own data, where most of a video sits near zero and only real moments spike. The order never changes, so peaks and drop-offs stay put.</span></li>
         </ol>
-        <div class="formula">score = rescale( <span class="k">0.35</span> × comments + <span class="k">0.25</span> × captions + <span class="k">0.25</span> × audio + <span class="k">0.15</span> × visuals )</div>
+        <div class="formula">score = shape( rescale( <span class="k">0.35</span> × comments + <span class="k">0.25</span> × captions + <span class="k">0.25</span> × audio + <span class="k">0.15</span> × visuals ) )</div>
         <div class="note">If a signal can't be measured (comments turned off, no captions, a download fails), it's <b>dropped</b> and the remaining weights are scaled up to add to 100%. The reason shows under <b>Signal weights</b> on the results.</div>
+        <div class="note"><b>Make estimates match your kind of videos:</b> run <code>calibrate</code> on a list of videos that do have YouTube's graph. It compares both versions and tunes these weights and the shape to fit.</div>
       </section>
 
       <section class="doc-sec" id="peaks">
