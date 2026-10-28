@@ -724,7 +724,7 @@
   addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawCharts, 120); });
 
   // decorative hero bars
-  $("heroStrip").innerHTML = Array.from({ length: 36 }, (_, i) => {
+  if ($("heroStrip")) $("heroStrip").innerHTML = Array.from({ length: 36 }, (_, i) => {
     const base = 0.18 + 0.8 * Math.pow(Math.sin((i / 35) * Math.PI * 1.15 + 0.4) * 0.5 + 0.5, 2.2) * (0.6 + 0.4 * Math.sin(i * 1.7));
     const a = Math.max(0.12, Math.min(1, base)), b = Math.max(0.12, Math.min(1, base * (0.55 + 0.6 * ((i * 37) % 10) / 10)));
     return `<i style="--a:${a.toFixed(2)};--b:${b.toFixed(2)};animation-delay:${(-i * 0.13).toFixed(2)}s"></i>`;
