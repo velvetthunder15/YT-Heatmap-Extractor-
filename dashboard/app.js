@@ -80,33 +80,58 @@
   }
 
   // ----------------------------------------------------------- settings --
+  // The key is kept only in this browser. "Remember" keeps it across visits (localStorage);
+  // otherwise it lasts until this tab closes (sessionStorage). It's only ever sent, as a header,
+  // to the API URL you entered.
+  const SESSION = "hmdash.session.v1";
+  let apiFromLink = null;
   function loadSettings() {
     try {
       const s = JSON.parse(localStorage.getItem(STORE) || "{}");
-      $("apiBase").value = s.apiBase || "";
-      $("apiKey").value = s.apiKey || "";
+      let sess = {};
+      try { sess = JSON.parse(sessionStorage.getItem(SESSION) || "{}"); } catch (_) { /* blocked */ }
+      $("apiBase").value = s.apiBase || sess.apiBase || "";
+      $("apiKey").value = s.apiKey || sess.apiKey || "";
       $("windowSel").value = s.window || "";
-      $("remember").checked = s.remember !== false;
+      $("remember").checked = s.remember === true;
       const params = new URLSearchParams(location.search);
-      if (params.get("api")) $("apiBase").value = params.get("api");
+      const linked = params.get("api") && normBase(params.get("api"));
+      if (linked && linked !== normBase($("apiBase").value)) {
+        // Someone else's link: show their URL, but never send it the key saved for your own server.
+        apiFromLink = linked;
+        $("apiBase").value = linked;
+        $("apiKey").value = "";
+      }
       if (params.get("v")) $("ytUrl").value = params.get("v");
       if (s.os) setOS(s.os);
     } catch (_) { /* ignore */ }
   }
   function saveSettings() {
     const remember = $("remember").checked;
-    const s = { remember, window: $("windowSel").value, os: currentOS };
-    if (remember) { s.apiBase = normBase($("apiBase").value); s.apiKey = $("apiKey").value.trim(); }
+    const creds = { apiBase: normBase($("apiBase").value), apiKey: $("apiKey").value.trim() };
+    const s = { remember, window: $("windowSel").value, os: currentOS, ...(remember ? creds : {}) };
     try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (_) { /* storage blocked */ }
+    try { remember ? sessionStorage.removeItem(SESSION) : sessionStorage.setItem(SESSION, JSON.stringify(creds)); } catch (_) { /* blocked */ }
+  }
+  function forgetKey() {
+    $("apiKey").value = "";
+    try { sessionStorage.removeItem(SESSION); } catch (_) { /* blocked */ }
+    try { const s = JSON.parse(localStorage.getItem(STORE) || "{}"); delete s.apiKey; localStorage.setItem(STORE, JSON.stringify(s)); } catch (_) { /* blocked */ }
+    setConn("neutral", "Not connected", "Key removed from this browser.");
+    openConn(true);
   }
 
   // ---------------------------------------------------------------- api --
+  const isLocal = (u) => { try { return ["localhost", "127.0.0.1", "[::1]"].includes(new URL(u).hostname); } catch (_) { return false; } };
   async function api(path, opts = {}) {
     const base = normBase($("apiBase").value);
     const key = $("apiKey").value.trim();
+    if (/^http:/i.test(base) && !isLocal(base)) {
+      throw Object.assign(new Error("Use an https:// API URL."), { code: "insecure_url", hint: "Plain http would send your API key unencrypted. Your workers.dev or trycloudflare.com URL is https; plain http only works for localhost." });
+    }
     let res;
     try {
-      res = await fetch(base + path, { ...opts, headers: { "X-API-Key": key, ...(opts.headers || {}) } });
+      res = await fetch(base + path, { ...opts, credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store", headers: { "X-API-Key": key, ...(opts.headers || {}) } });
     } catch (e) {
       const err = new Error("Couldn't reach the API.");
       err.hint = "Check the API URL (a random trycloudflare.com URL changes on every restart; a workers.dev URL stays the same), that the server window is still open, and that your server is up to date so it allows requests from this dashboard.";
@@ -165,16 +190,16 @@
       openConn(true);
       return false;
     }
-    setConn("neutral busy", "Checking…", "Checking " + hostOf(base) + "…");
+    setConn("neutral busy", "Checking…", "Checking " + esc(hostOf(base)) + "…");
     try {
       const { body } = await api("/health");
       const ok = body.status === "ok";
-      setConn(ok ? "ok" : "warn", ok ? "Connected" : "Degraded", `${hostOf(base)} · API v${esc(body.version || "?")}${ok ? "" : " · " + esc(body.status)}`);
+      setConn(ok ? "ok" : "warn", ok ? "Connected" : "Degraded", `${esc(hostOf(base))} · API v${esc(body.version || "?")}${ok ? "" : " · " + esc(body.status)}`);
       if (ok) openConn(false);
       return ok;
     } catch (e) {
-      const short = e.code === "server_offline" ? "Server offline" : e.status === 401 || e.status === 403 ? "Wrong key" : e.status ? `Error ${e.status}` : "Unreachable";
-      setConn("bad", short, (e.hint || e.message) );
+      const short = e.code === "insecure_url" ? "Needs https" : e.code === "server_offline" ? "Server offline" : e.status === 401 || e.status === 403 ? "Wrong key" : e.status ? `Error ${e.status}` : "Unreachable";
+      setConn("bad", short, esc(e.hint || e.message));
       if (!quiet) openConn(true);
       return false;
     }
@@ -246,7 +271,35 @@
     return null;
   }
 
+  // Results come from whatever API URL is configured, so treat them as untrusted: keep only the
+  // fields and types the page uses, and only YouTube links.
+  const num = (v) => (Number.isFinite(+v) ? +v : 0);
+  const sigName = (n) => /^[a-z_]{1,32}$/.test(n);
+  function cleanSignals(sig) {
+    if (Array.isArray(sig)) return sig.map((x) => (typeof x === "string" ? (sigName(x) ? x : null) : x && sigName(x.name) ? { name: x.name, ...(x.share != null ? { share: num(x.share) } : {}), ...(x.value != null ? { value: num(x.value) } : {}) } : null)).filter(Boolean);
+    if (sig && typeof sig === "object") return Object.fromEntries(Object.entries(sig).filter(([k]) => sigName(k)).map(([k, v]) => [k, num(v)]));
+    return sig == null ? sig : {};
+  }
+  function cleanResult(r) {
+    if (!r || typeof r !== "object" || !/^[\w-]{11}$/.test(r.video_id || "")) throw Object.assign(new Error("The server sent a result this page can't read."), { hint: "Make sure the API URL points to your own Heatmapify server." });
+    const seg = (m) => ({ ...m, start: num(m.start), end: num(m.end), score: num(m.score), link: /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(m.link || "") ? m.link : `https://youtu.be/${r.video_id}?t=${Math.floor(num(m.start))}`, signals: cleanSignals(m.signals) });
+    return {
+      ...r,
+      title: String(r.title || ""),
+      duration: num(r.duration),
+      window_seconds: r.window_seconds == null ? r.window_seconds : num(r.window_seconds),
+      source: r.source === "estimated" ? "estimated" : "official",
+      confidence: ["high", "medium", "low"].includes(r.confidence) ? r.confidence : null,
+      signals_used: (r.signals_used || []).filter((x) => typeof x === "string" && sigName(x)),
+      weights: cleanSignals(r.weights) || {},
+      full_heatmap: (r.full_heatmap || []).map((p) => ({ start: num(p.start), end: num(p.end), score: num(p.score), signals: cleanSignals(p.signals) })),
+      most_engaging: (r.most_engaging || []).map(seg),
+      least_engaging: (r.least_engaging || []).map(seg),
+    };
+  }
+
   function finish(result) {
+    result = cleanResult(result);
     hideProgress();
     addHistory(result);
     render(result);
@@ -301,6 +354,7 @@
 
   // ------------------------------------------------------------- render --
   function render(r) {
+    r = cleanResult(r);
     current = r;
     playhead = null;
     const peakTab = document.querySelector('.seg-toggle button[data-list="top"]');
@@ -699,11 +753,15 @@
   document.querySelectorAll(".os-tabs button").forEach((b) => b.addEventListener("click", () => { setOS(b.dataset.os); saveSettings(); }));
   document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); } catch (_) { /* ignore */ }
-  }));  $("showKey").addEventListener("click", () => {
-    const k = $("apiKey");
-    k.type = k.type === "password" ? "text" : "password";
-    $("showKey").textContent = k.type === "password" ? "Show" : "Hide";
+  }));  // The key box is a plain text field masked with CSS, so password managers never offer to save it.
+  $("showKey").addEventListener("click", () => {
+    const shown = $("apiKey").classList.toggle("revealed");
+    $("showKey").textContent = shown ? "Hide" : "Show";
   });
+  $("forgetKey").addEventListener("click", forgetKey);
+  $("remember").addEventListener("change", saveSettings);
+  $("thumb").addEventListener("error", () => ($("thumb").style.visibility = "hidden"));
+  $("thumb").addEventListener("load", () => ($("thumb").style.visibility = "visible"));
   $("testConn").addEventListener("click", () => { saveSettings(); testConnection(); });
   ["apiBase", "apiKey"].forEach((id) => $(id).addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); saveSettings(); testConnection(); } }));
   ["apiBase", "apiKey", "windowSel", "remember"].forEach((id) => $(id).addEventListener("change", saveSettings));
@@ -987,6 +1045,7 @@
   setOS(currentOS);
   loadSettings();
   drawHistory();
-  testConnection({ quiet: true }).then((ok) => { if (!ok && !normBase($("apiBase").value)) openConn(true); });
+  if (apiFromLink) { setConn("neutral", "Not connected", `This link points to ${esc(hostOf(apiFromLink))}. Add that server's key to connect.`); openConn(true); }
+  else testConnection({ quiet: true }).then((ok) => { if (!ok && !normBase($("apiBase").value)) openConn(true); });
   if (window.__SAMPLE__ || new URLSearchParams(location.search).get("sample") != null) $("sampleBtn").click();
 })();

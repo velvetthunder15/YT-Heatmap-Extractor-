@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com; frame-src https://www.youtube-nocookie.com; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Heatmapify · Find the moments that keep people watching</title>
 <meta name="description" content="Paste a YouTube link and see its most and least engaging moments: YouTube's own Most replayed data, or a clearly labelled estimate from comments, captions, audio and visuals.">
@@ -165,13 +167,14 @@
         <div class="field">
           <label for="apiKey">API key</label>
           <div class="with-btn">
-            <input id="apiKey" type="password" placeholder="yhx_…" spellcheck="false" autocomplete="off">
+            <input id="apiKey" class="secret" type="text" placeholder="yhx_…" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other">
             <button id="showKey" type="button" class="btn-ghost btn-sm">Show</button>
           </div>
-          <small>It's in <code>secrets/api_key.txt</code> in the project folder.</small>
+          <small>It's in <code>secrets/api_key.txt</code> in the project folder. It stays in this browser and is only sent to your API URL.</small>
         </div>
         <div class="row">
-          <label class="toggle"><input id="remember" type="checkbox" checked> Remember on this device</label>
+          <label class="toggle"><input id="remember" type="checkbox"> Remember on this device</label>
+          <button id="forgetKey" type="button" class="btn-link">Forget key</button>
           <button id="testConn" type="button" class="btn-ghost">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
             Save &amp; test
@@ -215,7 +218,7 @@
 
     <section id="r-overview" class="card overview">
       <a id="thumbLink" class="thumb" target="_blank" rel="noopener">
-        <img id="thumb" alt="" onerror="this.style.visibility='hidden'" onload="this.style.visibility='visible'">
+        <img id="thumb" alt="">
         <span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
       </a>
       <div class="ov-body">

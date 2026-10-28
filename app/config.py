@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     public_base_url: str = ""  # e.g. https://api.example.com (used to build status_url)
     log_level: str = "INFO"
     cors_origins: str = ""  # comma-separated, "*" for any, empty = CORS disabled
+    # Browser pages on this computer (a dashboard opened from localhost) are allowed as well.
+    cors_allow_localhost: bool = True
 
     # --- Auth / limits ---------------------------------------------------
     require_api_key: bool = True
@@ -92,6 +94,10 @@ class Settings(BaseSettings):
             "audio": self.enable_audio,
             "visual": self.enable_visual,
         }
+
+    @property
+    def cors_localhost_regex(self) -> str | None:
+        return r"^https?://(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$" if self.cors_allow_localhost else None
 
     @property
     def cors_list(self) -> list[str]:

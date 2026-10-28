@@ -546,6 +546,15 @@ conflict with [YouTube's Terms of Service](https://www.youtube.com/t/terms). **R
 (and get legal advice) before running this publicly or as a paid service.** Prefer the
 official API where it covers your needs, cache aggressively, and respect rate limits.
 
+## Security
+
+- **Your API key never leaves your browser except to your own server.** The dashboard is a static page with no backend. The key is sent only as an `X-API-Key` header to the API URL you entered, and only over https (plain http is refused except for `localhost`).
+- **Where it's stored:** only in this browser. By default it lasts until you close the tab. Tick *Remember on this device* to keep it, and use *Forget key* to wipe it. The key box isn't a password field, so browsers won't offer to save it as a login.
+- **Shared links can't steal it:** opening a link with someone else's `?api=` never sends them your saved key.
+- **The page is locked down:** a strict Content-Security-Policy (no inline or third-party scripts), no framing, no referrer. Results from the server are validated before they're shown.
+- **On the server:** keys are stored only as HMAC-SHA256 hashes, every key is rate-limited, and browsers may call the API only from the Heatmapify dashboard or pages on your own computer (`CORS_ORIGINS`). API responses are marked `no-store`.
+- **If your key leaks:** double-click `rotate-key.bat` (Windows) or `rotate-key.command` (Mac). It prints a new key, the old one stops working once the server restarts, and you paste the new key into the dashboard.
+
 ## License
 
 [MIT](LICENSE) © 2026 Chirag Rasane. The license covers this code only. It doesn't grant any rights to YouTube content or override YouTube's Terms of Service.

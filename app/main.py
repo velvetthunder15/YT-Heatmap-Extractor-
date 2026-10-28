@@ -39,6 +39,8 @@ if settings.cors_list:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_list,
+        allow_origin_regex=settings.cors_localhost_regex,
+        allow_credentials=False,
         allow_methods=["GET", "POST"],
         allow_headers=["X-API-Key", "Content-Type"],
     )
@@ -82,6 +84,9 @@ async def access_log(request: Request, call_next):
     t0 = time.time()
     response = await call_next(request)
     response.headers["X-Request-ID"] = rid
+    response.headers.setdefault("Cache-Control", "no-store")  # results are per-key; never cache them in shared proxies
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
     log_event(log, "request", rid=rid, method=request.method, path=request.url.path,
               status=response.status_code, ms=int((time.time() - t0) * 1000))
     return response

@@ -566,3 +566,8 @@ button:active, .dl-btn:active, .cta-ghost:active, .cta a.btn-primary:active, .na
 .share-actions button { display: inline-flex; align-items: center; gap: 7px; }
 .share-actions svg, #shareImage svg { width: 15px; height: 15px; }
 @media (max-width: 520px) { .share-actions button { flex: 1 1 auto; justify-content: center; } }
+
+/* API key box: a text field masked with CSS, so browsers don't treat it as a login */
+.secret { -webkit-text-security: disc; font-family: var(--mono); letter-spacing: .04em; }
+.secret.revealed { -webkit-text-security: none; }
+.secret::placeholder { -webkit-text-security: none; }

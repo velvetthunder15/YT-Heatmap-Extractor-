@@ -1,5 +1,7 @@
 import pytest
 
+from tests.test_api import client  # noqa: F401  (fixture)
+
 from app.errors import classify_ytdlp_error
 from app.sources.official import check_playable
 
@@ -38,3 +40,16 @@ def test_unlisted_is_allowed():
     check_playable({"id": "x", "availability": "unlisted", "formats": [{}], "duration": 60})
 
 
+
+
+def test_cors_localhost_regex():
+    import re
+    from app.config import Settings
+    rx = Settings(cors_origins="https://heatmapify.onrender.com").cors_localhost_regex
+    assert re.match(rx, "http://localhost:8080") and re.match(rx, "http://127.0.0.1")
+    assert not re.match(rx, "https://evil.com") and not re.match(rx, "http://localhost.evil.com")
+
+
+def test_api_responses_are_not_cached(client):
+    r = client.get("/health")
+    assert r.headers["cache-control"] == "no-store" and r.headers["x-content-type-options"] == "nosniff"
