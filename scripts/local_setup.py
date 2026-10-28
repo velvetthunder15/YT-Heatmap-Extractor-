@@ -18,7 +18,7 @@ ENV = ROOT / ".env"
 KEY_FILE = ROOT / "secrets" / "api_key.txt"
 # Only the hosted dashboard may call the API from a browser (plus pages on this computer).
 # The key is still required; this just stops other websites from using it in a visitor's browser.
-DASHBOARD_ORIGINS = "https://heatmapify.onrender.com,https://heatmapify.netlify.app"
+DASHBOARD_ORIGINS = "https://heatmapify.onrender.com"
 
 LOCAL_OVERRIDES = {
     "REDIS_URL": "memory://",

@@ -17,7 +17,6 @@ dashboard that shows exactly why.
 | `estimated` | No official data, so comments, captions, audio and visuals are scored | `high` / `medium` / `low` |
 | error | Nothing usable | `no_data_available` (never fabricated) |
 
-(backup: https://heatmapify.netlify.app) ·
 ---
 
 ## Quick start (Windows, about 5 minutes)
@@ -71,7 +70,7 @@ API key:     yhx_xxxxxxxxxxxxxxxx   (also saved in secrets\api_key.txt)
 
 ### 4. Open the dashboard
 
-1. Go to **https://heatmapify.onrender.com** (backup: https://heatmapify.netlify.app)
+1. Go to **https://heatmapify.onrender.com**
 2. Tap **Connection**, paste the **API URL** and **API key**, then tap **Test connection**. You should see a green *Connected*.
 3. Leave **Remember on this device** ticked so you only paste the key once. With the quick tunnel, update the URL after each restart. With a permanent URL, you never have to.
 
@@ -559,8 +558,6 @@ calibrate.bat / calibrate.command     tune estimate weights against official dat
 setup-permanent-url.command   macOS permanent-URL setup
 worker/proxy.js           the workers.dev forwarding Worker
 render.yaml       deploys dashboard/ to Render (main dashboard, auto-deploys on push)
-netlify.toml      deploys dashboard/ to Netlify (backup mirror)
-dashboard/_headers   security headers (CSP etc.) for Netlify zip deploys
 SECURITY.md       how keys are protected, and how to report a problem
 tests/
 ```
