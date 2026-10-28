@@ -38,7 +38,7 @@ case "$ROOT" in
   "$HOME/Desktop"*|"$HOME/Documents"*|"$HOME/Downloads"*)
     echo "This folder is in Desktop, Documents or Downloads, which macOS won't let background jobs read."
     echo "Move it to your home folder first, for example:"
-    echo "  mv \"$ROOT\" ~/YT-Heatmap-Extractor && cd ~/YT-Heatmap-Extractor && bash install-background.command"
+    echo "  mv \"$ROOT\" ~/Heatmapify && cd ~/Heatmapify && bash install-background.command"
     exit 1 ;;
 esac
 
