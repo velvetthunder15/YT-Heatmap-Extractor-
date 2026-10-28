@@ -97,7 +97,7 @@
     const remember = $("remember").checked;
     const s = { remember, window: $("windowSel").value, os: currentOS };
     if (remember) { s.apiBase = normBase($("apiBase").value); s.apiKey = $("apiKey").value.trim(); }
-    localStorage.setItem(STORE, JSON.stringify(s));
+    try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (_) { /* storage blocked */ }
   }
 
   // ---------------------------------------------------------------- api --
@@ -277,6 +277,7 @@
     if (peakTab) peakTab.click();
     hiddenSignals = new Set();
     $("results").classList.remove("hidden");
+    Array.from($("results").children).forEach((el, i) => { el.classList.remove("reveal"); void el.offsetWidth; el.style.animationDelay = Math.min(i, 8) * 60 + "ms"; el.classList.add("reveal"); });
     const heat = r.full_heatmap || [];
     const estimated = r.source === "estimated";
     const vid = r.video_id;
@@ -672,7 +673,7 @@
   $("sampleBtn").addEventListener("click", async () => {
     hideError();
     try {
-      const r = await (await fetch("sample.json")).json();
+      const r = window.__SAMPLE__ || await (await fetch("sample.json")).json();
       render(r);
     } catch (_) { showError("Couldn't load the sample."); }
   });
@@ -733,5 +734,5 @@
   loadSettings();
   drawHistory();
   testConnection({ quiet: true }).then((ok) => { if (!ok && !normBase($("apiBase").value)) openConn(true); });
-  if (new URLSearchParams(location.search).get("sample") != null) $("sampleBtn").click();
+  if (window.__SAMPLE__ || new URLSearchParams(location.search).get("sample") != null) $("sampleBtn").click();
 })();
