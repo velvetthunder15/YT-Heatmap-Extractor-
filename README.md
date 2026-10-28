@@ -1,4 +1,4 @@
-# YouTube Heatmap Extractor
+# Heatmapify
 
 Runs on your own Windows or Mac for free. Paste a YouTube link, get the **most** and **least engaging moments** of the video, with a
 dashboard that shows exactly why.
@@ -7,7 +7,7 @@ dashboard that shows exactly why.
 - Otherwise builds a clearly labelled **estimate** from four signals: comments, captions, audio and visuals.
 - Never makes numbers up: if nothing usable exists, you get a clear error.
 
-**Dashboard:** https://yt-heatmap-dashboard.onrender.com  Host your own copy: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/velvetthunder15/YT-Heatmap-Extractor-)
+**Dashboard:** https://heatmapify.onrender.com  Host your own copy: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/velvetthunder15/YT-Heatmap-Extractor-)
 
 **Quick start:** [Windows](#quick-start-windows-about-5-minutes) · [macOS](#quick-start-macos-about-5-minutes)
 
@@ -17,7 +17,7 @@ dashboard that shows exactly why.
 | `estimated` | No official data, so comments, captions, audio and visuals are scored | `high` / `medium` / `low` |
 | error | Nothing usable | `no_data_available` (never fabricated) |
 
-(backup: https://yt-heatmap-dashboard.netlify.app) ·
+(backup: https://heatmapify.netlify.app) ·
 ---
 
 ## Quick start (Windows, about 5 minutes)
@@ -33,7 +33,7 @@ git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git
 cd YT-Heatmap-Extractor-
 ```
 
-or [**download the latest release (.zip)**](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/YT-Heatmap-Extractor.zip) and extract it anywhere (for example `Documents\YT-Heatmap-Extractor`).
+or [**download the latest release (.zip)**](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/Heatmapify.zip) and extract it anywhere (for example `Documents\Heatmapify`).
 
 ### 2. Start the server
 
@@ -57,7 +57,7 @@ Later starts take a few seconds.
 When it's ready, the window prints something like:
 
 ```
-================ YouTube Heatmap Extractor ================
+================ Heatmapify ================
 Local docs:  http://127.0.0.1:8000/docs
 Public docs: https://random-words-here.trycloudflare.com/docs
 API URL:     https://random-words-here.trycloudflare.com   (paste this into the dashboard)
@@ -71,7 +71,7 @@ API key:     yhx_xxxxxxxxxxxxxxxx   (also saved in secrets\api_key.txt)
 
 ### 4. Open the dashboard
 
-1. Go to **https://yt-heatmap-dashboard.onrender.com** (backup: https://yt-heatmap-dashboard.netlify.app)
+1. Go to **https://heatmapify.onrender.com** (backup: https://heatmapify.netlify.app)
 2. Tap **Connection**, paste the **API URL** and **API key**, then tap **Test connection**. You should see a green *Connected*.
 3. Leave **Remember on this device** ticked so you only paste the key once. With the quick tunnel, update the URL after each restart. With a permanent URL, you never have to.
 
@@ -142,7 +142,7 @@ always on (an old laptop, a Raspberry Pi-class mini PC). Cloud servers usually g
 
 ### Updating
 
-[Re-download the latest release](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/YT-Heatmap-Extractor.zip) and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
+[Re-download the latest release](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/Heatmapify.zip) and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
 Your `.env` and API key are kept.
 
 ---
@@ -160,10 +160,10 @@ git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git
 cd YT-Heatmap-Extractor-
 ```
 
-No git? [Download the latest release (.zip)](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/YT-Heatmap-Extractor.zip), double-click it in Downloads, then in Terminal:
+No git? [Download the latest release (.zip)](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/Heatmapify.zip), double-click it in Downloads, then in Terminal:
 
 ```bash
-cd ~/Downloads/YT-Heatmap-Extractor
+cd ~/Downloads/Heatmapify
 ```
 
 (If macOS asks to install the *command line developer tools* when you run `git`, click Install, or use the ZIP.)

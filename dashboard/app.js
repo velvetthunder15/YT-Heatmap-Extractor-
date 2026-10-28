@@ -1,4 +1,4 @@
-/* Heatmap Dashboard: talks to the YouTube Heatmap Extractor API and draws the result. */
+/* Heatmapify dashboard: talks to the Heatmapify API and draws the result. */
 (() => {
   "use strict";
   if (location.hash === "#about") { location.replace("about.html"); return; }

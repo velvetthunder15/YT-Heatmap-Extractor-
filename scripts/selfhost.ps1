@@ -81,7 +81,7 @@ if (-not (Test-Path secrets\.first_key_created)) {
 
 $base = if ($url) { $url } else { "http://localhost:8000" }
 Write-Host ""
-Write-Host "================ YouTube Heatmap Extractor is live ================"
+Write-Host "================ Heatmapify is live ================"
 Write-Host "Local:   http://localhost:8000/docs"
 if ($url) { Write-Host "Public:  $url/docs" } else { Write-Host "Tunnel URL not ready yet. Run: .\scripts\selfhost.ps1 url" }
 if ($key) { Write-Host "API key: $key   (shown ONCE - save it now)" }

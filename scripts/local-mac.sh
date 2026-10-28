@@ -161,7 +161,7 @@ start_tunnel
 write_status
 
 echo
-printf '\033[32m================ YouTube Heatmap Extractor ================\033[0m\n'
+printf '\033[32m================ Heatmapify ================\033[0m\n'
 echo "Local docs:  http://127.0.0.1:$PORT/docs"
 if [ -n "$URL" ]; then
   printf '\033[32mPublic docs: %s/docs\nAPI URL:     %s   (paste this into the dashboard)\033[0m\n' "$URL" "$URL"

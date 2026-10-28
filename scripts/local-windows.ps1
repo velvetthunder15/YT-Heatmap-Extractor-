@@ -172,7 +172,7 @@ Start-Tunnel
 Write-Status
 
 Write-Host ""
-Write-Host "================ YouTube Heatmap Extractor ================" -ForegroundColor Green
+Write-Host "================ Heatmapify ================" -ForegroundColor Green
 Write-Host "Local docs:  http://127.0.0.1:$port/docs"
 if ($url) { Write-Host "Public docs: $url/docs" -ForegroundColor Green; Write-Host "API URL:     $url   (paste this into the dashboard)" -ForegroundColor Green }
 else { Write-Host "Public URL not ready (check the tunnel-*.log file in .tools). Local still works." -ForegroundColor Yellow }

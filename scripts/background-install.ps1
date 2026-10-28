@@ -36,7 +36,7 @@ switch ($Action) {
     $lnk.TargetPath = "$env:WINDIR\System32\wscript.exe"
     $lnk.Arguments = "`"$root\scripts\run-hidden.vbs`""
     $lnk.WorkingDirectory = $root
-    $lnk.Description = "YouTube Heatmap Extractor API (background)"
+    $lnk.Description = "Heatmapify API (background)"
     $lnk.Save()
     Remove-Item $statusFile -ErrorAction SilentlyContinue
     Start-Process "$env:WINDIR\System32\wscript.exe" -ArgumentList "`"$root\scripts\run-hidden.vbs`""

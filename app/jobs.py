@@ -57,7 +57,7 @@ def send_webhook(url: str, payload: dict[str, Any]) -> None:
     for attempt in range(3):
         try:
             with httpx.Client(timeout=s.webhook_timeout, follow_redirects=False) as c:
-                resp = c.post(url, json=payload, headers={"User-Agent": "yt-heatmap-extractor/1.0"})
+                resp = c.post(url, json=payload, headers={"User-Agent": "heatmapify/1.0"})
             if resp.status_code < 500:
                 return
         except Exception as exc:

@@ -74,7 +74,7 @@ if [ ! -f secrets/.first_key_created ]; then
 fi
 
 echo
-echo "================ YouTube Heatmap Extractor is live ================"
+echo "================ Heatmapify is live ================"
 echo "Local:   http://localhost:8000/docs"
 [ -n "$URL" ] && echo "Public:  $URL/docs"
 if [ -n "$KEY_LINE" ]; then

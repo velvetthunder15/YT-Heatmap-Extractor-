@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 
     # --- Core -----------------------------------------------------------
-    app_name: str = "YouTube Heatmap Extractor"
+    app_name: str = "Heatmapify"
     redis_url: str = "redis://localhost:6379/0"
     public_base_url: str = ""  # e.g. https://api.example.com (used to build status_url)
     log_level: str = "INFO"

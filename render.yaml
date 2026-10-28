@@ -2,7 +2,7 @@
 # One-click: https://render.com/deploy?repo=https://github.com/velvetthunder15/YT-Heatmap-Extractor-
 services:
   - type: web
-    name: yt-heatmap-dashboard
+    name: heatmapify
     runtime: static
     buildCommand: echo "static site, no build"
     staticPublishPath: ./dashboard
