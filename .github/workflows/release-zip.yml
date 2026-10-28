@@ -1,5 +1,5 @@
 # Builds Heatmapify.zip and attaches it to the release, so this link always works:
-# https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/Heatmapify.zip
+# https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip
 name: Release zip
 on:
   release:

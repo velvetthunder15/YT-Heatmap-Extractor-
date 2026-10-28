@@ -7,7 +7,7 @@ dashboard that shows exactly why.
 - Otherwise builds a clearly labelled **estimate** from four signals: comments, captions, audio and visuals.
 - Never makes numbers up: if nothing usable exists, you get a clear error.
 
-**Dashboard:** https://heatmapify.onrender.com  Host your own copy: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/velvetthunder15/YT-Heatmap-Extractor-)
+**Dashboard:** https://heatmapify.onrender.com  Host your own copy: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/velvetthunder15/heatmapify)
 
 **Quick start:** [Windows](#quick-start-windows-about-5-minutes) · [macOS](#quick-start-macos-about-5-minutes)
 
@@ -29,11 +29,11 @@ You need Windows 10 or 11 and nothing else. No Docker, no WSL, no Redis, no paid
 Either clone it:
 
 ```bat
-git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git
-cd YT-Heatmap-Extractor-
+git clone https://github.com/velvetthunder15/heatmapify.git
+cd heatmapify
 ```
 
-or [**download the latest release (.zip)**](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/Heatmapify.zip) and extract it anywhere (for example `Documents\Heatmapify`).
+or [**download the latest release (.zip)**](https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip) and extract it anywhere (for example `Documents\Heatmapify`).
 
 ### 2. Start the server
 
@@ -142,7 +142,7 @@ always on (an old laptop, a Raspberry Pi-class mini PC). Cloud servers usually g
 
 ### Updating
 
-[Re-download the latest release](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/Heatmapify.zip) and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
+[Re-download the latest release](https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip) and extract it over the folder (or `git pull`), then run `start-windows.bat` again.
 Your `.env` and API key are kept.
 
 ---
@@ -156,11 +156,11 @@ Works on Apple Silicon (M1–M4) and Intel Macs running macOS 12 or later. No Do
 Open **Terminal** (Spotlight → "Terminal") and run:
 
 ```bash
-git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git
-cd YT-Heatmap-Extractor-
+git clone https://github.com/velvetthunder15/heatmapify.git
+cd heatmapify
 ```
 
-No git? [Download the latest release (.zip)](https://github.com/velvetthunder15/YT-Heatmap-Extractor-/releases/latest/download/Heatmapify.zip), double-click it in Downloads, then in Terminal:
+No git? [Download the latest release (.zip)](https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip), double-click it in Downloads, then in Terminal:
 
 ```bash
 cd ~/Downloads/Heatmapify
@@ -414,7 +414,7 @@ YouTube is far less likely to block extraction, so no proxy is needed. The API i
 while your computer is on and Docker is running.
 
 1. Install [Docker Desktop](https://docs.docker.com/get-docker/) and start it.
-2. `git clone https://github.com/velvetthunder15/YT-Heatmap-Extractor-.git && cd YT-Heatmap-Extractor-`
+2. `git clone https://github.com/velvetthunder15/heatmapify.git && cd heatmapify`
 3. Run one command:
    - macOS / Linux / WSL: `./scripts/selfhost.sh`
    - Windows PowerShell: `powershell -ExecutionPolicy Bypass -File .\scripts\selfhost.ps1`
