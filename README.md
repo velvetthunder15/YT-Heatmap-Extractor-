@@ -134,6 +134,7 @@ it crashes, reconnects the tunnel if your network drops, and keeps the PC from i
 |---|---|
 | `background-status.bat` | Is it running? Shows the current API URL and key |
 | `uninstall-background.bat` | Stop it and remove it from login |
+| `rotate-key.bat` | Replace your API key if it ever leaks (restart the server after) |
 | `logs\server.log` | What it's doing (errors show up here) |
 
 It still stops when the computer is **shut down, asleep (lid closed) or offline**. With a workers.dev URL
@@ -201,6 +202,7 @@ The window prints the same `API URL` and `API key` lines. Continue with **steps 
 | `install-background.bat` | `bash install-background.command` (move the folder out of Desktop/Documents/Downloads first, since macOS blocks background jobs there) |
 | `background-status.bat` | `bash install-background.command --status` |
 | `uninstall-background.bat` | `bash install-background.command --uninstall` |
+| `rotate-key.bat` | `bash rotate-key.command` (restarts background mode for you) |
 
 Keep the Terminal window open while you use the API, or use background mode (step 7) to run it as a hidden
 login service via launchd that also keeps the Mac awake.
@@ -477,6 +479,10 @@ make bump-ytdlp V=2026.11.01
   hash in `API_KEY_HASHES`.
 - Rate limit is per minute; daily quota resets 00:00 UTC. Polling `/v1/jobs/{id}` counts toward
   the rate limit but not the daily quota.
+- Local mode's key lives in `secrets/api_key.txt`. `rotate-key.bat` / `rotate-key.command`
+  (`python -m scripts.local_setup --rotate-key`) replaces it and removes the old hash.
+- `CORS_ORIGINS` lists the websites allowed to call the API from a browser (default: the two
+  Heatmapify dashboards). Pages on `localhost` are always allowed (`CORS_ALLOW_LOCALHOST=false` to turn off).
 
 ### Multi-user safety
 
@@ -532,10 +538,13 @@ setup-permanent-url.bat   permanent URL via your Cloudflare account (workers.dev
 start-mac.command         macOS one-command start
 install-background.bat / uninstall-background.bat / background-status.bat   Windows background mode
 install-background.command   macOS background mode
+rotate-key.bat / rotate-key.command   replace the API key
 setup-permanent-url.command   macOS permanent-URL setup
 worker/proxy.js           the workers.dev forwarding Worker
 render.yaml       deploys dashboard/ to Render (main dashboard, auto-deploys on push)
 netlify.toml      deploys dashboard/ to Netlify (backup mirror)
+dashboard/_headers   security headers (CSP etc.) for Netlify zip deploys
+SECURITY.md       how keys are protected, and how to report a problem
 tests/
 ```
 

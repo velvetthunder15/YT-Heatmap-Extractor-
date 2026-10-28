@@ -68,6 +68,7 @@
       <a href="#confidence">Confidence</a>
       <a href="#charts">Reading the charts</a>
       <a href="#server">Your server &amp; URL</a>
+      <a href="#security">Your key &amp; security</a>
       <a href="#limits">Limitations</a>
     </aside>
 
@@ -197,8 +198,31 @@
         <div class="note"><b>No window to keep open:</b> <code>install-background</code> runs the server hidden, starts it at login, restarts it if it stops and reconnects the tunnel by itself. It still stops while the computer is off or asleep, and then a permanent URL answers <code>server_offline</code>.</div>
       </section>
 
+      <section class="doc-sec" id="security">
+        <h2><span class="n">09</span>Your key &amp; security</h2>
+        <p>This dashboard has no backend. Your API key goes <b>only to the API URL you enter</b>, as a header and only over https. Nothing is sent to Heatmapify or anyone else.</p>
+        <div class="tiles two">
+          <div class="tile">
+            <h4>Where it's kept</h4>
+            <p>Only in this browser, and by default only until you close the tab. Tick <b>Remember on this device</b> to keep it, or press <b>Forget key</b> to wipe it. Browsers won't offer to save it as a password.</p>
+          </div>
+          <div class="tile">
+            <h4>Shared links are safe</h4>
+            <p>A link that points the dashboard at someone else's server never sends them your saved key. You'd have to type their key in yourself.</p>
+          </div>
+          <div class="tile">
+            <h4>On your server</h4>
+            <p>Keys are stored only as hashes, every key is rate-limited, and browsers can call your API only from this dashboard or pages on your own computer.</p>
+          </div>
+          <div class="tile">
+            <h4>If your key leaks</h4>
+            <p>Double-click <code>rotate-key</code> in the project folder, restart the server and paste the new key here. The old key stops working.</p>
+          </div>
+        </div>
+      </section>
+
       <section class="doc-sec" id="limits">
-        <h2><span class="n">09</span>Limitations</h2>
+        <h2><span class="n">10</span>Limitations</h2>
         <div class="note warnish">Estimates find moments that <b>look and sound</b> engaging and that commenters point to. They can't see real watch time, so treat them as a strong hint, not proof. Official data is relative replay intensity, not view counts.</div>
       </section>
 
