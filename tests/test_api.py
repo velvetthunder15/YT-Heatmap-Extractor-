@@ -95,3 +95,31 @@ def test_worker_runs_job_end_to_end(client, monkeypatch):
     # result is now cached: the fast path answers with 200
     res = client.get("/v1/heatmap", params={"url": "dQw4w9WgXcQ"}, headers=h)
     assert res.status_code == 200 and res.json()["cached"] is True
+
+
+def test_api_maps_members_only(client, monkeypatch):
+    import app.sources.official as off
+    from app.errors import VideoMembersOnly, MEMBERS_MSG
+
+    def boom(_vid):
+        raise VideoMembersOnly(MEMBERS_MSG)
+    monkeypatch.setattr(off, "fetch_metadata", boom)
+    r = client.get("/v1/heatmap", params={"url": "https://youtu.be/dQw4w9WgXcQ"}, headers={"X-API-Key": client.key})
+    assert r.status_code == 403
+    assert r.json()["error"]["code"] == "video_members_only"
+
+
+def test_api_maps_raw_ytdlp_error(client, monkeypatch):
+    import app.sources.official as off
+
+    class DownloadError(Exception):
+        pass
+    DownloadError.__module__ = "yt_dlp.utils"
+
+    def boom(_vid):
+        raise DownloadError("ERROR: [youtube] dQw4w9WgXcQ: Private video. Sign in if you've been granted access")
+    monkeypatch.setattr(off, "fetch_metadata", boom)
+    import app.main as main
+    c = TestClient(main.app, raise_server_exceptions=False)
+    r = c.get("/v1/heatmap", params={"url": "https://youtu.be/dQw4w9WgXcQ"}, headers={"X-API-Key": client.key})
+    assert r.status_code == 403 and r.json()["error"]["code"] == "video_private"

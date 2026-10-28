@@ -550,3 +550,19 @@ button:active, .dl-btn:active, .cta-ghost:active, .cta a.btn-primary:active, .na
 @media (max-width: 440px) { .nav-right { gap: 6px; } .navlinks { gap: 2px; } .navlinks a { padding: 7px 9px; } }
 @media (max-width: 380px) { .nav-right .icon-link { display: none; } }
 @media (max-width: 860px) { .dl-btn span { display: none; } .dl-btn { padding: 9px; } }
+
+/* share-as-image dialog */
+.share-dlg { width: min(560px, calc(100vw - 24px)); max-height: calc(100vh - 24px); padding: 18px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--bg-2); color: var(--text); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .7); overflow: auto; }
+.share-dlg::backdrop { background: rgba(0, 0, 0, .6); backdrop-filter: blur(4px); }
+.share-dlg[open] { animation: dlg-in .22s var(--ease, ease-out); }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+.share-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.share-head h3 { font-size: 17px; }
+.share-preview { position: relative; aspect-ratio: 4 / 5; border-radius: var(--radius-sm); overflow: hidden; background: #0b0b10; border: 1px solid var(--line); }
+.share-preview img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.share-preview img:not([src]) { visibility: hidden; }
+.share-busy { position: absolute; inset: 0; display: grid; place-items: center; color: #a7a7b8; font: 500 13px var(--mono); }
+.share-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+.share-actions button { display: inline-flex; align-items: center; gap: 7px; }
+.share-actions svg, #shareImage svg { width: 15px; height: 15px; }
+@media (max-width: 520px) { .share-actions button { flex: 1 1 auto; justify-content: center; } }

@@ -17,7 +17,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from . import auth, jobs
 from .cache import cache_no_official, get_cached, get_redis, known_no_official, set_cached
 from .config import get_settings
-from .errors import APIError, InvalidURL, UpstreamBlocked, VideoTooLong
+from .errors import APIError, InvalidURL, classify_ytdlp_error, UpstreamBlocked, VideoTooLong
 from .logging_setup import log_event, setup_logging
 from .pipeline import official_data, render_result
 from .urls import extract_video_id
@@ -69,6 +69,9 @@ async def http_handler(_: Request, exc: StarletteHTTPException):
 
 @app.exception_handler(Exception)
 async def unhandled(_: Request, exc: Exception):
+    if type(exc).__module__.startswith("yt_dlp"):  # a YouTube error that slipped past the typed mapping
+        mapped = classify_ytdlp_error(str(exc))
+        return _err(mapped.code, mapped.message, mapped.status)
     log.exception("unhandled")
     return _err("internal_error", "Internal server error.", 500)
 

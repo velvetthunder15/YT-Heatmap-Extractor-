@@ -13,7 +13,7 @@ from rq import Queue, get_current_job
 from rq.job import Job, JobStatus
 
 from .config import get_settings
-from .errors import APIError, InvalidURL, JobNotFound, UpstreamBlocked
+from .errors import APIError, InvalidURL, JobNotFound, UpstreamBlocked, classify_ytdlp_error
 from .logging_setup import log_event
 
 log = logging.getLogger(__name__)
@@ -122,9 +122,12 @@ def run_heatmap_job(video_id: str, top: int, bottom: int, window: int, force_est
     except APIError as exc:
         outcome = {"ok": False, **exc.to_dict()}
     except Exception as exc:  # never leak stack traces to clients
-        log.exception("job crashed")
-        outcome = {"ok": False, "error": {"code": "internal_error", "message": "Processing failed unexpectedly."}}
-        log_event(log, "job_crashed", job_id=job_id, error=str(exc)[:200])
+        if type(exc).__module__.startswith("yt_dlp"):
+            outcome = {"ok": False, **classify_ytdlp_error(str(exc)).to_dict()}
+        else:
+            log.exception("job crashed")
+            outcome = {"ok": False, "error": {"code": "internal_error", "message": "Processing failed unexpectedly."}}
+            log_event(log, "job_crashed", job_id=job_id, error=str(exc)[:200])
     finally:
         r.delete(f"inflight:{video_id}:{window}:{int(force_estimate)}")
 

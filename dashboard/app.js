@@ -114,17 +114,48 @@
     }
     let body = null;
     try { body = await res.json(); } catch (_) { /* non-JSON */ }
-    if (!res.ok) {
-      const e = new Error((body && body.error && body.error.message) || `Request failed (${res.status}).`);
-      e.code = body && body.error && body.error.code;
-      e.status = res.status;
-      if (res.status === 401 || res.status === 403) e.hint = "Check your API key: it's the line in secrets\\api_key.txt.";
-      if (res.status === 429) e.hint = "You've hit the rate limit or daily quota. Wait a minute and try again.";
-      if (res.status === 530 || res.status === 502 || res.status === 404 && !body) e.hint = "The tunnel isn't reaching your server. Restart the server (start-windows.bat or start-mac.command), and paste the new URL if you aren't using a permanent one.";
-      if (e.code === "server_offline") e.hint = "Your permanent URL works, but the server behind it is off. Start the server (start-windows.bat or start-mac.command) on the host computer. Right after a start it can take up to a minute to switch over.";
-      throw e;
-    }
+    if (!res.ok) throw friendlyError(body && body.error, res.status, !!body);
     return { status: res.status, body };
+  }
+
+  // What a viewer can do about each video problem. Also recognises the raw YouTube text an older
+  // server sends ("Upstream error from YouTube: ... Join this channel ..."), so the right message
+  // shows even before the server is updated.
+  const ONLY_PUBLIC = "Heatmapify can only read videos anyone can watch without signing in. Public and unlisted links work.";
+  const VIDEO_ERRORS = {
+    video_private: ["This video is private.", ONLY_PUBLIC],
+    video_members_only: ["This video is for channel members only.", ONLY_PUBLIC],
+    video_premium_only: ["This video needs YouTube Premium.", ONLY_PUBLIC],
+    video_needs_sign_in: ["YouTube only shows this video to signed-in viewers.", ONLY_PUBLIC],
+    video_age_restricted: ["This video is age-restricted.", "Age-restricted videos need a YouTube cookies file on your server (YT_COOKIES_FILE in .env)."],
+    video_unavailable: ["This video is unavailable.", "It may have been removed, blocked in your server's country, or the link may be wrong. Check that it plays on YouTube."],
+    video_live: ["Live streams and upcoming premieres can't be analysed.", "Try again once the stream has ended and the replay is up."],
+    upstream_blocked: [null, "YouTube refused the request from your server. Wait a few minutes and try again. If it keeps happening, set YT_PROXY or YT_COOKIES_FILE in .env."],
+    internal_error: ["Something went wrong on your server.", "Check the server window (or logs/server.log) for the details, and make sure you're on the latest version."],
+  };
+  function guessCode(msg) {
+    const m = (msg || "").toLowerCase();
+    if (m.includes("private video") || m.includes("video is private")) return "video_private";
+    if (/members-only|members only|join this channel|channel's members|members on level/.test(m)) return "video_members_only";
+    if (m.includes("youtube premium") || m.includes("premium members")) return "video_premium_only";
+    if (m.includes("confirm your age") || m.includes("age-restricted")) return "video_age_restricted";
+    if (m.includes("video unavailable") || m.includes("has been removed")) return "video_unavailable";
+    return null;
+  }
+  function friendlyError(err, status, hasBody) {
+    err = err || {};
+    let code = err.code;
+    if (!code || code === "upstream_blocked" || code === "internal_error") code = guessCode(err.message) || code;
+    const known = VIDEO_ERRORS[code];
+    const e = new Error((known && known[0]) || err.message || (status ? `Request failed (${status}).` : "The analysis failed."));
+    e.code = code;
+    e.status = status;
+    if (known) e.hint = known[1];
+    else if (code === "server_offline") e.hint = "Your permanent URL works, but the server behind it is off. Start the server (start-windows.bat or start-mac.command) on the host computer. Right after a start it can take up to a minute to switch over.";
+    else if (status === 401 || code === "unauthorized") e.hint = "Check your API key: it's the line in secrets\\api_key.txt.";
+    else if (status === 429) e.hint = "You've hit the rate limit or daily quota. Wait a minute and try again.";
+    else if (!hasBody && (status === 530 || status === 502 || status === 404)) e.hint = "The tunnel isn't reaching your server. Restart the server (start-windows.bat or start-mac.command), and paste the new URL if you aren't using a permanent one.";
+    return e;
   }
 
   async function testConnection({ quiet = false } = {}) {
@@ -207,8 +238,7 @@
       const { body } = await api("/v1/jobs/" + encodeURIComponent(jobId));
       if (body.status === "done" && body.result) return body.result;
       if (body.status === "failed") {
-        const err = body.error || {};
-        throw Object.assign(new Error(err.message || "The analysis failed."), { code: err.code });
+        throw friendlyError(body.error, 0, true);
       }
       showProgress(body);
       await new Promise((r) => setTimeout(r, POLL_MS));
@@ -300,19 +330,7 @@
     setNow(null);
 
     // KPIs
-    const scores = heat.map((x) => x.score);
-    const top = (r.most_engaging || [])[0];
-    const low = (r.least_engaging || [])[0];
-    const avg = mean(scores);
-    const hot = scores.filter((s) => s >= 0.6).length;
-    const win = r.window_seconds || (heat[0] ? heat[0].end - heat[0].start : 0);
-    $("kpis").innerHTML = [
-      kpi("Peak moment", top ? hms(top.start) : "–", top ? `score ${top.score.toFixed(2)} · tap to play` : "", top && top.start, "accent"),
-      kpi("Biggest drop-off", low ? hms(low.start) : "–", low ? `score ${low.score.toFixed(2)} · tap to play` : "", low && low.start),
-      kpi("Average engagement", avg.toFixed(2), "out of 1.00"),
-      kpi("Hot segments", heat.length ? pct(hot / heat.length) : "–", `${hot} of ${heat.length} score ≥ 0.6`),
-      kpi(estimated ? "Signals used" : "Data points", estimated ? String((r.signals_used || []).length) : String(heat.length), estimated ? `${win}s segments` : "from YouTube"),
-    ].join("");
+    $("kpis").innerHTML = kpiData(r).map((k) => kpi(k.k, k.v, k.s, k.seek, k.accent ? "accent" : "")).join("");
 
     // lists
     $("topList").innerHTML = (r.most_engaging || []).map((m, i) => momentHTML(m, i, true)).join("") || `<li class="empty">No clear peaks.</li>`;
@@ -331,6 +349,25 @@
 
     drawCharts();
     $("results").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // The headline numbers. The KPI cards and the share image both read from here, so they always match.
+  function kpiData(r) {
+    const heat = r.full_heatmap || [];
+    const estimated = r.source === "estimated";
+    const scores = heat.map((x) => x.score);
+    const top = (r.most_engaging || [])[0];
+    const low = (r.least_engaging || [])[0];
+    const avg = mean(scores);
+    const hot = scores.filter((s) => s >= 0.6).length;
+    const win = r.window_seconds || (heat[0] ? heat[0].end - heat[0].start : 0);
+    return [
+      { k: "Peak moment", v: top ? hms(top.start) : "–", s: top ? `score ${top.score.toFixed(2)} · tap to play` : "", seek: top && top.start, accent: true, share: top ? `score ${top.score.toFixed(2)}` : "" },
+      { k: "Biggest drop-off", v: low ? hms(low.start) : "–", s: low ? `score ${low.score.toFixed(2)} · tap to play` : "", seek: low && low.start, share: low ? `score ${low.score.toFixed(2)}` : "" },
+      { k: "Average engagement", v: avg.toFixed(2), s: "out of 1.00" },
+      { k: "Hot segments", v: heat.length ? pct(hot / heat.length) : "–", s: `${hot} of ${heat.length} score ≥ 0.6` },
+      { k: estimated ? "Signals used" : "Data points", v: estimated ? String((r.signals_used || []).length) : String(heat.length), s: estimated ? `${win}s segments` : "from YouTube" },
+    ];
   }
 
   function kpi(k, v, s, seek, extra = "") {
@@ -709,6 +746,223 @@
     const lbl = $("copyJson").querySelector("span");
     try { await navigator.clipboard.writeText(JSON.stringify(current, null, 2)); lbl.textContent = "Copied"; setTimeout(() => (lbl.textContent = "Copy JSON"), 1500); } catch (_) { /* ignore */ }
   });
+
+  // ------------------------------------------------------- share image --
+  // A 1080x1350 summary card of exactly what the page shows: title, source and confidence,
+  // the engagement curve with its heat strip and numbered peaks, the KPIs, top moments and drop-offs.
+  const SH = { bg: "#0b0b10", card: "#15151d", line: "rgba(255,255,255,.09)", text: "#f3f3f6", sub: "#a7a7b8", faint: "#6c6c80", good: "#3ecf8e", bad: "#ff6b6b", gold: "#ffb347", ember: "#ff5a1f", pink: "#ff2e63", warn: "#f5c451" };
+  const SANS = 'Inter, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+  const MONO = '"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace';
+
+  function svgImage(el, fill) {
+    return new Promise((resolve) => {
+      if (!el) return resolve(null);
+      const c = el.cloneNode(true);
+      c.removeAttribute("class");
+      c.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      let src = new XMLSerializer().serializeToString(c);
+      if (fill) src = src.replace(/currentColor/g, fill);
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(src);
+    });
+  }
+  function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); }
+  function fitText(ctx, text, maxW) {
+    if (ctx.measureText(text).width <= maxW) return text;
+    while (text.length > 1 && ctx.measureText(text + "…").width > maxW) text = text.slice(0, -1);
+    return text.trimEnd() + "…";
+  }
+  function wrapLines(ctx, text, maxW, maxLines) {
+    const words = String(text).split(/\s+/), lines = [];
+    let line = "";
+    for (let i = 0; i < words.length; i++) {
+      const t = line ? line + " " + words[i] : words[i];
+      if (ctx.measureText(t).width <= maxW || !line) { line = t; continue; }
+      lines.push(line); line = words[i];
+      if (lines.length === maxLines - 1) { line = words.slice(i).join(" "); break; }
+    }
+    if (line) lines.push(line);
+    return lines.slice(0, maxLines).map((l, i, a) => (i === a.length - 1 ? fitText(ctx, l, maxW) : l));
+  }
+  function pill(ctx, x, y, text, fg, bg) {
+    ctx.font = `600 20px ${MONO}`;
+    const w = ctx.measureText(text).width + 28;
+    rr(ctx, x - w, y, w, 38, 19); ctx.fillStyle = bg; ctx.fill();
+    ctx.fillStyle = fg; ctx.textBaseline = "middle"; ctx.textAlign = "left"; ctx.fillText(text, x - w + 14, y + 20);
+    return x - w - 10;
+  }
+
+  async function buildShareImage(r) {
+    try { await Promise.all([document.fonts.load(`700 44px Inter`), document.fonts.load(`600 20px "JetBrains Mono"`), document.fonts.load(`500 20px Inter`)]); } catch (_) { /* fallback fonts */ }
+    const W = 1080, H = 1350, P = 64;
+    const cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d");
+    const heat = r.full_heatmap || [];
+    const estimated = r.source === "estimated";
+    const dur = r.duration || (heat.length ? heat[heat.length - 1].end : 1);
+
+    // background with a faint ember glow at the top
+    ctx.fillStyle = SH.bg; ctx.fillRect(0, 0, W, H);
+    const glow = ctx.createRadialGradient(W * 0.5, -120, 10, W * 0.5, -120, 760);
+    glow.addColorStop(0, "rgba(255,90,31,.22)"); glow.addColorStop(1, "rgba(255,90,31,0)");
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, W, 700);
+
+    // brand
+    const [mark, word] = await Promise.all([svgImage(document.querySelector(".hero-mark")), svgImage(document.querySelector(".nav-wordmark") || document.querySelector(".hero-wordmark"), SH.text)]);
+    let bx = P;
+    if (mark) { ctx.drawImage(mark, bx, P, 70, 70 * 720 / 1136); bx += 84; }
+    if (word) { const h = 34, w = h * word.width / word.height; ctx.drawImage(word, bx, P + 6, w, h); }
+    else { ctx.font = `800 36px ${SANS}`; ctx.fillStyle = SH.text; ctx.textBaseline = "top"; ctx.fillText("heatmapify", bx, P); }
+    let px = W - P;
+    if (r.confidence) px = pill(ctx, px, P + 2, `${r.confidence[0].toUpperCase()}${r.confidence.slice(1)} confidence`, r.confidence === "high" ? SH.good : r.confidence === "low" ? SH.bad : SH.warn, "rgba(255,255,255,.06)");
+    pill(ctx, px, P + 2, estimated ? "Estimated" : "Official data", estimated ? SH.gold : SH.good, estimated ? "rgba(255,179,71,.12)" : "rgba(62,207,142,.12)");
+
+    // title + meta
+    ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
+    ctx.font = `700 44px ${SANS}`; ctx.fillStyle = SH.text;
+    const lines = wrapLines(ctx, r.title || r.video_id, W - P * 2, 2);
+    let y = 182;
+    lines.forEach((l) => { ctx.fillText(l, P, y); y += 54; });
+    ctx.font = `500 21px ${MONO}`; ctx.fillStyle = SH.sub;
+    const win = r.window_seconds || (heat[0] ? heat[0].end - heat[0].start : 0);
+    ctx.fillText(fitText(ctx, `${hms(dur)} long · ${heat.length} segments of ${win}s · youtu.be/${r.video_id}`, W - P * 2), P, y + 2);
+
+    // chart
+    const cy0 = y + 44, ch = 300, cx0 = P + 44, cw = W - P - cx0;
+    const X = (t) => cx0 + (t / dur) * cw, Y = (v) => cy0 + (1 - v) * ch;
+    ctx.font = `500 17px ${MONO}`;
+    [0, 0.5, 1].forEach((v) => {
+      ctx.strokeStyle = SH.line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx0, Y(v)); ctx.lineTo(cx0 + cw, Y(v)); ctx.stroke();
+      ctx.fillStyle = SH.faint; ctx.textAlign = "right"; ctx.fillText(v === 0.5 ? "0.5" : String(v), cx0 - 12, Y(v) + 6);
+    });
+    const band = (list, fill, edge) => (list || []).forEach((s) => {
+      const bx0 = X(s.start), bw = Math.max(3, X(s.end) - bx0);
+      ctx.fillStyle = fill; ctx.fillRect(bx0, cy0, bw, ch); ctx.fillStyle = edge; ctx.fillRect(bx0, cy0 + ch - 3, bw, 4);
+    });
+    band(r.least_engaging, "rgba(255,107,107,.09)", SH.bad);
+    band(r.most_engaging, "rgba(62,207,142,.11)", SH.good);
+    if (heat.length) {
+      const pts = heat.map((p) => [X((p.start + p.end) / 2), Y(p.score)]);
+      const path = new Path2D(smooth(pts));
+      const area = new Path2D(smooth(pts) + `L${pts[pts.length - 1][0]},${Y(0)}L${pts[0][0]},${Y(0)}Z`);
+      const fade = ctx.createLinearGradient(0, cy0, 0, cy0 + ch);
+      fade.addColorStop(0, "rgba(255,90,31,.42)"); fade.addColorStop(0.6, "rgba(255,46,99,.08)"); fade.addColorStop(1, "rgba(255,46,99,0)");
+      ctx.fillStyle = fade; ctx.fill(area);
+      const stroke = ctx.createLinearGradient(cx0, 0, cx0 + cw, 0);
+      stroke.addColorStop(0, SH.gold); stroke.addColorStop(0.5, SH.ember); stroke.addColorStop(1, SH.pink);
+      ctx.save(); ctx.shadowColor = "rgba(255,90,31,.6)"; ctx.shadowBlur = 14;
+      ctx.strokeStyle = stroke; ctx.lineWidth = 3.5; ctx.lineJoin = "round"; ctx.lineCap = "round"; ctx.stroke(path); ctx.restore();
+      const avg = mean(heat.map((p) => p.score));
+      ctx.setLineDash([5, 8]); ctx.strokeStyle = "rgba(255,255,255,.3)"; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(cx0, Y(avg)); ctx.lineTo(cx0 + cw, Y(avg)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font = `600 17px ${MONO}`; ctx.textAlign = "right";
+      const at = `avg ${avg.toFixed(2)}`, aw = ctx.measureText(at).width;
+      rr(ctx, cx0 + cw - aw - 12, Y(avg) - 30, aw + 12, 26, 6); ctx.fillStyle = "rgba(11,11,16,.85)"; ctx.fill();
+      ctx.fillStyle = SH.sub; ctx.fillText(at, cx0 + cw - 6, Y(avg) - 11);
+      // heat strip
+      const sy = cy0 + ch + 16, sh = 20;
+      ctx.save(); rr(ctx, cx0, sy, cw, sh, 6); ctx.clip();
+      heat.forEach((p) => { ctx.fillStyle = heatColor(p.score); ctx.fillRect(X(p.start), sy, Math.max(1, X(p.end) - X(p.start)) + 0.6, sh); });
+      ctx.restore();
+      // time ticks
+      ctx.font = `500 17px ${MONO}`; ctx.fillStyle = SH.faint;
+      niceTicks(dur, 6).forEach((t, i, a) => { ctx.textAlign = i === 0 ? "left" : i === a.length - 1 && X(t) > cx0 + cw - 40 ? "right" : "center"; ctx.fillText(hms(t), X(t), sy + sh + 30); });
+      // numbered peak markers
+      const R = 15, placed = [];
+      (r.most_engaging || []).slice(0, 5).forEach((s, i) => {
+        const mx = X((s.start + s.end) / 2); let my = Y(s.score);
+        for (let k = 0; k < 6 && placed.some(([qx, qy]) => Math.hypot(qx - mx, qy - my) < R * 2 + 3); k++) my = my - (R * 2 + 4) >= cy0 - 6 ? my - (R * 2 + 4) : my + (R * 2 + 4);
+        placed.push([mx, my]);
+        ctx.beginPath(); ctx.arc(mx, my, R, 0, Math.PI * 2); ctx.fillStyle = SH.bg; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = SH.good; ctx.stroke();
+        ctx.font = `700 16px ${SANS}`; ctx.fillStyle = SH.good; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(String(i + 1), mx, my + 1); ctx.textBaseline = "alphabetic";
+      });
+    }
+
+    // KPI cards (the first four the page shows)
+    const ky = cy0 + ch + 102, gap = 16, kw = (W - P * 2 - gap) / 2, kh = 112;
+    kpiData(r).slice(0, 4).forEach((k, i) => {
+      const x = P + (i % 2) * (kw + gap), yy = ky + Math.floor(i / 2) * (kh + gap);
+      rr(ctx, x, yy, kw, kh, 14); ctx.fillStyle = SH.card; ctx.fill(); ctx.strokeStyle = SH.line; ctx.lineWidth = 1; ctx.stroke();
+      if (k.accent) { const g = ctx.createLinearGradient(x, 0, x + kw, 0); g.addColorStop(0, SH.gold); g.addColorStop(0.5, SH.ember); g.addColorStop(1, SH.pink); ctx.fillStyle = g; rr(ctx, x, yy, 5, kh, 3); ctx.fill(); }
+      ctx.textAlign = "left";
+      ctx.font = `600 18px ${MONO}`; ctx.fillStyle = SH.sub; ctx.fillText(k.k, x + 24, yy + 36);
+      ctx.font = `700 40px ${SANS}`; ctx.fillStyle = SH.text; ctx.fillText(k.v, x + 24, yy + 86);
+      const vw = ctx.measureText(k.v).width;
+      ctx.font = `500 18px ${MONO}`; ctx.fillStyle = SH.faint; ctx.fillText(fitText(ctx, k.share != null ? k.share : k.s, kw - vw - 60), x + 24 + vw + 16, yy + 84);
+    });
+
+    // top moments and drop-offs
+    const ly = ky + kh * 2 + gap + 50, colW = (W - P * 2 - 40) / 2;
+    const list = (items, x, title, col) => {
+      ctx.textAlign = "left"; ctx.font = `700 22px ${SANS}`; ctx.fillStyle = SH.text; ctx.fillText(title, x, ly);
+      const rows = (items || []).slice(0, 5);
+      if (!rows.length) { ctx.font = `500 18px ${MONO}`; ctx.fillStyle = SH.faint; ctx.fillText("None found", x, ly + 40); }
+      rows.forEach((m, i) => {
+        const yy = ly + 44 + i * 40;
+        ctx.font = `700 18px ${MONO}`; ctx.fillStyle = col; ctx.fillText(String(i + 1), x, yy);
+        ctx.font = `500 19px ${MONO}`; ctx.fillStyle = SH.text; ctx.fillText(`${hms(m.start)} – ${hms(m.end)}`, x + 30, yy);
+        ctx.textAlign = "right"; ctx.font = `700 19px ${MONO}`; ctx.fillText(m.score.toFixed(2), x + colW, yy); ctx.textAlign = "left";
+        const bx0 = x + colW - 150, bw = 90;
+        rr(ctx, bx0, yy - 10, bw, 6, 3); ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fill();
+        rr(ctx, bx0, yy - 10, Math.max(4, bw * m.score), 6, 3); ctx.fillStyle = col; ctx.fill();
+      });
+    };
+    list(r.most_engaging, P, "Top moments", SH.good);
+    list(r.least_engaging, P + colW + 40, "Drop-offs", SH.bad);
+
+    // footer
+    ctx.strokeStyle = SH.line; ctx.beginPath(); ctx.moveTo(P, H - 78); ctx.lineTo(W - P, H - 78); ctx.stroke();
+    ctx.textAlign = "left"; ctx.font = `500 18px ${MONO}`; ctx.fillStyle = SH.faint;
+    ctx.fillText(estimated ? fitText(ctx, `Estimated from ${(r.signals_used || []).map(label).join(", ").toLowerCase() || "public signals"}`, W - P * 2 - 280) : "YouTube's own \"Most replayed\" data", P, H - 40);
+    ctx.textAlign = "right"; ctx.font = `600 19px ${MONO}`; ctx.fillStyle = SH.gold; ctx.fillText("heatmapify.onrender.com", W - P, H - 40);
+
+    return new Promise((res) => cv.toBlob((b) => res(b), "image/png"));
+  }
+
+  let shareBlob = null;
+  async function openShare() {
+    if (!current) return;
+    const dlg = $("shareDlg");
+    $("shareImg").removeAttribute("src");
+    $("shareBusy").classList.remove("hidden");
+    dlg.showModal ? dlg.showModal() : dlg.setAttribute("open", "");
+    shareBlob = await buildShareImage(current);
+    $("shareBusy").classList.add("hidden");
+    if (shareBlob) $("shareImg").src = URL.createObjectURL(shareBlob);
+    const file = shareFile();
+    $("shareNative").classList.toggle("hidden", !(file && navigator.canShare && navigator.canShare({ files: [file] })));
+    $("shareCopy").classList.toggle("hidden", !(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write));
+  }
+  const shareName = () => `heatmapify-${current ? current.video_id : "summary"}.png`;
+  const shareFile = () => (shareBlob ? new File([shareBlob], shareName(), { type: "image/png" }) : null);
+  function flash(btn, text) {
+    const s = btn.querySelector("span"), old = s.textContent;
+    s.textContent = text; setTimeout(() => (s.textContent = old), 1600);
+  }
+  $("shareImage").addEventListener("click", openShare);
+  $("shareClose").addEventListener("click", () => $("shareDlg").close ? $("shareDlg").close() : $("shareDlg").removeAttribute("open"));
+  $("shareDlg").addEventListener("click", (e) => { if (e.target === $("shareDlg")) $("shareDlg").close(); });
+  $("shareSave").addEventListener("click", () => {
+    if (!shareBlob) return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(shareBlob); a.download = shareName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  });
+  $("shareCopy").addEventListener("click", async () => {
+    if (!shareBlob) return;
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": shareBlob })]); flash($("shareCopy"), "Copied"); }
+    catch (_) { flash($("shareCopy"), "Couldn't copy"); }
+  });
+  $("shareNative").addEventListener("click", async () => {
+    const file = shareFile();
+    if (!file) return;
+    try { await navigator.share({ files: [file], title: current.title || "Heatmapify", text: `Engagement heatmap for "${current.title || current.video_id}", made with Heatmapify` }); } catch (_) { /* cancelled */ }
+  });
+
   document.addEventListener("themechange", (e) => {
     C = THEMES[e.detail === "light" ? "light" : "dark"];
     if (!current) return;

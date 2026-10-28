@@ -11,7 +11,10 @@ import re
 from typing import Any
 
 from ..config import get_settings
-from ..errors import AgeRestricted, VideoLive, VideoPrivate, VideoUnavailable
+from ..errors import (
+    AGE_MSG, MEMBERS_MSG, PREMIUM_MSG, PRIVATE_MSG, SIGN_IN_MSG, UNAVAILABLE_MSG,
+    AgeRestricted, VideoLive, VideoMembersOnly, VideoNeedsSignIn, VideoPremiumOnly, VideoPrivate, VideoUnavailable,
+)
 from ..logging_setup import log_event
 from ..scoring import Segment
 from ..urls import canonical_url
@@ -28,16 +31,23 @@ def fetch_metadata(video_id: str) -> dict[str, Any]:
 
 
 def check_playable(info: dict[str, Any]) -> None:
+    """Unlisted and public videos pass. Anything YouTube hides from anonymous viewers raises a typed error."""
     if not info:
-        raise VideoUnavailable("This video is unavailable.")
+        raise VideoUnavailable(UNAVAILABLE_MSG)
     live_status = info.get("live_status")
     if info.get("is_live") or live_status in ("is_live", "is_upcoming"):
         raise VideoLive("Live or upcoming videos are not supported.")
     availability = info.get("availability")
     if availability == "private":
-        raise VideoPrivate("This video is private.")
-    if availability == "needs_auth" or ((info.get("age_limit") or 0) >= 18 and not info.get("formats")):
-        raise AgeRestricted("This video is age-restricted and cannot be analysed without cookies.")
+        raise VideoPrivate(PRIVATE_MSG)
+    if availability == "subscriber_only":
+        raise VideoMembersOnly(MEMBERS_MSG)
+    if availability == "premium_only":
+        raise VideoPremiumOnly(PREMIUM_MSG)
+    if (info.get("age_limit") or 0) >= 18 and not info.get("formats"):
+        raise AgeRestricted(AGE_MSG)
+    if availability == "needs_auth" and not info.get("formats"):
+        raise VideoNeedsSignIn(SIGN_IN_MSG)
 
 
 def heatmap_from_info(info: dict[str, Any]) -> list[Segment] | None:

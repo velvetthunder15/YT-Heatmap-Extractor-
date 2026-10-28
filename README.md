@@ -368,7 +368,7 @@ Always `{"error": {"code": "...", "message": "..."}}`:
 |---|---|---|
 | 400 | `invalid_url` | not a YouTube video URL / ID |
 | 401 | `unauthorized` | missing or invalid `X-API-Key` |
-| 403 | `video_private`, `video_age_restricted` | can't be analysed (age-restricted works with cookies) |
+| 403 | `video_private`, `video_members_only`, `video_premium_only`, `video_needs_sign_in`, `video_age_restricted` | can't be analysed: only videos anyone can watch work, public or unlisted (age-restricted works with cookies) |
 | 404 | `video_unavailable`, `job_not_found` | removed video, unknown/expired job |
 | 422 | `video_live`, `video_too_long`, `no_data_available`, `validation_error` | |
 | 429 | `rate_limited`, `quota_exceeded` | per-minute limit / daily quota (has `Retry-After`) |
