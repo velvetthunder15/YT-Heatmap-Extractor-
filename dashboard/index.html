@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com; frame-src https://www.youtube-nocookie.com; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; object-src 'none'; base-uri 'none'; form-action 'none'">
-<meta name="referrer" content="no-referrer">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Heatmapify · Find the moments that keep people watching</title>
 <meta name="description" content="Paste a YouTube link and see its most and least engaging moments: YouTube's own Most replayed data, or a clearly labelled estimate from comments, captions, audio and visuals.">
@@ -245,7 +245,7 @@
     <div id="r-moments" class="grid-player">
       <section class="card player-card">
         <div class="card-head" style="margin-bottom:14px"><div><h3>Player</h3><p>Jump straight to any moment.</p></div></div>
-        <div class="player"><iframe id="player" title="YouTube player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+        <div class="player"><iframe id="player" title="YouTube player" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
         <div id="nowPlaying" class="now"><span class="live"></span><span>Pick a moment to jump there.</span></div>
       </section>
       <section class="card">
