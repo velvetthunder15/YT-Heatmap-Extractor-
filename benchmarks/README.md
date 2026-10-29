@@ -29,3 +29,29 @@ Optional environment variables: `FIG_LABEL` replaces the title label, and `FIG_N
 \* The v1.3 data was digitised from exported PNGs, not raw JSON. The listed top-5 and drop-off scores are exact; the other bins are read from the plotted curve to within about ±0.02. The mean and hot-segment share match the export summary. Later entries use raw JSON exports.
 
 Note that p-values treat bins as independent. Neighbouring bins are autocorrelated, so the p-values are optimistic.
+
+## Accuracy vs engagement
+
+`band_plot.py` plots how accuracy changes with a video's comment count. Add a `meta.json` next to each pair (`{"comments": 6598, "views": 2900000, "genre": "gaming"}`), then run:
+
+```bash
+python benchmarks/band_plot.py v1.4 gaming
+```
+
+It writes `accuracy_vs_engagement.png` and a CSV with two scores per video:
+
+- **Peak accuracy %**: the share of YouTube's top-5 peaks the estimate finds within ±15 s.
+- **Ranking accuracy %**: the share of segment pairs the estimate orders the same way as YouTube, which is (Kendall τ + 1) / 2. 50% is chance and 100% is perfect.
+
+### Gaming engagement set (counts read 2026-10-29)
+
+| Video | Comments | Views | Length |
+|---|---|---|---|
+| [RKQGRPoDV_I](https://youtu.be/RKQGRPoDV_I) | 30,203 | 24M | 33:24 |
+| [dpFpRBt90W0](https://youtu.be/dpFpRBt90W0) | 8,856 | 2.2M | 31:14 |
+| [arWClcUVxm8](https://youtu.be/arWClcUVxm8) | 6,598 | 2.9M | 40:26 |
+| [kYhb7w2GNIs](https://youtu.be/kYhb7w2GNIs) | 2,229 | 1.7M | 55:42 |
+| [vCohhCaxJdM](https://youtu.be/vCohhCaxJdM) | 447 | 371K | 38:31 |
+| [ScTGNr6zSIE](https://youtu.be/ScTGNr6zSIE) | 161 | 184K | 45:47 |
+
+Each folder already has its `meta.json`; drop `official.json` and `estimated.json` into `<id>/v1.4/` and run `band_plot.py`.
