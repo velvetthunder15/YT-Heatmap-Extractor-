@@ -25,6 +25,9 @@ Optional environment variables: `FIG_LABEL` replaces the title label, and `FIG_N
 | Video | Version | Spearman ρ | Pearson r | Top-5 peak recall | Mean (official / est.) | Data |
 |---|---|---|---|---|---|---|
 | [IKPJq5Z_1ZM](https://youtu.be/IKPJq5Z_1ZM) | v1.3 | 0.41 (p < 0.001) | 0.41 | 3/5 | 0.12 / 0.50 | digitised* |
+| [RKQGRPoDV_I](https://youtu.be/RKQGRPoDV_I) | v1.4 | 0.22 (p = 0.029) | 0.42 | 2/5 | 0.17 / 0.16 | raw JSON |
+
+RKQGRPoDV_I (30,203 comments): comments alone reach ρ 0.53, but captions run negative (ρ −0.25), which pulls the fused curve down. A raw comments-only blend scores ρ 0.53 with 4/5 peaks. That comes from one video in-sample, so it's a lead, not a new set of weights.
 
 \* The v1.3 data was digitised from exported PNGs, not raw JSON. The listed top-5 and drop-off scores are exact; the other bins are read from the plotted curve to within about ±0.02. The mean and hot-segment share match the export summary. Later entries use raw JSON exports.
 

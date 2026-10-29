@@ -1,0 +1,689 @@
+{
+  "video_id": "RKQGRPoDV_I",
+  "title": "Poppy Playtime",
+  "duration": 2005,
+  "source": "official",
+  "confidence": "high",
+  "confidence_reason": "YouTube's own 'Most replayed' data (relative replay intensity).",
+  "signals_used": [
+    "official_most_replayed"
+  ],
+  "most_engaging": [
+    {
+      "start": 741.85,
+      "end": 761.9,
+      "start_hms": "00:12:22",
+      "end_hms": "00:12:42",
+      "score": 1,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=741",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 1403.5,
+      "end": 1423.55,
+      "start_hms": "00:23:24",
+      "end_hms": "00:23:44",
+      "score": 0.956,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1403",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 1383.45,
+      "end": 1403.5,
+      "start_hms": "00:23:03",
+      "end_hms": "00:23:24",
+      "score": 0.787,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1383",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 1483.7,
+      "end": 1503.75,
+      "start_hms": "00:24:44",
+      "end_hms": "00:25:04",
+      "score": 0.702,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1483",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 1684.2,
+      "end": 1704.25,
+      "start_hms": "00:28:04",
+      "end_hms": "00:28:24",
+      "score": 0.666,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1684",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 721.8,
+      "end": 741.85,
+      "start_hms": "00:12:02",
+      "end_hms": "00:12:22",
+      "score": 0.664,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=721",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 0,
+      "end": 20.05,
+      "start_hms": "00:00:00",
+      "end_hms": "00:00:20",
+      "score": 0.629,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=0",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 1704.25,
+      "end": 1724.3,
+      "start_hms": "00:28:24",
+      "end_hms": "00:28:44",
+      "score": 0.535,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1704",
+      "signals": [
+        "official_most_replayed"
+      ]
+    }
+  ],
+  "least_engaging": [
+    {
+      "start": 1924.8,
+      "end": 2005,
+      "start_hms": "00:32:05",
+      "end_hms": "00:33:25",
+      "score": 0,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1924",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 60.15,
+      "end": 140.35,
+      "start_hms": "00:01:00",
+      "end_hms": "00:02:20",
+      "score": 0.017,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=60",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 421.05,
+      "end": 461.15,
+      "start_hms": "00:07:01",
+      "end_hms": "00:07:41",
+      "score": 0.022,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=421",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 1062.65,
+      "end": 1142.85,
+      "start_hms": "00:17:43",
+      "end_hms": "00:19:03",
+      "score": 0.023,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1062",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 621.55,
+      "end": 681.7,
+      "start_hms": "00:10:22",
+      "end_hms": "00:11:22",
+      "score": 0.025,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=621",
+      "signals": [
+        "official_most_replayed"
+      ]
+    },
+    {
+      "start": 1824.55,
+      "end": 1884.7,
+      "start_hms": "00:30:25",
+      "end_hms": "00:31:25",
+      "score": 0.025,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1824",
+      "signals": [
+        "official_most_replayed"
+      ]
+    }
+  ],
+  "full_heatmap": [
+    {
+      "start": 0,
+      "end": 20.05,
+      "score": 0.629
+    },
+    {
+      "start": 20.05,
+      "end": 40.1,
+      "score": 0.19
+    },
+    {
+      "start": 40.1,
+      "end": 60.15,
+      "score": 0.069
+    },
+    {
+      "start": 60.15,
+      "end": 80.2,
+      "score": 0.035
+    },
+    {
+      "start": 80.2,
+      "end": 100.25,
+      "score": 0.023
+    },
+    {
+      "start": 100.25,
+      "end": 120.3,
+      "score": 0.017
+    },
+    {
+      "start": 120.3,
+      "end": 140.35,
+      "score": 0.066
+    },
+    {
+      "start": 140.35,
+      "end": 160.4,
+      "score": 0.139
+    },
+    {
+      "start": 160.4,
+      "end": 180.45,
+      "score": 0.06
+    },
+    {
+      "start": 180.45,
+      "end": 200.5,
+      "score": 0.11
+    },
+    {
+      "start": 200.5,
+      "end": 220.55,
+      "score": 0.092
+    },
+    {
+      "start": 220.55,
+      "end": 240.6,
+      "score": 0.027
+    },
+    {
+      "start": 240.6,
+      "end": 260.65,
+      "score": 0.054
+    },
+    {
+      "start": 260.65,
+      "end": 280.7,
+      "score": 0.275
+    },
+    {
+      "start": 280.7,
+      "end": 300.75,
+      "score": 0.148
+    },
+    {
+      "start": 300.75,
+      "end": 320.8,
+      "score": 0.039
+    },
+    {
+      "start": 320.8,
+      "end": 340.85,
+      "score": 0.131
+    },
+    {
+      "start": 340.85,
+      "end": 360.9,
+      "score": 0.09
+    },
+    {
+      "start": 360.9,
+      "end": 380.95,
+      "score": 0.086
+    },
+    {
+      "start": 380.95,
+      "end": 401,
+      "score": 0.172
+    },
+    {
+      "start": 401,
+      "end": 421.05,
+      "score": 0.098
+    },
+    {
+      "start": 421.05,
+      "end": 441.1,
+      "score": 0.022
+    },
+    {
+      "start": 441.1,
+      "end": 461.15,
+      "score": 0.038
+    },
+    {
+      "start": 461.15,
+      "end": 481.2,
+      "score": 0.119
+    },
+    {
+      "start": 481.2,
+      "end": 501.25,
+      "score": 0.103
+    },
+    {
+      "start": 501.25,
+      "end": 521.3,
+      "score": 0.088
+    },
+    {
+      "start": 521.3,
+      "end": 541.35,
+      "score": 0.105
+    },
+    {
+      "start": 541.35,
+      "end": 561.4,
+      "score": 0.11
+    },
+    {
+      "start": 561.4,
+      "end": 581.45,
+      "score": 0.383
+    },
+    {
+      "start": 581.45,
+      "end": 601.5,
+      "score": 0.214
+    },
+    {
+      "start": 601.5,
+      "end": 621.55,
+      "score": 0.076
+    },
+    {
+      "start": 621.55,
+      "end": 641.6,
+      "score": 0.055
+    },
+    {
+      "start": 641.6,
+      "end": 661.65,
+      "score": 0.025
+    },
+    {
+      "start": 661.65,
+      "end": 681.7,
+      "score": 0.04
+    },
+    {
+      "start": 681.7,
+      "end": 701.75,
+      "score": 0.206
+    },
+    {
+      "start": 701.75,
+      "end": 721.8,
+      "score": 0.274
+    },
+    {
+      "start": 721.8,
+      "end": 741.85,
+      "score": 0.664
+    },
+    {
+      "start": 741.85,
+      "end": 761.9,
+      "score": 1
+    },
+    {
+      "start": 761.9,
+      "end": 781.95,
+      "score": 0.188
+    },
+    {
+      "start": 781.95,
+      "end": 802,
+      "score": 0.072
+    },
+    {
+      "start": 802,
+      "end": 822.05,
+      "score": 0.037
+    },
+    {
+      "start": 822.05,
+      "end": 842.1,
+      "score": 0.082
+    },
+    {
+      "start": 842.1,
+      "end": 862.15,
+      "score": 0.068
+    },
+    {
+      "start": 862.15,
+      "end": 882.2,
+      "score": 0.043
+    },
+    {
+      "start": 882.2,
+      "end": 902.25,
+      "score": 0.037
+    },
+    {
+      "start": 902.25,
+      "end": 922.3,
+      "score": 0.052
+    },
+    {
+      "start": 922.3,
+      "end": 942.35,
+      "score": 0.314
+    },
+    {
+      "start": 942.35,
+      "end": 962.4,
+      "score": 0.289
+    },
+    {
+      "start": 962.4,
+      "end": 982.45,
+      "score": 0.096
+    },
+    {
+      "start": 982.45,
+      "end": 1002.5,
+      "score": 0.064
+    },
+    {
+      "start": 1002.5,
+      "end": 1022.55,
+      "score": 0.076
+    },
+    {
+      "start": 1022.55,
+      "end": 1042.6,
+      "score": 0.266
+    },
+    {
+      "start": 1042.6,
+      "end": 1062.65,
+      "score": 0.107
+    },
+    {
+      "start": 1062.65,
+      "end": 1082.7,
+      "score": 0.061
+    },
+    {
+      "start": 1082.7,
+      "end": 1102.75,
+      "score": 0.023
+    },
+    {
+      "start": 1102.75,
+      "end": 1122.8,
+      "score": 0.045
+    },
+    {
+      "start": 1122.8,
+      "end": 1142.85,
+      "score": 0.052
+    },
+    {
+      "start": 1142.85,
+      "end": 1162.9,
+      "score": 0.093
+    },
+    {
+      "start": 1162.9,
+      "end": 1182.95,
+      "score": 0.033
+    },
+    {
+      "start": 1182.95,
+      "end": 1203,
+      "score": 0.032
+    },
+    {
+      "start": 1203,
+      "end": 1223.05,
+      "score": 0.052
+    },
+    {
+      "start": 1223.05,
+      "end": 1243.1,
+      "score": 0.113
+    },
+    {
+      "start": 1243.1,
+      "end": 1263.15,
+      "score": 0.185
+    },
+    {
+      "start": 1263.15,
+      "end": 1283.2,
+      "score": 0.179
+    },
+    {
+      "start": 1283.2,
+      "end": 1303.25,
+      "score": 0.047
+    },
+    {
+      "start": 1303.25,
+      "end": 1323.3,
+      "score": 0.055
+    },
+    {
+      "start": 1323.3,
+      "end": 1343.35,
+      "score": 0.153
+    },
+    {
+      "start": 1343.35,
+      "end": 1363.4,
+      "score": 0.504
+    },
+    {
+      "start": 1363.4,
+      "end": 1383.45,
+      "score": 0.288
+    },
+    {
+      "start": 1383.45,
+      "end": 1403.5,
+      "score": 0.787
+    },
+    {
+      "start": 1403.5,
+      "end": 1423.55,
+      "score": 0.956
+    },
+    {
+      "start": 1423.55,
+      "end": 1443.6,
+      "score": 0.337
+    },
+    {
+      "start": 1443.6,
+      "end": 1463.65,
+      "score": 0.322
+    },
+    {
+      "start": 1463.65,
+      "end": 1483.7,
+      "score": 0.532
+    },
+    {
+      "start": 1483.7,
+      "end": 1503.75,
+      "score": 0.702
+    },
+    {
+      "start": 1503.75,
+      "end": 1523.8,
+      "score": 0.129
+    },
+    {
+      "start": 1523.8,
+      "end": 1543.85,
+      "score": 0.128
+    },
+    {
+      "start": 1543.85,
+      "end": 1563.9,
+      "score": 0.259
+    },
+    {
+      "start": 1563.9,
+      "end": 1583.95,
+      "score": 0.06
+    },
+    {
+      "start": 1583.95,
+      "end": 1604,
+      "score": 0.139
+    },
+    {
+      "start": 1604,
+      "end": 1624.05,
+      "score": 0.037
+    },
+    {
+      "start": 1624.05,
+      "end": 1644.1,
+      "score": 0.051
+    },
+    {
+      "start": 1644.1,
+      "end": 1664.15,
+      "score": 0.096
+    },
+    {
+      "start": 1664.15,
+      "end": 1684.2,
+      "score": 0.424
+    },
+    {
+      "start": 1684.2,
+      "end": 1704.25,
+      "score": 0.666
+    },
+    {
+      "start": 1704.25,
+      "end": 1724.3,
+      "score": 0.535
+    },
+    {
+      "start": 1724.3,
+      "end": 1744.35,
+      "score": 0.094
+    },
+    {
+      "start": 1744.35,
+      "end": 1764.4,
+      "score": 0.114
+    },
+    {
+      "start": 1764.4,
+      "end": 1784.45,
+      "score": 0.102
+    },
+    {
+      "start": 1784.45,
+      "end": 1804.5,
+      "score": 0.195
+    },
+    {
+      "start": 1804.5,
+      "end": 1824.55,
+      "score": 0.222
+    },
+    {
+      "start": 1824.55,
+      "end": 1844.6,
+      "score": 0.037
+    },
+    {
+      "start": 1844.6,
+      "end": 1864.65,
+      "score": 0.025
+    },
+    {
+      "start": 1864.65,
+      "end": 1884.7,
+      "score": 0.059
+    },
+    {
+      "start": 1884.7,
+      "end": 1904.75,
+      "score": 0.363
+    },
+    {
+      "start": 1904.75,
+      "end": 1924.8,
+      "score": 0.149
+    },
+    {
+      "start": 1924.8,
+      "end": 1944.85,
+      "score": 0.01
+    },
+    {
+      "start": 1944.85,
+      "end": 1964.9,
+      "score": 0.005
+    },
+    {
+      "start": 1964.9,
+      "end": 1984.95,
+      "score": 0
+    },
+    {
+      "start": 1984.95,
+      "end": 2005,
+      "score": 0.02
+    }
+  ],
+  "is_estimate": false,
+  "disclaimer": "Scores are YouTube's relative replay intensity (0-1), not raw view counts.",
+  "cached": false,
+  "weights": {}
+}

@@ -105,7 +105,7 @@ ax.plot(xs, sl * xs + ic, color="black", lw=0.9)
 ax.plot([0, 1], [0, 1], color="0.6", lw=0.7, ls=":")
 ax.set_xlim(0, 1.02); ax.set_ylim(0, 1.02); ax.set_aspect("equal")
 ax.set_xlabel("Official score"); ax.set_ylabel("Estimated score (resampled)")
-ax.text(0.97, 0.04, f"Pearson r = {r_p:.2f} ({fmt_p(p_p)})\nSpearman ρ = {r_s:.2f} ({fmt_p(p_s)})\ny = {sl:.2f}x + {ic:.2f}", transform=ax.transAxes, va="bottom", ha="right", fontsize=7, bbox=dict(fc="white", ec="0.6", lw=0.5, pad=2))
+ax.text(0.97, 0.97, f"Pearson r = {r_p:.2f} ({fmt_p(p_p)})\nSpearman ρ = {r_s:.2f} ({fmt_p(p_s)})\ny = {sl:.2f}x + {ic:.2f}", transform=ax.transAxes, va="top", ha="right", fontsize=7, bbox=dict(fc="white", ec="0.6", lw=0.5, pad=2))
 ax.text(-0.3, 1.04, "(b)", transform=ax.transAxes, fontweight="bold")
 
 # (c) per-signal correlation, or score distributions when per-signal data is absent

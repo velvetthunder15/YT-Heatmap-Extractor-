@@ -1,0 +1,2570 @@
+{
+  "video_id": "RKQGRPoDV_I",
+  "title": "Poppy Playtime",
+  "duration": 2005,
+  "source": "estimated",
+  "confidence": "high",
+  "confidence_reason": "264 timestamped comments plus 3 other signals agree on the timeline.",
+  "signals_used": [
+    "comments",
+    "transcript",
+    "audio",
+    "visual"
+  ],
+  "signals_skipped": {},
+  "most_engaging": [
+    {
+      "start": 930,
+      "end": 940,
+      "start_hms": "00:15:30",
+      "end_hms": "00:15:40",
+      "score": 1,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=930",
+      "signals": [
+        {
+          "name": "comments",
+          "share": 0.435,
+          "value": 0.758
+        },
+        {
+          "name": "audio",
+          "share": 0.303,
+          "value": 0.737
+        },
+        {
+          "name": "transcript",
+          "share": 0.242,
+          "value": 0.59
+        }
+      ]
+    },
+    {
+      "start": 740,
+      "end": 750,
+      "start_hms": "00:12:20",
+      "end_hms": "00:12:30",
+      "score": 0.763,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=740",
+      "signals": [
+        {
+          "name": "comments",
+          "share": 0.64,
+          "value": 1
+        }
+      ]
+    },
+    {
+      "start": 1590,
+      "end": 1600,
+      "start_hms": "00:26:30",
+      "end_hms": "00:26:40",
+      "score": 0.634,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1590",
+      "signals": [
+        {
+          "name": "audio",
+          "share": 0.39,
+          "value": 0.792
+        },
+        {
+          "name": "visual",
+          "share": 0.295,
+          "value": 1
+        },
+        {
+          "name": "transcript",
+          "share": 0.208,
+          "value": 0.424
+        }
+      ]
+    },
+    {
+      "start": 520,
+      "end": 530,
+      "start_hms": "00:08:40",
+      "end_hms": "00:08:50",
+      "score": 0.629,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=520",
+      "signals": [
+        {
+          "name": "transcript",
+          "share": 0.454,
+          "value": 0.919
+        },
+        {
+          "name": "audio",
+          "share": 0.44,
+          "value": 0.891
+        }
+      ]
+    },
+    {
+      "start": 940,
+      "end": 950,
+      "start_hms": "00:15:40",
+      "end_hms": "00:15:50",
+      "score": 0.562,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=940",
+      "signals": [
+        {
+          "name": "comments",
+          "share": 0.529,
+          "value": 0.733
+        },
+        {
+          "name": "audio",
+          "share": 0.295,
+          "value": 0.573
+        }
+      ]
+    },
+    {
+      "start": 1480,
+      "end": 1500,
+      "start_hms": "00:24:40",
+      "end_hms": "00:25:00",
+      "score": 0.551,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1480",
+      "signals": [
+        {
+          "name": "audio",
+          "share": 0.44,
+          "value": 0.839
+        },
+        {
+          "name": "comments",
+          "share": 0.217,
+          "value": 0.296
+        }
+      ]
+    },
+    {
+      "start": 1680,
+      "end": 1690,
+      "start_hms": "00:28:00",
+      "end_hms": "00:28:10",
+      "score": 0.516,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1680",
+      "signals": [
+        {
+          "name": "audio",
+          "share": 0.533,
+          "value": 1
+        },
+        {
+          "name": "transcript",
+          "share": 0.301,
+          "value": 0.565
+        }
+      ]
+    },
+    {
+      "start": 1690,
+      "end": 1710,
+      "start_hms": "00:28:10",
+      "end_hms": "00:28:30",
+      "score": 0.489,
+      "type": "peak",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1690",
+      "signals": [
+        {
+          "name": "audio",
+          "share": 0.458,
+          "value": 0.829
+        },
+        {
+          "name": "transcript",
+          "share": 0.255,
+          "value": 0.461
+        },
+        {
+          "name": "comments",
+          "share": 0.216,
+          "value": 0.278
+        }
+      ]
+    }
+  ],
+  "least_engaging": [
+    {
+      "start": 350,
+      "end": 380,
+      "start_hms": "00:05:50",
+      "end_hms": "00:06:20",
+      "score": 0,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=350",
+      "signals": [
+        {
+          "name": "visual",
+          "value": 0.022
+        },
+        {
+          "name": "comments",
+          "value": 0.047
+        },
+        {
+          "name": "transcript",
+          "value": 0.11
+        },
+        {
+          "name": "audio",
+          "value": 0.311
+        }
+      ]
+    },
+    {
+      "start": 1510,
+      "end": 1530,
+      "start_hms": "00:25:10",
+      "end_hms": "00:25:30",
+      "score": 0.01,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1510",
+      "signals": [
+        {
+          "name": "comments",
+          "value": 0.027
+        },
+        {
+          "name": "audio",
+          "value": 0.145
+        },
+        {
+          "name": "visual",
+          "value": 0.265
+        },
+        {
+          "name": "transcript",
+          "value": 0.318
+        }
+      ]
+    },
+    {
+      "start": 880,
+      "end": 920,
+      "start_hms": "00:14:40",
+      "end_hms": "00:15:20",
+      "score": 0.01,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=880",
+      "signals": [
+        {
+          "name": "comments",
+          "value": 0.016
+        },
+        {
+          "name": "visual",
+          "value": 0.086
+        },
+        {
+          "name": "transcript",
+          "value": 0.248
+        },
+        {
+          "name": "audio",
+          "value": 0.39
+        }
+      ]
+    },
+    {
+      "start": 850,
+      "end": 870,
+      "start_hms": "00:14:10",
+      "end_hms": "00:14:30",
+      "score": 0.012,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=850",
+      "signals": [
+        {
+          "name": "comments",
+          "value": 0
+        },
+        {
+          "name": "visual",
+          "value": 0.118
+        },
+        {
+          "name": "transcript",
+          "value": 0.183
+        },
+        {
+          "name": "audio",
+          "value": 0.437
+        }
+      ]
+    },
+    {
+      "start": 1880,
+      "end": 1890,
+      "start_hms": "00:31:20",
+      "end_hms": "00:31:30",
+      "score": 0.015,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=1880",
+      "signals": [
+        {
+          "name": "comments",
+          "value": 0.02
+        },
+        {
+          "name": "visual",
+          "value": 0.05
+        },
+        {
+          "name": "audio",
+          "value": 0.253
+        },
+        {
+          "name": "transcript",
+          "value": 0.321
+        }
+      ]
+    },
+    {
+      "start": 390,
+      "end": 400,
+      "start_hms": "00:06:30",
+      "end_hms": "00:06:40",
+      "score": 0.018,
+      "type": "drop-off",
+      "link": "https://youtu.be/RKQGRPoDV_I?t=390",
+      "signals": [
+        {
+          "name": "visual",
+          "value": 0.007
+        },
+        {
+          "name": "comments",
+          "value": 0.064
+        },
+        {
+          "name": "audio",
+          "value": 0.269
+        },
+        {
+          "name": "transcript",
+          "value": 0.299
+        }
+      ]
+    }
+  ],
+  "full_heatmap": [
+    {
+      "start": 0,
+      "end": 10,
+      "score": 0.294,
+      "signals": {
+        "comments": 0.269,
+        "transcript": 0.14,
+        "audio": 0.847,
+        "visual": 0.263
+      }
+    },
+    {
+      "start": 10,
+      "end": 20,
+      "score": 0.208,
+      "signals": {
+        "comments": 0.061,
+        "transcript": 0.418,
+        "audio": 0.675,
+        "visual": 0.276
+      }
+    },
+    {
+      "start": 20,
+      "end": 30,
+      "score": 0.146,
+      "signals": {
+        "comments": 0.065,
+        "transcript": 0.391,
+        "audio": 0.585,
+        "visual": 0.209
+      }
+    },
+    {
+      "start": 30,
+      "end": 40,
+      "score": 0.037,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.336,
+        "audio": 0.434,
+        "visual": 0.026
+      }
+    },
+    {
+      "start": 40,
+      "end": 50,
+      "score": 0.41,
+      "signals": {
+        "comments": 0.057,
+        "transcript": 0.809,
+        "audio": 0.823,
+        "visual": 0.015
+      }
+    },
+    {
+      "start": 50,
+      "end": 60,
+      "score": 0.265,
+      "signals": {
+        "comments": 0.064,
+        "transcript": 0.837,
+        "audio": 0.507,
+        "visual": 0.052
+      }
+    },
+    {
+      "start": 60,
+      "end": 70,
+      "score": 0.048,
+      "signals": {
+        "comments": 0.048,
+        "transcript": 0.376,
+        "audio": 0.325,
+        "visual": 0.131
+      }
+    },
+    {
+      "start": 70,
+      "end": 80,
+      "score": 0.126,
+      "signals": {
+        "comments": 0.113,
+        "transcript": 0.57,
+        "audio": 0.363,
+        "visual": 0.071
+      }
+    },
+    {
+      "start": 80,
+      "end": 90,
+      "score": 0.039,
+      "signals": {
+        "comments": 0.128,
+        "transcript": 0.321,
+        "audio": 0.135,
+        "visual": 0.273
+      }
+    },
+    {
+      "start": 90,
+      "end": 100,
+      "score": 0.138,
+      "signals": {
+        "comments": 0.043,
+        "transcript": 0.613,
+        "audio": 0.448,
+        "visual": 0.079
+      }
+    },
+    {
+      "start": 100,
+      "end": 110,
+      "score": 0.313,
+      "signals": {
+        "comments": 0.048,
+        "transcript": 0.775,
+        "audio": 0.493,
+        "visual": 0.368
+      }
+    },
+    {
+      "start": 110,
+      "end": 120,
+      "score": 0.163,
+      "signals": {
+        "comments": 0.202,
+        "transcript": 0.405,
+        "audio": 0.5,
+        "visual": 0.081
+      }
+    },
+    {
+      "start": 120,
+      "end": 130,
+      "score": 0.204,
+      "signals": {
+        "comments": 0.089,
+        "transcript": 0.624,
+        "audio": 0.454,
+        "visual": 0.219
+      }
+    },
+    {
+      "start": 130,
+      "end": 140,
+      "score": 0.205,
+      "signals": {
+        "comments": 0.081,
+        "transcript": 0.563,
+        "audio": 0.526,
+        "visual": 0.225
+      }
+    },
+    {
+      "start": 140,
+      "end": 150,
+      "score": 0.083,
+      "signals": {
+        "comments": 0.109,
+        "transcript": 0.272,
+        "audio": 0.259,
+        "visual": 0.517
+      }
+    },
+    {
+      "start": 150,
+      "end": 160,
+      "score": 0.089,
+      "signals": {
+        "comments": 0.066,
+        "transcript": 0.495,
+        "audio": 0.414,
+        "visual": 0.026
+      }
+    },
+    {
+      "start": 160,
+      "end": 170,
+      "score": 0.165,
+      "signals": {
+        "comments": 0.036,
+        "transcript": 0.576,
+        "audio": 0.585,
+        "visual": 0.049
+      }
+    },
+    {
+      "start": 170,
+      "end": 180,
+      "score": 0.032,
+      "signals": {
+        "comments": 0.02,
+        "transcript": 0.359,
+        "audio": 0.348,
+        "visual": 0.034
+      }
+    },
+    {
+      "start": 180,
+      "end": 190,
+      "score": 0.036,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.331,
+        "audio": 0.391,
+        "visual": 0.105
+      }
+    },
+    {
+      "start": 190,
+      "end": 200,
+      "score": 0.081,
+      "signals": {
+        "comments": 0.018,
+        "transcript": 0.328,
+        "audio": 0.494,
+        "visual": 0.23
+      }
+    },
+    {
+      "start": 200,
+      "end": 210,
+      "score": 0.1,
+      "signals": {
+        "comments": 0.056,
+        "transcript": 0.4,
+        "audio": 0.49,
+        "visual": 0.141
+      }
+    },
+    {
+      "start": 210,
+      "end": 220,
+      "score": 0.106,
+      "signals": {
+        "comments": 0.013,
+        "transcript": 0.521,
+        "audio": 0.532,
+        "visual": 0.001
+      }
+    },
+    {
+      "start": 220,
+      "end": 230,
+      "score": 0.102,
+      "signals": {
+        "comments": 0.048,
+        "transcript": 0.469,
+        "audio": 0.524,
+        "visual": 0
+      }
+    },
+    {
+      "start": 230,
+      "end": 240,
+      "score": 0.093,
+      "signals": {
+        "comments": 0.033,
+        "transcript": 0.469,
+        "audio": 0.511,
+        "visual": 0
+      }
+    },
+    {
+      "start": 240,
+      "end": 250,
+      "score": 0.27,
+      "signals": {
+        "comments": 0.029,
+        "transcript": 1,
+        "audio": 0.435,
+        "visual": 0.001
+      }
+    },
+    {
+      "start": 250,
+      "end": 260,
+      "score": 0.195,
+      "signals": {
+        "comments": 0.188,
+        "transcript": 0.447,
+        "audio": 0.601,
+        "visual": 0.005
+      }
+    },
+    {
+      "start": 260,
+      "end": 270,
+      "score": 0.318,
+      "signals": {
+        "comments": 0.147,
+        "transcript": 0.547,
+        "audio": 0.737,
+        "visual": 0.126
+      }
+    },
+    {
+      "start": 270,
+      "end": 280,
+      "score": 0.22,
+      "signals": {
+        "comments": 0.088,
+        "transcript": 0.594,
+        "audio": 0.571,
+        "visual": 0.139
+      }
+    },
+    {
+      "start": 280,
+      "end": 290,
+      "score": 0.152,
+      "signals": {
+        "comments": 0.214,
+        "transcript": 0.284,
+        "audio": 0.569,
+        "visual": 0.089
+      }
+    },
+    {
+      "start": 290,
+      "end": 300,
+      "score": 0.12,
+      "signals": {
+        "comments": 0.04,
+        "transcript": 0.381,
+        "audio": 0.618,
+        "visual": 0.102
+      }
+    },
+    {
+      "start": 300,
+      "end": 310,
+      "score": 0.213,
+      "signals": {
+        "comments": 0.022,
+        "transcript": 0.454,
+        "audio": 0.759,
+        "visual": 0.183
+      }
+    },
+    {
+      "start": 310,
+      "end": 320,
+      "score": 0.078,
+      "signals": {
+        "comments": 0.041,
+        "transcript": 0.41,
+        "audio": 0.444,
+        "visual": 0.104
+      }
+    },
+    {
+      "start": 320,
+      "end": 330,
+      "score": 0.176,
+      "signals": {
+        "comments": 0.015,
+        "transcript": 0.491,
+        "audio": 0.629,
+        "visual": 0.211
+      }
+    },
+    {
+      "start": 330,
+      "end": 340,
+      "score": 0.196,
+      "signals": {
+        "comments": 0.074,
+        "transcript": 0.404,
+        "audio": 0.715,
+        "visual": 0.154
+      }
+    },
+    {
+      "start": 340,
+      "end": 350,
+      "score": 0.203,
+      "signals": {
+        "comments": 0.073,
+        "transcript": 0.373,
+        "audio": 0.539,
+        "visual": 0.531
+      }
+    },
+    {
+      "start": 350,
+      "end": 360,
+      "score": 0.035,
+      "signals": {
+        "comments": 0.055,
+        "transcript": 0.314,
+        "audio": 0.352,
+        "visual": 0.055
+      }
+    },
+    {
+      "start": 360,
+      "end": 370,
+      "score": 0,
+      "signals": {
+        "comments": 0.047,
+        "transcript": 0,
+        "audio": 0.273,
+        "visual": 0.006
+      }
+    },
+    {
+      "start": 370,
+      "end": 380,
+      "score": 0,
+      "signals": {
+        "comments": 0.039,
+        "transcript": 0.015,
+        "audio": 0.309,
+        "visual": 0.006
+      }
+    },
+    {
+      "start": 380,
+      "end": 390,
+      "score": 0.119,
+      "signals": {
+        "comments": 0.025,
+        "transcript": 0.314,
+        "audio": 0.564,
+        "visual": 0.335
+      }
+    },
+    {
+      "start": 390,
+      "end": 400,
+      "score": 0.018,
+      "signals": {
+        "comments": 0.064,
+        "transcript": 0.299,
+        "audio": 0.269,
+        "visual": 0.007
+      }
+    },
+    {
+      "start": 400,
+      "end": 410,
+      "score": 0.182,
+      "signals": {
+        "comments": 0.13,
+        "transcript": 0.366,
+        "audio": 0.536,
+        "visual": 0.333
+      }
+    },
+    {
+      "start": 410,
+      "end": 420,
+      "score": 0.038,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.284,
+        "audio": 0.413,
+        "visual": 0.156
+      }
+    },
+    {
+      "start": 420,
+      "end": 430,
+      "score": 0.097,
+      "signals": {
+        "comments": 0.007,
+        "transcript": 0.429,
+        "audio": 0.548,
+        "visual": 0.097
+      }
+    },
+    {
+      "start": 430,
+      "end": 440,
+      "score": 0.238,
+      "signals": {
+        "comments": 0.01,
+        "transcript": 0.529,
+        "audio": 0.755,
+        "visual": 0.188
+      }
+    },
+    {
+      "start": 440,
+      "end": 450,
+      "score": 0.073,
+      "signals": {
+        "comments": 0.005,
+        "transcript": 0.354,
+        "audio": 0.463,
+        "visual": 0.216
+      }
+    },
+    {
+      "start": 450,
+      "end": 460,
+      "score": 0.136,
+      "signals": {
+        "comments": 0.019,
+        "transcript": 0.381,
+        "audio": 0.641,
+        "visual": 0.192
+      }
+    },
+    {
+      "start": 460,
+      "end": 470,
+      "score": 0.258,
+      "signals": {
+        "comments": 0.082,
+        "transcript": 0.599,
+        "audio": 0.712,
+        "visual": 0.042
+      }
+    },
+    {
+      "start": 470,
+      "end": 480,
+      "score": 0.053,
+      "signals": {
+        "comments": 0.017,
+        "transcript": 0.314,
+        "audio": 0.52,
+        "visual": 0.017
+      }
+    },
+    {
+      "start": 480,
+      "end": 490,
+      "score": 0.031,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.251,
+        "audio": 0.462,
+        "visual": 0.062
+      }
+    },
+    {
+      "start": 490,
+      "end": 500,
+      "score": 0.026,
+      "signals": {
+        "comments": 0.011,
+        "transcript": 0.233,
+        "audio": 0.406,
+        "visual": 0.104
+      }
+    },
+    {
+      "start": 500,
+      "end": 510,
+      "score": 0.235,
+      "signals": {
+        "comments": 0.076,
+        "transcript": 0.562,
+        "audio": 0.563,
+        "visual": 0.287
+      }
+    },
+    {
+      "start": 510,
+      "end": 520,
+      "score": 0.261,
+      "signals": {
+        "comments": 0.183,
+        "transcript": 0.395,
+        "audio": 0.744,
+        "visual": 0.103
+      }
+    },
+    {
+      "start": 520,
+      "end": 530,
+      "score": 0.629,
+      "signals": {
+        "comments": 0.148,
+        "transcript": 0.919,
+        "audio": 0.891,
+        "visual": 0.015
+      }
+    },
+    {
+      "start": 530,
+      "end": 540,
+      "score": 0.277,
+      "signals": {
+        "comments": 0.036,
+        "transcript": 0.536,
+        "audio": 0.892,
+        "visual": 0.017
+      }
+    },
+    {
+      "start": 540,
+      "end": 550,
+      "score": 0.234,
+      "signals": {
+        "comments": 0.008,
+        "transcript": 0.583,
+        "audio": 0.775,
+        "visual": 0.053
+      }
+    },
+    {
+      "start": 550,
+      "end": 560,
+      "score": 0.307,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.661,
+        "audio": 0.863,
+        "visual": 0.035
+      }
+    },
+    {
+      "start": 560,
+      "end": 570,
+      "score": 0.039,
+      "signals": {
+        "comments": 0.002,
+        "transcript": 0.314,
+        "audio": 0.433,
+        "visual": 0.079
+      }
+    },
+    {
+      "start": 570,
+      "end": 580,
+      "score": 0.05,
+      "signals": {
+        "comments": 0.091,
+        "transcript": 0.307,
+        "audio": 0.39,
+        "visual": 0.055
+      }
+    },
+    {
+      "start": 580,
+      "end": 590,
+      "score": 0.109,
+      "signals": {
+        "comments": 0.042,
+        "transcript": 0.381,
+        "audio": 0.595,
+        "visual": 0.081
+      }
+    },
+    {
+      "start": 590,
+      "end": 600,
+      "score": 0.061,
+      "signals": {
+        "comments": 0.027,
+        "transcript": 0.366,
+        "audio": 0.334,
+        "visual": 0.28
+      }
+    },
+    {
+      "start": 600,
+      "end": 610,
+      "score": 0.086,
+      "signals": {
+        "comments": 0.035,
+        "transcript": 0.363,
+        "audio": 0.553,
+        "visual": 0.062
+      }
+    },
+    {
+      "start": 610,
+      "end": 620,
+      "score": 0.085,
+      "signals": {
+        "comments": 0.029,
+        "transcript": 0.335,
+        "audio": 0.595,
+        "visual": 0.052
+      }
+    },
+    {
+      "start": 620,
+      "end": 630,
+      "score": 0.218,
+      "signals": {
+        "comments": 0.021,
+        "transcript": 0.454,
+        "audio": 0.841,
+        "visual": 0.068
+      }
+    },
+    {
+      "start": 630,
+      "end": 640,
+      "score": 0.137,
+      "signals": {
+        "comments": 0.014,
+        "transcript": 0.412,
+        "audio": 0.698,
+        "visual": 0.057
+      }
+    },
+    {
+      "start": 640,
+      "end": 650,
+      "score": 0.039,
+      "signals": {
+        "comments": 0.013,
+        "transcript": 0.292,
+        "audio": 0.445,
+        "visual": 0.077
+      }
+    },
+    {
+      "start": 650,
+      "end": 660,
+      "score": 0.061,
+      "signals": {
+        "comments": 0.02,
+        "transcript": 0.336,
+        "audio": 0.488,
+        "visual": 0.091
+      }
+    },
+    {
+      "start": 660,
+      "end": 670,
+      "score": 0.068,
+      "signals": {
+        "comments": 0.009,
+        "transcript": 0.403,
+        "audio": 0.434,
+        "visual": 0.146
+      }
+    },
+    {
+      "start": 670,
+      "end": 680,
+      "score": 0.18,
+      "signals": {
+        "comments": 0.035,
+        "transcript": 0.426,
+        "audio": 0.735,
+        "visual": 0.115
+      }
+    },
+    {
+      "start": 680,
+      "end": 690,
+      "score": 0.072,
+      "signals": {
+        "comments": 0.005,
+        "transcript": 0.348,
+        "audio": 0.54,
+        "visual": 0.095
+      }
+    },
+    {
+      "start": 690,
+      "end": 700,
+      "score": 0.051,
+      "signals": {
+        "comments": 0.015,
+        "transcript": 0.314,
+        "audio": 0.425,
+        "visual": 0.168
+      }
+    },
+    {
+      "start": 700,
+      "end": 710,
+      "score": 0.022,
+      "signals": {
+        "comments": 0.061,
+        "transcript": 0.244,
+        "audio": 0.32,
+        "visual": 0.074
+      }
+    },
+    {
+      "start": 710,
+      "end": 720,
+      "score": 0.03,
+      "signals": {
+        "comments": 0.044,
+        "transcript": 0.329,
+        "audio": 0.327,
+        "visual": 0.052
+      }
+    },
+    {
+      "start": 720,
+      "end": 730,
+      "score": 0.058,
+      "signals": {
+        "comments": 0.037,
+        "transcript": 0.305,
+        "audio": 0.454,
+        "visual": 0.137
+      }
+    },
+    {
+      "start": 730,
+      "end": 740,
+      "score": 0.066,
+      "signals": {
+        "comments": 0.14,
+        "transcript": 0.276,
+        "audio": 0.352,
+        "visual": 0.17
+      }
+    },
+    {
+      "start": 740,
+      "end": 750,
+      "score": 0.763,
+      "signals": {
+        "comments": 1,
+        "transcript": 0.292,
+        "audio": 0.409,
+        "visual": 0.142
+      }
+    },
+    {
+      "start": 750,
+      "end": 760,
+      "score": 0.13,
+      "signals": {
+        "comments": 0.138,
+        "transcript": 0.351,
+        "audio": 0.528,
+        "visual": 0.121
+      }
+    },
+    {
+      "start": 760,
+      "end": 770,
+      "score": 0.156,
+      "signals": {
+        "comments": 0.103,
+        "transcript": 0.388,
+        "audio": 0.599,
+        "visual": 0.145
+      }
+    },
+    {
+      "start": 770,
+      "end": 780,
+      "score": 0.223,
+      "signals": {
+        "comments": 0.045,
+        "transcript": 0.366,
+        "audio": 0.739,
+        "visual": 0.349
+      }
+    },
+    {
+      "start": 780,
+      "end": 790,
+      "score": 0.081,
+      "signals": {
+        "comments": 0.06,
+        "transcript": 0.312,
+        "audio": 0.488,
+        "visual": 0.17
+      }
+    },
+    {
+      "start": 790,
+      "end": 800,
+      "score": 0.175,
+      "signals": {
+        "comments": 0.043,
+        "transcript": 0.584,
+        "audio": 0.571,
+        "visual": 0.088
+      }
+    },
+    {
+      "start": 800,
+      "end": 810,
+      "score": 0.059,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.331,
+        "audio": 0.532,
+        "visual": 0.057
+      }
+    },
+    {
+      "start": 810,
+      "end": 820,
+      "score": 0.034,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.282,
+        "audio": 0.452,
+        "visual": 0.056
+      }
+    },
+    {
+      "start": 820,
+      "end": 830,
+      "score": 0.074,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.395,
+        "audio": 0.529,
+        "visual": 0.062
+      }
+    },
+    {
+      "start": 830,
+      "end": 840,
+      "score": 0.066,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.344,
+        "audio": 0.528,
+        "visual": 0.091
+      }
+    },
+    {
+      "start": 840,
+      "end": 850,
+      "score": 0.073,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.419,
+        "audio": 0.468,
+        "visual": 0.116
+      }
+    },
+    {
+      "start": 850,
+      "end": 860,
+      "score": 0.035,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.292,
+        "audio": 0.419,
+        "visual": 0.109
+      }
+    },
+    {
+      "start": 860,
+      "end": 870,
+      "score": 0.012,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.074,
+        "audio": 0.455,
+        "visual": 0.127
+      }
+    },
+    {
+      "start": 870,
+      "end": 880,
+      "score": 0.077,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.351,
+        "audio": 0.517,
+        "visual": 0.174
+      }
+    },
+    {
+      "start": 880,
+      "end": 890,
+      "score": 0.026,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.307,
+        "audio": 0.356,
+        "visual": 0.101
+      }
+    },
+    {
+      "start": 890,
+      "end": 900,
+      "score": 0.045,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.344,
+        "audio": 0.453,
+        "visual": 0.057
+      }
+    },
+    {
+      "start": 900,
+      "end": 910,
+      "score": 0.025,
+      "signals": {
+        "comments": 0.023,
+        "transcript": 0.284,
+        "audio": 0.347,
+        "visual": 0.079
+      }
+    },
+    {
+      "start": 910,
+      "end": 920,
+      "score": 0.01,
+      "signals": {
+        "comments": 0.04,
+        "transcript": 0.059,
+        "audio": 0.406,
+        "visual": 0.107
+      }
+    },
+    {
+      "start": 920,
+      "end": 930,
+      "score": 0.069,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.303,
+        "audio": 0.566,
+        "visual": 0.115
+      }
+    },
+    {
+      "start": 930,
+      "end": 940,
+      "score": 1,
+      "signals": {
+        "comments": 0.758,
+        "transcript": 0.59,
+        "audio": 0.737,
+        "visual": 0.08
+      }
+    },
+    {
+      "start": 940,
+      "end": 950,
+      "score": 0.562,
+      "signals": {
+        "comments": 0.733,
+        "transcript": 0.277,
+        "audio": 0.573,
+        "visual": 0.107
+      }
+    },
+    {
+      "start": 950,
+      "end": 960,
+      "score": 0.033,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.284,
+        "audio": 0.472,
+        "visual": 0.012
+      }
+    },
+    {
+      "start": 960,
+      "end": 970,
+      "score": 0.052,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.126,
+        "audio": 0.649,
+        "visual": 0.149
+      }
+    },
+    {
+      "start": 970,
+      "end": 980,
+      "score": 0.076,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.351,
+        "audio": 0.537,
+        "visual": 0.132
+      }
+    },
+    {
+      "start": 980,
+      "end": 990,
+      "score": 0.099,
+      "signals": {
+        "comments": 0.012,
+        "transcript": 0.362,
+        "audio": 0.639,
+        "visual": 0.052
+      }
+    },
+    {
+      "start": 990,
+      "end": 1000,
+      "score": 0.039,
+      "signals": {
+        "comments": 0.005,
+        "transcript": 0.307,
+        "audio": 0.418,
+        "visual": 0.114
+      }
+    },
+    {
+      "start": 1000,
+      "end": 1010,
+      "score": 0.05,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.297,
+        "audio": 0.506,
+        "visual": 0.091
+      }
+    },
+    {
+      "start": 1010,
+      "end": 1020,
+      "score": 0.033,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.314,
+        "audio": 0.373,
+        "visual": 0.132
+      }
+    },
+    {
+      "start": 1020,
+      "end": 1030,
+      "score": 0.078,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.388,
+        "audio": 0.52,
+        "visual": 0.112
+      }
+    },
+    {
+      "start": 1030,
+      "end": 1040,
+      "score": 0.267,
+      "signals": {
+        "comments": 0.13,
+        "transcript": 0.601,
+        "audio": 0.673,
+        "visual": 0.019
+      }
+    },
+    {
+      "start": 1040,
+      "end": 1050,
+      "score": 0.086,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.296,
+        "audio": 0.674,
+        "visual": 0.056
+      }
+    },
+    {
+      "start": 1050,
+      "end": 1060,
+      "score": 0.109,
+      "signals": {
+        "comments": 0.028,
+        "transcript": 0.388,
+        "audio": 0.562,
+        "visual": 0.157
+      }
+    },
+    {
+      "start": 1060,
+      "end": 1070,
+      "score": 0.122,
+      "signals": {
+        "comments": 0.041,
+        "transcript": 0.381,
+        "audio": 0.592,
+        "visual": 0.153
+      }
+    },
+    {
+      "start": 1070,
+      "end": 1080,
+      "score": 0.187,
+      "signals": {
+        "comments": 0.027,
+        "transcript": 0.411,
+        "audio": 0.752,
+        "visual": 0.158
+      }
+    },
+    {
+      "start": 1080,
+      "end": 1090,
+      "score": 0.257,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.582,
+        "audio": 0.821,
+        "visual": 0.076
+      }
+    },
+    {
+      "start": 1090,
+      "end": 1100,
+      "score": 0.335,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.616,
+        "audio": 0.977,
+        "visual": 0.005
+      }
+    },
+    {
+      "start": 1100,
+      "end": 1110,
+      "score": 0.234,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.587,
+        "audio": 0.806,
+        "visual": 0.013
+      }
+    },
+    {
+      "start": 1110,
+      "end": 1120,
+      "score": 0.231,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.559,
+        "audio": 0.799,
+        "visual": 0.059
+      }
+    },
+    {
+      "start": 1120,
+      "end": 1130,
+      "score": 0.289,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.643,
+        "audio": 0.763,
+        "visual": 0.178
+      }
+    },
+    {
+      "start": 1130,
+      "end": 1140,
+      "score": 0.078,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.297,
+        "audio": 0.504,
+        "visual": 0.29
+      }
+    },
+    {
+      "start": 1140,
+      "end": 1150,
+      "score": 0.108,
+      "signals": {
+        "comments": 0.014,
+        "transcript": 0.425,
+        "audio": 0.56,
+        "visual": 0.123
+      }
+    },
+    {
+      "start": 1150,
+      "end": 1160,
+      "score": 0.127,
+      "signals": {
+        "comments": 0.136,
+        "transcript": 0.353,
+        "audio": 0.544,
+        "visual": 0.081
+      }
+    },
+    {
+      "start": 1160,
+      "end": 1170,
+      "score": 0.076,
+      "signals": {
+        "comments": 0.024,
+        "transcript": 0.447,
+        "audio": 0.485,
+        "visual": 0.002
+      }
+    },
+    {
+      "start": 1170,
+      "end": 1180,
+      "score": 0.103,
+      "signals": {
+        "comments": 0.013,
+        "transcript": 0.499,
+        "audio": 0.544,
+        "visual": 0.002
+      }
+    },
+    {
+      "start": 1180,
+      "end": 1190,
+      "score": 0.112,
+      "signals": {
+        "comments": 0.058,
+        "transcript": 0.438,
+        "audio": 0.57,
+        "visual": 0.003
+      }
+    },
+    {
+      "start": 1190,
+      "end": 1200,
+      "score": 0.098,
+      "signals": {
+        "comments": 0.019,
+        "transcript": 0.441,
+        "audio": 0.575,
+        "visual": 0.008
+      }
+    },
+    {
+      "start": 1200,
+      "end": 1210,
+      "score": 0.06,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.398,
+        "audio": 0.504,
+        "visual": 0.002
+      }
+    },
+    {
+      "start": 1210,
+      "end": 1220,
+      "score": 0.156,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.635,
+        "audio": 0.582,
+        "visual": 0.001
+      }
+    },
+    {
+      "start": 1220,
+      "end": 1230,
+      "score": 0.08,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.41,
+        "audio": 0.554,
+        "visual": 0.027
+      }
+    },
+    {
+      "start": 1230,
+      "end": 1240,
+      "score": 0.244,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.433,
+        "audio": 0.697,
+        "visual": 0.487
+      }
+    },
+    {
+      "start": 1240,
+      "end": 1250,
+      "score": 0.062,
+      "signals": {
+        "comments": 0.02,
+        "transcript": 0.314,
+        "audio": 0.41,
+        "visual": 0.263
+      }
+    },
+    {
+      "start": 1250,
+      "end": 1260,
+      "score": 0.228,
+      "signals": {
+        "comments": 0.068,
+        "transcript": 0.454,
+        "audio": 0.739,
+        "visual": 0.164
+      }
+    },
+    {
+      "start": 1260,
+      "end": 1270,
+      "score": 0.085,
+      "signals": {
+        "comments": 0.036,
+        "transcript": 0.351,
+        "audio": 0.548,
+        "visual": 0.083
+      }
+    },
+    {
+      "start": 1270,
+      "end": 1280,
+      "score": 0.131,
+      "signals": {
+        "comments": 0.005,
+        "transcript": 0.351,
+        "audio": 0.765,
+        "visual": 0.043
+      }
+    },
+    {
+      "start": 1280,
+      "end": 1290,
+      "score": 0.089,
+      "signals": {
+        "comments": 0.025,
+        "transcript": 0.395,
+        "audio": 0.539,
+        "visual": 0.074
+      }
+    },
+    {
+      "start": 1290,
+      "end": 1300,
+      "score": 0.084,
+      "signals": {
+        "comments": 0.003,
+        "transcript": 0.358,
+        "audio": 0.533,
+        "visual": 0.168
+      }
+    },
+    {
+      "start": 1300,
+      "end": 1310,
+      "score": 0.153,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.467,
+        "audio": 0.678,
+        "visual": 0.109
+      }
+    },
+    {
+      "start": 1310,
+      "end": 1320,
+      "score": 0.125,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.515,
+        "audio": 0.548,
+        "visual": 0.113
+      }
+    },
+    {
+      "start": 1320,
+      "end": 1330,
+      "score": 0.034,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.271,
+        "audio": 0.447,
+        "visual": 0.085
+      }
+    },
+    {
+      "start": 1330,
+      "end": 1340,
+      "score": 0.125,
+      "signals": {
+        "comments": 0.028,
+        "transcript": 0.388,
+        "audio": 0.674,
+        "visual": 0.052
+      }
+    },
+    {
+      "start": 1340,
+      "end": 1350,
+      "score": 0.079,
+      "signals": {
+        "comments": 0.059,
+        "transcript": 0.377,
+        "audio": 0.486,
+        "visual": 0.057
+      }
+    },
+    {
+      "start": 1350,
+      "end": 1360,
+      "score": 0.034,
+      "signals": {
+        "comments": 0.078,
+        "transcript": 0.366,
+        "audio": 0.279,
+        "visual": 0.026
+      }
+    },
+    {
+      "start": 1360,
+      "end": 1370,
+      "score": 0.033,
+      "signals": {
+        "comments": 0.156,
+        "transcript": 0,
+        "audio": 0.334,
+        "visual": 0.355
+      }
+    },
+    {
+      "start": 1370,
+      "end": 1380,
+      "score": 0.102,
+      "signals": {
+        "comments": 0.011,
+        "transcript": 0.118,
+        "audio": 0.665,
+        "visual": 0.432
+      }
+    },
+    {
+      "start": 1380,
+      "end": 1390,
+      "score": 0.15,
+      "signals": {
+        "comments": 0.024,
+        "transcript": 0.403,
+        "audio": 0.688,
+        "visual": 0.127
+      }
+    },
+    {
+      "start": 1390,
+      "end": 1400,
+      "score": 0.268,
+      "signals": {
+        "comments": 0.172,
+        "transcript": 0.451,
+        "audio": 0.582,
+        "visual": 0.326
+      }
+    },
+    {
+      "start": 1400,
+      "end": 1410,
+      "score": 0.348,
+      "signals": {
+        "comments": 0.146,
+        "transcript": 0.41,
+        "audio": 0.918,
+        "visual": 0.142
+      }
+    },
+    {
+      "start": 1410,
+      "end": 1420,
+      "score": 0.292,
+      "signals": {
+        "comments": 0.309,
+        "transcript": 0.272,
+        "audio": 0.766,
+        "visual": 0.076
+      }
+    },
+    {
+      "start": 1420,
+      "end": 1430,
+      "score": 0.115,
+      "signals": {
+        "comments": 0.129,
+        "transcript": 0.398,
+        "audio": 0.385,
+        "visual": 0.23
+      }
+    },
+    {
+      "start": 1430,
+      "end": 1440,
+      "score": 0.158,
+      "signals": {
+        "comments": 0.02,
+        "transcript": 0.336,
+        "audio": 0.771,
+        "visual": 0.149
+      }
+    },
+    {
+      "start": 1440,
+      "end": 1450,
+      "score": 0.264,
+      "signals": {
+        "comments": 0.042,
+        "transcript": 0.523,
+        "audio": 0.862,
+        "visual": 0.034
+      }
+    },
+    {
+      "start": 1450,
+      "end": 1460,
+      "score": 0.446,
+      "signals": {
+        "comments": 0.089,
+        "transcript": 0.405,
+        "audio": 0.88,
+        "visual": 0.61
+      }
+    },
+    {
+      "start": 1460,
+      "end": 1470,
+      "score": 0.211,
+      "signals": {
+        "comments": 0.08,
+        "transcript": 0.333,
+        "audio": 0.736,
+        "visual": 0.281
+      }
+    },
+    {
+      "start": 1470,
+      "end": 1480,
+      "score": 0.213,
+      "signals": {
+        "comments": 0.261,
+        "transcript": 0.314,
+        "audio": 0.614,
+        "visual": 0.104
+      }
+    },
+    {
+      "start": 1480,
+      "end": 1490,
+      "score": 0.522,
+      "signals": {
+        "comments": 0.371,
+        "transcript": 0.373,
+        "audio": 0.797,
+        "visual": 0.329
+      }
+    },
+    {
+      "start": 1490,
+      "end": 1500,
+      "score": 0.551,
+      "signals": {
+        "comments": 0.221,
+        "transcript": 0.359,
+        "audio": 0.881,
+        "visual": 0.626
+      }
+    },
+    {
+      "start": 1500,
+      "end": 1510,
+      "score": 0.251,
+      "signals": {
+        "comments": 0.187,
+        "transcript": 0.473,
+        "audio": 0.694,
+        "visual": 0.015
+      }
+    },
+    {
+      "start": 1510,
+      "end": 1520,
+      "score": 0.01,
+      "signals": {
+        "comments": 0.011,
+        "transcript": 0.284,
+        "audio": 0,
+        "visual": 0.468
+      }
+    },
+    {
+      "start": 1520,
+      "end": 1530,
+      "score": 0.029,
+      "signals": {
+        "comments": 0.043,
+        "transcript": 0.351,
+        "audio": 0.29,
+        "visual": 0.062
+      }
+    },
+    {
+      "start": 1530,
+      "end": 1540,
+      "score": 0.189,
+      "signals": {
+        "comments": 0.019,
+        "transcript": 0.426,
+        "audio": 0.76,
+        "visual": 0.149
+      }
+    },
+    {
+      "start": 1540,
+      "end": 1550,
+      "score": 0.311,
+      "signals": {
+        "comments": 0.21,
+        "transcript": 0.358,
+        "audio": 0.702,
+        "visual": 0.332
+      }
+    },
+    {
+      "start": 1550,
+      "end": 1560,
+      "score": 0.276,
+      "signals": {
+        "comments": 0.056,
+        "transcript": 0.633,
+        "audio": 0.768,
+        "visual": 0.011
+      }
+    },
+    {
+      "start": 1560,
+      "end": 1570,
+      "score": 0.125,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.37,
+        "audio": 0.65,
+        "visual": 0.184
+      }
+    },
+    {
+      "start": 1570,
+      "end": 1580,
+      "score": 0.092,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.311,
+        "audio": 0.609,
+        "visual": 0.176
+      }
+    },
+    {
+      "start": 1580,
+      "end": 1590,
+      "score": 0.178,
+      "signals": {
+        "comments": 0.002,
+        "transcript": 0.355,
+        "audio": 0.699,
+        "visual": 0.364
+      }
+    },
+    {
+      "start": 1590,
+      "end": 1600,
+      "score": 0.634,
+      "signals": {
+        "comments": 0.155,
+        "transcript": 0.424,
+        "audio": 0.792,
+        "visual": 1
+      }
+    },
+    {
+      "start": 1600,
+      "end": 1610,
+      "score": 0.385,
+      "signals": {
+        "comments": 0.016,
+        "transcript": 0.503,
+        "audio": 0.912,
+        "visual": 0.406
+      }
+    },
+    {
+      "start": 1610,
+      "end": 1620,
+      "score": 0.171,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.428,
+        "audio": 0.702,
+        "visual": 0.209
+      }
+    },
+    {
+      "start": 1620,
+      "end": 1630,
+      "score": 0.165,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.509,
+        "audio": 0.553,
+        "visual": 0.297
+      }
+    },
+    {
+      "start": 1630,
+      "end": 1640,
+      "score": 0.132,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.419,
+        "audio": 0.608,
+        "visual": 0.206
+      }
+    },
+    {
+      "start": 1640,
+      "end": 1650,
+      "score": 0.451,
+      "signals": {
+        "comments": 0.026,
+        "transcript": 0.478,
+        "audio": 0.76,
+        "visual": 0.85
+      }
+    },
+    {
+      "start": 1650,
+      "end": 1660,
+      "score": 0.192,
+      "signals": {
+        "comments": 0.026,
+        "transcript": 0.525,
+        "audio": 0.663,
+        "visual": 0.141
+      }
+    },
+    {
+      "start": 1660,
+      "end": 1670,
+      "score": 0.193,
+      "signals": {
+        "comments": 0.061,
+        "transcript": 0.484,
+        "audio": 0.67,
+        "visual": 0.117
+      }
+    },
+    {
+      "start": 1670,
+      "end": 1680,
+      "score": 0.309,
+      "signals": {
+        "comments": 0.209,
+        "transcript": 0.281,
+        "audio": 0.661,
+        "visual": 0.523
+      }
+    },
+    {
+      "start": 1680,
+      "end": 1690,
+      "score": 0.516,
+      "signals": {
+        "comments": 0.069,
+        "transcript": 0.565,
+        "audio": 1,
+        "visual": 0.357
+      }
+    },
+    {
+      "start": 1690,
+      "end": 1700,
+      "score": 0.448,
+      "signals": {
+        "comments": 0.153,
+        "transcript": 0.498,
+        "audio": 0.875,
+        "visual": 0.317
+      }
+    },
+    {
+      "start": 1700,
+      "end": 1710,
+      "score": 0.489,
+      "signals": {
+        "comments": 0.404,
+        "transcript": 0.425,
+        "audio": 0.782,
+        "visual": 0.112
+      }
+    },
+    {
+      "start": 1710,
+      "end": 1720,
+      "score": 0.093,
+      "signals": {
+        "comments": 0.004,
+        "transcript": 0.478,
+        "audio": 0.496,
+        "visual": 0.079
+      }
+    },
+    {
+      "start": 1720,
+      "end": 1730,
+      "score": 0.106,
+      "signals": {
+        "comments": 0.039,
+        "transcript": 0.351,
+        "audio": 0.614,
+        "visual": 0.085
+      }
+    },
+    {
+      "start": 1730,
+      "end": 1740,
+      "score": 0.127,
+      "signals": {
+        "comments": 0.042,
+        "transcript": 0.371,
+        "audio": 0.633,
+        "visual": 0.126
+      }
+    },
+    {
+      "start": 1740,
+      "end": 1750,
+      "score": 0.113,
+      "signals": {
+        "comments": 0.09,
+        "transcript": 0.432,
+        "audio": 0.507,
+        "visual": 0.047
+      }
+    },
+    {
+      "start": 1750,
+      "end": 1760,
+      "score": 0.2,
+      "signals": {
+        "comments": 0.222,
+        "transcript": 0.499,
+        "audio": 0.514,
+        "visual": 0.004
+      }
+    },
+    {
+      "start": 1760,
+      "end": 1770,
+      "score": 0.111,
+      "signals": {
+        "comments": 0.027,
+        "transcript": 0.453,
+        "audio": 0.594,
+        "visual": 0.004
+      }
+    },
+    {
+      "start": 1770,
+      "end": 1780,
+      "score": 0.224,
+      "signals": {
+        "comments": 0.004,
+        "transcript": 0.824,
+        "audio": 0.546,
+        "visual": 0.004
+      }
+    },
+    {
+      "start": 1780,
+      "end": 1790,
+      "score": 0.185,
+      "signals": {
+        "comments": 0.039,
+        "transcript": 0.635,
+        "audio": 0.594,
+        "visual": 0.011
+      }
+    },
+    {
+      "start": 1790,
+      "end": 1800,
+      "score": 0.056,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.372,
+        "audio": 0.499,
+        "visual": 0.025
+      }
+    },
+    {
+      "start": 1800,
+      "end": 1810,
+      "score": 0.064,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.292,
+        "audio": 0.56,
+        "visual": 0.112
+      }
+    },
+    {
+      "start": 1810,
+      "end": 1820,
+      "score": 0.296,
+      "signals": {
+        "comments": 0.016,
+        "transcript": 0.779,
+        "audio": 0.664,
+        "visual": 0.1
+      }
+    },
+    {
+      "start": 1820,
+      "end": 1830,
+      "score": 0.106,
+      "signals": {
+        "comments": 0.079,
+        "transcript": 0.324,
+        "audio": 0.579,
+        "visual": 0.101
+      }
+    },
+    {
+      "start": 1830,
+      "end": 1840,
+      "score": 0.165,
+      "signals": {
+        "comments": 0.125,
+        "transcript": 0.418,
+        "audio": 0.574,
+        "visual": 0.126
+      }
+    },
+    {
+      "start": 1840,
+      "end": 1850,
+      "score": 0.022,
+      "signals": {
+        "comments": 0.038,
+        "transcript": 0.318,
+        "audio": 0.254,
+        "visual": 0.107
+      }
+    },
+    {
+      "start": 1850,
+      "end": 1860,
+      "score": 0.048,
+      "signals": {
+        "comments": 0.01,
+        "transcript": 0.316,
+        "audio": 0.443,
+        "visual": 0.122
+      }
+    },
+    {
+      "start": 1860,
+      "end": 1870,
+      "score": 0.085,
+      "signals": {
+        "comments": 0.147,
+        "transcript": 0.321,
+        "audio": 0.378,
+        "visual": 0.157
+      }
+    },
+    {
+      "start": 1870,
+      "end": 1880,
+      "score": 0.067,
+      "signals": {
+        "comments": 0.035,
+        "transcript": 0.358,
+        "audio": 0.464,
+        "visual": 0.1
+      }
+    },
+    {
+      "start": 1880,
+      "end": 1890,
+      "score": 0.015,
+      "signals": {
+        "comments": 0.02,
+        "transcript": 0.321,
+        "audio": 0.253,
+        "visual": 0.05
+      }
+    },
+    {
+      "start": 1890,
+      "end": 1900,
+      "score": 0.139,
+      "signals": {
+        "comments": 0.179,
+        "transcript": 0.504,
+        "audio": 0.382,
+        "visual": 0.056
+      }
+    },
+    {
+      "start": 1900,
+      "end": 1910,
+      "score": 0.02,
+      "signals": {
+        "comments": 0.126,
+        "transcript": 0.321,
+        "audio": 0.176,
+        "visual": 0
+      }
+    },
+    {
+      "start": 1910,
+      "end": 1920,
+      "score": 0.067,
+      "signals": {
+        "comments": 0.039,
+        "transcript": 0.466,
+        "audio": 0.375,
+        "visual": 0.057
+      }
+    },
+    {
+      "start": 1920,
+      "end": 1930,
+      "score": 0.245,
+      "signals": {
+        "comments": 0.216,
+        "transcript": 0.382,
+        "audio": 0.664,
+        "visual": 0.126
+      }
+    },
+    {
+      "start": 1930,
+      "end": 1940,
+      "score": 0.323,
+      "signals": {
+        "comments": 0.13,
+        "transcript": 0.578,
+        "audio": 0.74,
+        "visual": 0.123
+      }
+    },
+    {
+      "start": 1940,
+      "end": 1950,
+      "score": 0.231,
+      "signals": {
+        "comments": 0.09,
+        "transcript": 0.44,
+        "audio": 0.772,
+        "visual": 0.095
+      }
+    },
+    {
+      "start": 1950,
+      "end": 1960,
+      "score": 0.231,
+      "signals": {
+        "comments": 0.006,
+        "transcript": 0.554,
+        "audio": 0.769,
+        "visual": 0.107
+      }
+    },
+    {
+      "start": 1960,
+      "end": 1970,
+      "score": 0.172,
+      "signals": {
+        "comments": 0.023,
+        "transcript": 0.375,
+        "audio": 0.811,
+        "visual": 0.066
+      }
+    },
+    {
+      "start": 1970,
+      "end": 1980,
+      "score": 0.093,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.439,
+        "audio": 0.542,
+        "visual": 0.078
+      }
+    },
+    {
+      "start": 1980,
+      "end": 1990,
+      "score": 0.272,
+      "signals": {
+        "comments": 0,
+        "transcript": 0.687,
+        "audio": 0.786,
+        "visual": 0.007
+      }
+    },
+    {
+      "start": 1990,
+      "end": 2005,
+      "score": 0.089,
+      "signals": {
+        "comments": 0.018,
+        "transcript": 0.307,
+        "audio": 0.566,
+        "visual": 0.196
+      }
+    }
+  ],
+  "is_estimate": true,
+  "disclaimer": "Estimated from timestamped comments, captions, audio and visuals. This is a heuristic, not real viewer data.",
+  "weights": {
+    "comments": 0.35,
+    "transcript": 0.25,
+    "audio": 0.25,
+    "visual": 0.15
+  },
+  "window_seconds": 10
+}
