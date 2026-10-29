@@ -46,21 +46,4 @@ It writes `accuracy_vs_engagement.png` and a CSV with two scores per video:
 - **Peak accuracy %**: the share of YouTube's top-5 peaks the estimate finds within ±15 s.
 - **Ranking accuracy %**: the share of segment pairs the estimate orders the same way as YouTube, which is (Kendall τ + 1) / 2. 50% is chance and 100% is perfect.
 
-### Gaming engagement set (counts read 2026-10-29)
-
-| Video | Comments | Views | Length |
-|---|---|---|---|
-| [RKQGRPoDV_I](https://youtu.be/RKQGRPoDV_I) | 30,203 | 24M | 33:24 |
-| [dpFpRBt90W0](https://youtu.be/dpFpRBt90W0) | 8,856 | 2.2M | 31:14 |
-| [arWClcUVxm8](https://youtu.be/arWClcUVxm8) | 6,598 | 2.9M | 40:26 |
-| [kYhb7w2GNIs](https://youtu.be/kYhb7w2GNIs) | 2,229 | 1.7M | 55:42 |
-| [vCohhCaxJdM](https://youtu.be/vCohhCaxJdM) | 447 | 371K | 38:31 |
-| [ScTGNr6zSIE](https://youtu.be/ScTGNr6zSIE) | 161 | 184K | 45:47 |
-
-Each folder already has its `meta.json`; drop `official.json` and `estimated.json` into `<id>/v1.4/` and run `band_plot.py`.
-
-### Controlled sets (counts read 2026-10-29)
-
-Views vary while comments stay about the same (~3.6k–4.2k): [rMvqiIWGZ5g](https://youtu.be/rMvqiIWGZ5g) 4M / 3,923 · [ijsSF33ffHw](https://youtu.be/ijsSF33ffHw) 2.9M / 4,242 · [OsO3A5tsyW4](https://youtu.be/OsO3A5tsyW4) 677K / 3,606
-
-Comments vary while views stay about the same (~1.9M–2.9M): [dpFpRBt90W0](https://youtu.be/dpFpRBt90W0) 2.2M / 8,856 · [ijsSF33ffHw](https://youtu.be/ijsSF33ffHw) 2.9M / 4,242 · [hOAJ7LN8IiQ](https://youtu.be/hOAJ7LN8IiQ) 1.9M / 1,701
+A benchmark folder is added only once its `official.json` and `estimated.json` exist.
