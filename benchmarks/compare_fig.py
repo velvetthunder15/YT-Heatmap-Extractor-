@@ -145,6 +145,7 @@ rows = [
     ["Median score (official / estimated)", f"{np.median(y_off):.3f} / {np.median(y_est):.3f}"],
     ["Pearson r  ·  Spearman ρ  ·  Kendall τ", f"{r_p:.3f}  ·  {r_s:.3f}  ·  {tau:.3f}"],
     ["MAE  ·  RMSE", f"{mae:.3f}  ·  {rmse:.3f}"],
+    ["Curve match, 1 − MAE (estimate / flat-median baseline)", f"{(1 - mae) * 100:.1f}% / {(1 - np.mean(np.abs(y_off - np.median(y_off)))) * 100:.1f}%"],
     [f"Top-{K} peak recall (± {int(TOL)} s)", f"{hits}/{K} ({100 * hits / K:.0f}%)"],
 ]
 t = ax.table(cellText=rows, colLabels=["Metric", "Value"], loc="center", cellLoc="left", colWidths=[0.62, 0.38], edges="horizontal")

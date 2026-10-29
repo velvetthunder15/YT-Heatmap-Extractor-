@@ -16,7 +16,7 @@ pip install numpy scipy matplotlib
 python benchmarks/compare_fig.py official.json estimated.json figure.png
 ```
 
-Before comparing, estimated windows are resampled onto the official bin grid with overlap-weighted means. The script reports Pearson, Spearman and Kendall correlations, MAE/RMSE, mean, median and hot-bin share (score ≥ 0.6), top-5 peak recall within ±15 s, and per-signal Spearman when the export includes signal scores. Without signal scores it shows score ECDFs with a KS test instead.
+Before comparing, estimated windows are resampled onto the official bin grid with overlap-weighted means. The script reports Pearson, Spearman and Kendall correlations, MAE/RMSE, curve match (1 − MAE) beside a flat-median baseline, mean, median and hot-bin share (score ≥ 0.6), top-5 peak recall within ±15 s, and per-signal Spearman when the export includes signal scores. Without signal scores it shows score ECDFs with a KS test instead.
 
 Optional environment variables: `FIG_LABEL` replaces the title label, and `FIG_NOTE` adds text to the footnote.
 
