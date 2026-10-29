@@ -77,8 +77,8 @@ plt.rcParams.update({
     "axes.linewidth": 0.8, "axes.spines.top": False, "axes.spines.right": False,
     "xtick.direction": "out", "ytick.direction": "out", "figure.dpi": 100,
 })
-fig = plt.figure(figsize=(7.2, 7.6))
-gs = fig.add_gridspec(3, 2, height_ratios=[1.15, 1, 0.62], hspace=0.62, wspace=0.32)
+fig = plt.figure(figsize=(7.2, 8.6))
+gs = fig.add_gridspec(3, 2, height_ratios=[1.15, 1, 1.0], hspace=0.62, wspace=0.32)
 
 # (a) time series
 ax = fig.add_subplot(gs[0, :])
@@ -137,6 +137,23 @@ else:
     ax.legend(frameon=False, fontsize=7.5, loc="center right")
 ax.text(-0.36, 1.04, "(c)", transform=ax.transAxes, fontweight="bold")
 
+# Plain-language checks: hot-segment precision vs chance, #1 peak, shuffled-timing control.
+n_hot = max(1, int(round(0.2 * len(y_off))))
+hot_o = set(np.argsort(-y_off)[:n_hot]); hot_e = set(np.argsort(-y_est)[:n_hot])
+hot_prec = len(hot_o & hot_e) / n_hot
+e_mid = (E[:, 0] + E[:, 1]) / 2
+e_top = []
+for i in np.argsort(-E[:, 2]):  # estimate's own top-K windows at native resolution
+    if all(abs(e_mid[i] - e_mid[j]) > 30 for j in e_top):
+        e_top.append(i)
+    if len(e_top) == K:
+        break
+top1_rank = next((r + 1 for r, j in enumerate(e_top) if abs(mid[po[0]] - e_mid[j]) <= TOL), None)
+rng = np.random.default_rng(0)
+shuf = np.array([np.mean(np.abs(y_off - rng.permutation(y_est))) for _ in range(10000)])
+beat = np.mean(shuf > mae)
+flat = np.mean(np.abs(y_off - np.median(y_off)))
+
 # (d) table
 ax = fig.add_subplot(gs[2, :]); ax.axis("off")
 rows = [
@@ -147,6 +164,9 @@ rows = [
     ["MAE  ·  RMSE", f"{mae:.3f}  ·  {rmse:.3f}"],
     ["Curve match, 1 − MAE (estimate / flat-median baseline)", f"{(1 - mae) * 100:.1f}% / {(1 - np.mean(np.abs(y_off - np.median(y_off)))) * 100:.1f}%"],
     [f"Top-{K} peak recall (± {int(TOL)} s)", f"{hits}/{K} ({100 * hits / K:.0f}%)"],
+    [f"Official #1 peak in estimate's native top-{K} (± {int(TOL)} s)", f"yes, estimate's #{top1_rank}" if top1_rank else "no"],
+    ["Hot-segment precision, top 20% (estimate / chance)", f"{hot_prec*100:.0f}% / 20%  ({hot_prec/0.2:.2f}×)"],
+    ["Shuffled-timing control: estimate beats", f"{beat*100:.2f}% of 10,000 shuffles"],
 ]
 t = ax.table(cellText=rows, colLabels=["Metric", "Value"], loc="center", cellLoc="left", colWidths=[0.62, 0.38], edges="horizontal")
 t.auto_set_font_size(False); t.set_fontsize(8); t.scale(1, 1.25)
@@ -161,4 +181,4 @@ fig.suptitle(f"Official vs. estimated engagement: {label}, {mmss(dur)}", fontsiz
 fig.text(0.5, 0.005, "Estimated scores were averaged onto the official bin grid (overlap-weighted) before all comparisons. Official scores reflect replay behaviour; estimates reflect observable signals." + os.environ.get("FIG_NOTE", ""),
          ha="center", fontsize=6.8, color="0.3", wrap=True)
 fig.savefig(out, dpi=300, bbox_inches="tight", facecolor="white")
-print(json.dumps(dict(pearson=r_p, spearman=r_s, kendall=tau, mae=mae, rmse=rmse, hits=hits, mean_off=y_off.mean(), mean_est=y_est.mean(), sig=sig_r), default=float))
+print(json.dumps(dict(hot_prec=hot_prec, top1_rank=top1_rank, beat_shuffles=beat, flat_curve_match=1-flat, curve_match=1-mae, pearson=r_p, spearman=r_s, kendall=tau, mae=mae, rmse=rmse, hits=hits, mean_off=y_off.mean(), mean_est=y_est.mean(), sig=sig_r), default=float))
