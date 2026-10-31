@@ -160,10 +160,11 @@ git clone https://github.com/velvetthunder15/heatmapify.git
 cd heatmapify
 ```
 
-No git? [Download the latest release (.zip)](https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip), double-click it in Downloads, then in Terminal:
+No git? [Download the latest release (.zip)](https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip), double-click it in Downloads, then in Terminal move it to your home folder (macOS blocks background mode in Desktop, Documents and Downloads):
 
 ```bash
-cd ~/Downloads/Heatmapify
+mv ~/Downloads/Heatmapify ~
+cd ~/Heatmapify
 ```
 
 (If macOS asks to install the *command line developer tools* when you run `git`, click Install, or use the ZIP.)

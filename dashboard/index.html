@@ -119,9 +119,9 @@
             <div>
               <b>Start the server</b>
               <span class="os-only win"><a href="https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip">Download the latest release</a>, unzip it, open the folder and double-click <code>start-windows.bat</code>. The first run sets everything up by itself, which takes a few minutes.</span>
-              <span class="os-only mac"><a href="https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip">Download the latest release</a>, unzip it and move the folder out of Desktop, Documents and Downloads. Then open Terminal in that folder and run the command below. The first run sets everything up by itself.</span>
+              <span class="os-only mac"><a href="https://github.com/velvetthunder15/heatmapify/releases/latest/download/Heatmapify.zip">Download the latest release</a>, unzip it, then open Terminal and paste the command below. It moves the folder from Downloads to your home folder (<code>~/Heatmapify</code>, where background mode also works) and starts it. The first run sets everything up by itself.</span>
               <div class="file-hint os-only win"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6a2 2 0 0 1 2-2h4.6l2 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z"/></svg><span>Heatmapify › <code>start-windows.bat</code></span></div>
-              <div class="cmd os-only mac"><span>bash start-mac.command</span><button type="button" class="copy" data-copy="bash start-mac.command">Copy</button></div>
+              <div class="cmd os-only mac"><span>mv ~/Downloads/Heatmapify ~ 2&gt;/dev/null; cd ~/Heatmapify &amp;&amp; bash start-mac.command</span><button type="button" class="copy" data-copy="mv ~/Downloads/Heatmapify ~ 2&gt;/dev/null; cd ~/Heatmapify &amp;&amp; bash start-mac.command">Copy</button></div>
             </div>
           </li>
           <li>
